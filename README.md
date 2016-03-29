@@ -78,4 +78,4 @@ For the following commands, must be inside folder created with `aemm project cre
 	
 	aemm run ios --list
 	
-	aemm run ios -- target "iPhone-6s, 9.2"
+	aemm run ios --target "iPhone-6s, 9.2"
