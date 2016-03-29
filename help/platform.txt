@@ -1,0 +1,13 @@
+Usage: aemm platform <command>
+
+Description:
+
+  Perform commands that apply to platform.
+
+Commands:
+
+  install <platform>        Install SDKs for a specific platform
+
+Examples:
+
+  $ aemm platform install android

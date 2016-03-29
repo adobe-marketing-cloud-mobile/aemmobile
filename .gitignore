@@ -1,0 +1,5 @@
+node_modules
+developmentConfig.json
+npm-debug.log
+.vscode
+.idea

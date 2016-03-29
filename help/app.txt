@@ -1,0 +1,24 @@
+Usage: aemm app <command>
+
+Description:
+
+  Install and run the application in the simulator and serve articles from local server
+
+Commands:
+
+  install <platform>  [version]     Installs app binary for specified platform.  If version is specified, install specified version, otherwise latest version is installed.
+  		--list						List available versions of app binaries to install
+  version							Prints out the current version of installed binaries
+  update [platform]					Checks for an update to the app binaries and installs new binaries if update is available
+  									If platform is provided, then only the specified platform is updated.  Otherwise all platforms are updated. 
+  
+Examples:
+
+  $ aemm app install android		# Install latest version of android app binary
+  $ aemm app install ios --list		# List available app binaries for ios
+  $ aemm app install ios 2016.3.0	# Installs app binary with version 2016.3.0 on ios
+  $ aemm app version				# Displays installed app binary versions for all platforms
+  $ aemm app update					# Checks for updates to all platforms and installs new app binaries for platforms that are out of date
+  $ aemm app update	android			# Checks for updates to the android app binary and installs the new app binary for android if it is out of date
+
+

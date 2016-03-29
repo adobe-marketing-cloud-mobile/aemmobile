@@ -1,0 +1,9 @@
+Usage: aemm article <command>
+
+Description:
+
+  Perform commands that apply to articles.
+
+Commands:
+
+  create <path>        Creates a new article with the provided name.

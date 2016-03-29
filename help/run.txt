@@ -1,0 +1,17 @@
+Usage: aemm run <platform>
+
+Description:
+
+  Install and run the application in the simulator and serve articles from local server
+
+Options:
+
+  --list		       list available targets
+  --target <name>      install to a specific target
+
+Examples:
+
+  $ aemm run android
+  $ aemm run ios --list
+  $ aemm run ios --target iPhone6
+  $ aemm run ios --target "iPad-Air, 9.2"

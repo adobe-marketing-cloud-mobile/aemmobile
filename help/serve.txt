@@ -1,0 +1,6 @@
+Usage: aemm serve
+
+Description:
+
+  Runs a local server that preflight app can target to serve html articles from the local machine.  Edits on local machine will show up automatically on device.  
+

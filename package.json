@@ -1,0 +1,44 @@
+{
+  "name": "aemm",
+  "version": "1.0.3",
+  "description": "Command line utility for building AEMM apps",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "preferGlobal": true,
+  "license": "ISC",
+  "bin": {
+    "aemm": "./bin/aemm.js"
+  },
+  "dependencies": {
+    "ansi": "^0.3.1",
+    "bplist": "0.0.4",
+    "child-process-promise": "^1.1.0",
+    "connect-aemmobile": "^0.1.0",
+    "continuation-local-storage": "^3.1.6",
+    "cordova-lib": "^6.0.0",
+    "decompress-zip": "^0.2.0",
+    "ios-sim": "5.0.8",
+    "lodash": "^4.6.1",
+    "mkdirp": "^0.5.1",
+    "nopt": "^3.0.6",
+    "plist": "^1.2.0",
+    "q": "^1.4.1",
+    "q-io": "^1.13.2",
+    "request": "^2.67.0",
+    "request-promise": "^1.0.2",
+    "semver": "^5.1.0",
+    "shelljs": "^0.6.0"
+  },
+  "devDependencies": {
+    "jasmine": "^2.4.1"
+  },
+  "engines": {
+    "node": ">=4.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adobe-marketing-cloud-mobile/aemmobile.git"
+  }
+}

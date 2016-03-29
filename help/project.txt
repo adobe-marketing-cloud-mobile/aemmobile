@@ -1,0 +1,14 @@
+Usage: aemm project <command>
+
+Description:
+
+  Perform commands that apply to projects.
+
+Commands:
+
+  create <path>        Creates a new project at the provided path.
+
+Examples:
+
+  $ aemm project create my-project
+  $ aemm project create /local/path/to/plugin/
