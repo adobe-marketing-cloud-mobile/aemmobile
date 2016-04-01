@@ -15,13 +15,70 @@
  */
 "use strict";
 
-var extend = require('lodash/fp/extend');
-var config = require('../config.json');
-var developmentConfig = null;
-try {
-	developmentConfig = require('../developmentConfig.json');
-} catch(err) {}
+var Q = require('q');
+var path = require('path');
+var jsonfile = require('jsonfile');
+var project = require('./project');
+var pathToProjectConfig = path.join(project.cqProjectRootPath(), "/config.json");
 
-module.exports.get = function() {
-	return extend(config, developmentConfig);
+function configFile()
+{
+    var file = null;
+    try {
+        file = require(pathToProjectConfig);
+    } catch (err) {
+        // It's not a problem if the file is non-existent.
+        if (err.code == 'MODULE_NOT_FOUND') {
+            return;
+        }
+        throw err;
+    }
+    return file;
+}
+
+var file = configFile();
+module.exports = config;
+
+function config(options, args) 
+{
+    var getKey = options.get;
+    var setKey = options.set;
+    var unsetKey = options.unset;
+    
+    return Q.fcall( () => {
+        if (options.list)
+        {
+			return console.log(file);
+		}
+        if (options.get)
+        {
+            return console.log(getValueFromConfig(getKey));
+        }
+        if (options.set)
+        {
+            return setValueInConfig(setKey, args);    
+        }
+        if (options.unset)
+        {
+            return removeKeyFromConfig(unsetKey);
+        }
+    });
+}
+
+module.exports.getValueFromConfig = getValueFromConfig;
+function getValueFromConfig(key)
+{
+    return file[`${key}`];
+}
+
+function setValueInConfig(key, value)
+{
+    file[`${key}`] = value;
+    jsonfile.writeFileSync(pathToProjectConfig, file);
+}
+
+function removeKeyFromConfig(key)
+{
+    delete file[`${key}`];
+    jsonfile.writeFileSync(pathToProjectConfig, file);
 }

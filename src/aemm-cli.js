@@ -29,7 +29,8 @@ var commands = {
 	run: require('./run.js'),
 	project: require('./project.js'),
 	help: require("./help.js"),
-	platform: require("./platform.js")
+	platform: require("./platform.js"),
+    config: require("./config.js")
 }
 
 module.exports = cli;
@@ -39,7 +40,11 @@ function cli(inputArgs, callback)
 	{ 
 		'version' : Boolean,
 		'help' : Boolean,
-		'target': String
+		'target' : String,
+        'get' : String,
+        'set' : String,
+        'unset' : String,
+        'list' : Boolean
 	};
 
     var shortHands =

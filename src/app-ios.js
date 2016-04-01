@@ -18,7 +18,6 @@
 /**
  * Module dependencies.
  */
-var aemmConfig = require('../config');
 var Q = require('q');
 var path = require("path");
 var FS = require('q-io/fs');

@@ -24,6 +24,7 @@ var iossim = require('ios-sim');
 var serve = require('./serve');
 var iosApp = require('./app-ios');
 var app = require('./app');
+var config = require('./config');
 var bplist = require('bplist');
 var exec = require('child-process-promise').exec;
 
@@ -154,11 +155,17 @@ function modifyBinaryPlist(appPath)
 {
 	var appConfigPlistPath = path.join(appPath, "ApplicationConfig.plist");
 	var bplist_parseFile = Q.nfbind( bplist.parseFile );
-
+    
 	return bplist_parseFile(appConfigPlistPath)
 	.then( function(parseResults) {
 		var appConfig = parseResults[0];
 
+        var orientation = config.getValueFromConfig('screenOrientation');
+        if (orientation) {
+            appConfig.screenOrientation.tablet = orientation;
+            appConfig.screenOrientation.phone = orientation;
+        }
+        
 		delete appConfig.phoneIdKey;
 		delete appConfig.tabletIdKey;
 		delete appConfig.configServiceBaseURL;

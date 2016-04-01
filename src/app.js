@@ -22,7 +22,7 @@ var Q = require('q');
 var platformRequire = require('../utils/platformRequire');
 var path = require("path");
 var exec = require('child-process-promise').exec;
-var config = require('./config');
+var aemmConfig = require('./aemm-config');
 var rp = require('request-promise');
 var os = require('os');
 var downloadFile = require('../utils/downloadFile');
@@ -287,10 +287,10 @@ function update(options, optionalPlatform)
 
 function remoteBinaryVersionsUrl()
 {
-	return resolveTemplatedEnvironmentUrl(config.get().remoteBinaryVersionsUrl);
+	return resolveTemplatedEnvironmentUrl(aemmConfig.get().remoteBinaryVersionsUrl);
 }
 
 function resolveTemplatedEnvironmentUrl(templatedUrl)
 {
-	return templatedUrl.replace( "{AEMM_ENV}", config.get().AEMM_ENV);
+	return templatedUrl.replace( "{AEMM_ENV}", aemmConfig.get().AEMM_ENV);
 }
