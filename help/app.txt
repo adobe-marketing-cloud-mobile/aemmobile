@@ -2,13 +2,13 @@ Usage: aemm app <command>
 
 Description:
 
-  Install and run the application in the simulator and serve articles from local server
+  Install and run the application in the simulator and serve articles from the local server.
 
 Commands:
 
   install <platform>  [version]     Installs app binary for specified platform.  If version is specified, install specified version, otherwise latest version is installed.
-  		--list						List available versions of app binaries to install
-  version							Prints out the current version of installed binaries
+  		--list						List available versions of app binaries to install.
+  version							Prints out the current version of installed binaries.
   update [platform]					Checks for an update to the app binaries and installs new binaries if update is available
   									If platform is provided, then only the specified platform is updated.  Otherwise all platforms are updated. 
   

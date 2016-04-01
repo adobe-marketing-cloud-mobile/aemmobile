@@ -2,7 +2,7 @@ Usage: aemm run <platform>
 
 Description:
 
-  Install and run the application in the simulator and serve articles from local server
+  Install and run the application in the simulator and serve articles from local server.
 
 Options:
 
