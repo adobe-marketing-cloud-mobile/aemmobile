@@ -79,7 +79,7 @@ var getArgs = function(ipAddress, port)
 {
     var args;
     // Get list of articles to serve
-    var wwwFolder = path.join(project.cqProjectRootPath(), "/www");
+    var wwwFolder = path.join(project.projectRootPath(), "/www");
     return FS.list(wwwFolder)
         .then( function (fileArray) {
             var i = 0;
