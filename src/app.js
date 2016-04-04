@@ -33,7 +33,7 @@ function getApplicationSupportPath()
 {
 	return exec('osascript -e "posix path of (path to application support folder from user domain)"')
 	.then( function(processResponse) {
-		let appSupportPath = path.join( processResponse.stdout.trim(), "com.adobe.cq.mobile");
+		let appSupportPath = path.join( processResponse.stdout.trim(), "com.adobe.aemmobile");
 		return appSupportPath;
 	});
 }

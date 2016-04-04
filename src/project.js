@@ -45,8 +45,8 @@ function create(options, projectPath)
 	.then( () => createAEMMScaffolding(fullProjectPath) );
 }
 
-module.exports.cqProjectRootPath = cqProjectRootPath;
-function cqProjectRootPath()
+module.exports.projectRootPath = projectRootPath;
+function projectRootPath()
 {
 	let projectRoot = cordova.findProjectRoot(process.cwd());
 	if (!projectRoot)
@@ -61,7 +61,7 @@ module.exports.articleList = articleList;
 function articleList() 
 {
 	// Get list of articles to serve
-	var wwwFolder = path.join(cqProjectRootPath(), "/www");
+	var wwwFolder = path.join(projectRootPath(), "/www");
 	return FS.list(wwwFolder)
 	.then( function (fileArray) 
 	{

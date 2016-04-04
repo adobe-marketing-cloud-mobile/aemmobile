@@ -131,7 +131,7 @@ describe('run ios:', function()
 				
 				expect(path).toMatch(/AEMM.app/);
 				expect(fullDeviceList.indexOf(target)).toBe(1);
-				expect(logPath).toMatch(/Library\/Application Support\/com.adobe.cq.mobile\/TestProject.sim.console.log/);
+				expect(logPath).toMatch(/Library\/Application Support\/com.adobe.aemmobile\/TestProject.sim.console.log/);
 				expect(cmdLineArgs[0]).toMatch(/-phonegapServer/);
 				expect(cmdLineArgs[1]).toBe("10.0.0.1:3000");
 				done();

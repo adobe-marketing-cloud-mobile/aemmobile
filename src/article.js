@@ -34,7 +34,7 @@ function create(options /*, list of article names  */ )
 		{
 			throw Error( `You must specify an article name with the 'article create' command.`);
 		}
-		let projectPath = project.cqProjectRootPath();
+		let projectPath = project.projectRootPath();
 		let articlePromises = articleNamesList.map( (articleName) => createSingleArticle(projectPath, articleName) );
 		return Q.allSettled(articlePromises);		
 	});
