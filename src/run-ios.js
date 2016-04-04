@@ -40,7 +40,7 @@ function run(args)
 	}
 	return Q.fcall( () => 
 	{
-		// Make sure we are in an AEM Mobile project folder
+		// Make sure we are in a Cordova project folder
 		projectRootPath = project.projectRootPath();
 		
 		let allValidTargets = aemmSimulatorList();
