@@ -1,0 +1,19 @@
+Usage: aemm config [options]
+
+Description:
+
+  Set custom configuration values for the project.
+
+Options:
+
+  --list               Lists all key-value pairs set in the config.json
+  --get <key>          Returns the value associated with the provided key
+  --set <key> <value>  Sets the key-value pair as specified
+  --unset <key>        Removes the key-value pair from config.json
+
+Examples:
+
+$ aemm config --list
+$ aemm config --get screenOrientation
+$ aemm config --set screenOrientation landscape
+$ aemm config --unset screenOrientation
