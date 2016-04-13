@@ -19,7 +19,7 @@ var Q = require('q');
 var path = require('path');
 var jsonfile = require('jsonfile');
 var project = require('./project');
-var pathToProjectConfig = path.join(project.cqProjectRootPath(), "/config.json");
+var pathToProjectConfig = path.join(project.projectRootPath(), "/config.json");
 
 function configFile()
 {
