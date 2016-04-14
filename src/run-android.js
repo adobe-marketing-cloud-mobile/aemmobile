@@ -48,7 +48,9 @@ function run(args)
             }, function(code, output) {
                 if (code == 0) {
                     defer.resolve();
-                };
+                } else {
+                    deferred.reject(new Error("Launching AEMM app in emulator failed."));
+                }
             });
 
             return defer.promise;
@@ -67,6 +69,8 @@ function installApk()
             }, function(code, output) {
                 if (code == 0) {
                     defer.resolve();
+                } else {
+                    deferred.reject(new Error("Installing AEMM apk failed."));
                 }
             });
 

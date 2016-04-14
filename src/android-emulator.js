@@ -15,10 +15,11 @@
  */
 "use strict";
 
-var fs = require('fs'),
-    path = require('path'),
-    shell = require('shelljs'),
-    Q = require('q')
+var fs = require('fs');
+var path = require('path');
+var shell = require('shelljs');
+var Q = require('q');
+var spinner = require('simple-spinner');
 
 module.exports = {
     start: function(name) {
@@ -29,7 +30,7 @@ module.exports = {
             if (defer.promise.isRejected()) {
                 return;
             }
-            console.info('emulator.start: poll port', port);
+
             var checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' shell pm path android | findstr package:/system/framework/framework-res.apk';
             shell.exec(checkCmd, {
                 silent: true
@@ -37,16 +38,23 @@ module.exports = {
                 if (code !== 0) {
                     setTimeout(checkBooted.bind(this, port), 500);
                 } else {
+                    var wait = 0;
+                    if (process.platform == 'win32') {
+                        wait = 30000;
+                    } else if (process.platform == 'darwin') {
+                        wait = 3000;
+                    }
+
                     setTimeout(function () {
+                        spinner.stop();
                         defer.resolve({port: port});
-                    }, 30000);
+                    }, wait);
                 }
             });
         }
         
         var port = 5554;
         var cmd = userHome + '/platforms/android/sdk/tools/emulator -wipe-data -avd ' + name + ' -port ' + port + ' -gpu on';
-        console.info('emulator.start:', cmd);
 
         shell.exec(cmd, {
             async: true
@@ -57,6 +65,7 @@ module.exports = {
         });
 
         // start polling for device ready
+        spinner.start();
         checkBooted(port);
 
         return defer.promise;

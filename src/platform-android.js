@@ -25,18 +25,16 @@ var FS = require('q-io/fs');
 var app = require('./app');
 var shell = require('shelljs');
 var os = require('os');
-var decompressZip = require('decompress-zip');
 var downloadFile = require('../utils/downloadFile');
+var getUserHome = require('../utils/getUserHome');
+var unzip = require('../utils/unzip');
 var spawn = require('cross-spawn-async');
+var spinner = require('simple-spinner');
 
 const skinName = "Nexus-7";
 
 module.exports.install = install;
 function install() {
-    //return installSdk();
-    //return updateSdk();
-    //return createAvd();
-    //return installHAXM();
     return installSdk()
         .then( () => {
             return updateSdk();
@@ -47,28 +45,6 @@ function install() {
         .then( () => {
             return installHAXM();
         })
-}
-
-function updateSdk() {
-    var deferred = Q.defer();
-
-    var androidCmd = path.join(getUserHome(), 'platforms/android/sdk/tools/android');
-    var proc = spawn(androidCmd, ['--silent', 'update', 'sdk', '--all',
-        '--no-ui', '--filter', 'platform-tool,tool,android-23,sys-img-x86_64-android-23,extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
-
-    proc.on("error", function (error) {
-        deferred.reject(new Error("Installing Android platform encountered error " + error.message));
-    });
-    proc.on("exit", function(code) {
-        if (code !== 0) {
-            deferred.reject(new Error("Installing Android platform exited with code " + code));
-        } else {
-            console.log("Android SDK is updated successfully.");
-            deferred.resolve();
-        }
-    });
-
-    return deferred.promise;
 }
 
 function installSdk() {
@@ -95,12 +71,14 @@ function installSdk() {
         if (!err) {
             deferred.resolve();
         } else {
+            spinner.start();
+
             FS.makeTree(sdkInstallPath)
             .then( () => {
                 return downloadFile(sdkDownloadUrl, tempSdkDownloadFilePath)
             })
             .then( () => {
-                return unzipFile(tempSdkDownloadFilePath, tempSdkUnzipRoot)
+                return unzip(tempSdkDownloadFilePath, tempSdkUnzipRoot)
             })
             .then( () => {
                 return FS.copyTree(tempSdkUnzipPath, sdkInstallPath)
@@ -110,9 +88,33 @@ function installSdk() {
                     .catch( (err) => false ); // We don't care if it does not exist when we try to delete it
             })
             .then( () => {
+                spinner.stop();
+
                 console.log("Android SDK is installed successfully.");
                 deferred.resolve();
             })
+        }
+    });
+
+    return deferred.promise;
+}
+
+function updateSdk() {
+    var deferred = Q.defer();
+
+    var androidCmd = path.join(getUserHome(), 'platforms/android/sdk/tools/android');
+    var proc = spawn(androidCmd, ['--silent', 'update', 'sdk', '--all',
+        '--no-ui', '--filter', 'platform-tool,tool,android-23,sys-img-x86_64-android-23,extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
+
+    proc.on("error", function (error) {
+        deferred.reject(new Error("Installing Android platform encountered error " + error.message));
+    });
+    proc.on("exit", function(code) {
+        if (code !== 0) {
+            deferred.reject(new Error("Installing Android platform exited with code " + code));
+        } else {
+            console.log("Android SDK is updated successfully.");
+            deferred.resolve();
         }
     });
 
@@ -132,13 +134,17 @@ function installHAXM() {
         return;
     }
 
+    spinner.start();
     var workingDir = path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager');
     shell.cd(workingDir);
     shell.exec(command, {
         silent: false
     }, function (code, output) {
+        spinner.stop();
         if (code == 0) {
             deferred.resolve();
+        } else {
+            deferred.reject(new Error("Installing Intel HAXM failed."));
         }
     });
 
@@ -161,39 +167,13 @@ function createAvd() {
                 silent: false
             }, function (code, output) {
                 if (code == 0) {
-                    console.log("AVD:AEMM_Tablet is created successfully.");
+                    console.log("AVD is created successfully.");
                     deferred.resolve();
+                } else {
+                    deferred.reject(new Error("Creating AVD failed"));
                 }
             });
 
             return deferred.promise;
         });
-}
-
-function getUserHome() {
-    return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-}
-
-function unzipFile(zipFile, outputPath) {
-    var deferred = Q.defer();
-
-    var unzipper = new decompressZip(zipFile)
-
-    unzipper.on('error', function (err) {
-        deferred.reject(new Error("Failed to unzip the file"));
-    });
-
-    unzipper.on('extract', function (log) {
-        deferred.resolve(outputPath);
-    });
-
-    unzipper.on('progress', function (fileIndex, fileCount) {
-        // console.log('Extracted file ' + (fileIndex + 1) + ' of ' + fileCount);
-    });
-
-    unzipper.extract({
-        path: outputPath
-    });
-
-    return deferred.promise;
 }
