@@ -18,7 +18,7 @@ var path = require('path');
 
 module.exports.cordovaProjectRoot = function ()
 {
-	return cordova.cordova_lib.cordova.findProjectRoot(process.cwd());	
+    return cordova.cordova_lib.cordova.findProjectRoot(process.cwd());	
 }
 
 module.exports.getPathToCordovaBinary = getPathToCordovaBinary;
