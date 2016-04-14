@@ -87,7 +87,7 @@ function getPathToProjectConfig()
 {
     if (!pathToProjectConfig)
     {
-        pathToProjectConfig = path.join(project.projectRootPath(), "/config.json");
+        pathToProjectConfig = path.join(project.projectRootPath(), "config.json");
     }
     return pathToProjectConfig;
 }
