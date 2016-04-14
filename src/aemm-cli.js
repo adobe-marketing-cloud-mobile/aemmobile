@@ -23,14 +23,15 @@ var Q = require('q');
 var ansi = require('ansi');
 
 var commands = {
-	app: require('./app.js'),
-	article: require('./article.js'),
-	serve: require('./serve.js'),
-	run: require('./run.js'),
-	project: require('./project.js'),
-	help: require("./help.js"),
-	platform: require("./platform.js"),
-    config: require("./config.js")
+    app: require('./app.js'),
+    article: require('./article.js'),
+    config: require("./config.js"),
+    help: require("./help.js"),
+    platform: require("./platform.js"),
+    plugin: require("./plugin.js"),
+    project: require('./project.js'),
+    run: require('./run.js'),
+    serve: require('./serve.js')
 }
 
 module.exports = cli;
