@@ -30,16 +30,16 @@ module.exports = {
                 return;
             }
             console.info('emulator.start: poll port', port);
-            var checkCmd = userHome + '/platforms/android/sdk/platform-tools/adb shell pm path android | grep package:/system/framework/framework-res.apk';
+            var checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' shell pm path android | findstr package:/system/framework/framework-res.apk';
             shell.exec(checkCmd, {
                 silent: true
             }, function(code, output) {
                 if (code !== 0) {
                     setTimeout(checkBooted.bind(this, port), 500);
                 } else {
-                    defer.resolve({
-                        port: port
-                    });
+                    setTimeout(function () {
+                        defer.resolve({port: port});
+                    }, 30000);
                 }
             });
         }

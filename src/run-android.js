@@ -61,8 +61,7 @@ function installApk()
         .then((jupiterPath) => {
             var defer = Q.defer();
 
-            var userHome = process.env.HOME;
-            var checkCmd = userHome + '/platforms/android/sdk/platform-tools/adb install ' + '"' + jupiterPath + '"';
+            var checkCmd = path.join(process.env.HOME, 'platforms/android/sdk/platform-tools/adb install ' + '"' + jupiterPath + '"');
             shell.exec(checkCmd, {
                 silent: false
             }, function(code, output) {

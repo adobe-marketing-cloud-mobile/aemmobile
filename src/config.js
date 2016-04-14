@@ -19,10 +19,10 @@ var Q = require('q');
 var path = require('path');
 var jsonfile = require('jsonfile');
 var project = require('./project');
-var pathToProjectConfig = path.join(project.projectRootPath(), "/config.json");
 
 function configFile()
 {
+    var pathToProjectConfig = path.join(project.projectRootPath(), "/config.json");
     var file = null;
     try {
         file = require(pathToProjectConfig);
@@ -36,7 +36,6 @@ function configFile()
     return file;
 }
 
-var file = configFile();
 module.exports = config;
 
 function config(options, args) 
@@ -68,17 +67,22 @@ function config(options, args)
 module.exports.getValueFromConfig = getValueFromConfig;
 function getValueFromConfig(key)
 {
+    var file = configFile();
     return file[`${key}`];
 }
 
 function setValueInConfig(key, value)
 {
+    var pathToProjectConfig = path.join(project.projectRootPath(), "/config.json");
+    var file = configFile();
     file[`${key}`] = value;
     jsonfile.writeFileSync(pathToProjectConfig, file);
 }
 
 function removeKeyFromConfig(key)
 {
+    var pathToProjectConfig = path.join(project.projectRootPath(), "/config.json");
+    var file = configFile();
     delete file[`${key}`];
     jsonfile.writeFileSync(pathToProjectConfig, file);
 }
