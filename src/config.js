@@ -19,26 +19,12 @@ var Q = require('q');
 var path = require('path');
 var jsonfile = require('jsonfile');
 var project = require('./project');
-var pathToProjectConfig = path.join(project.projectRootPath(), "/config.json");
+var help = require('./help');
 
-function configFile()
-{
-    var file = null;
-    try {
-        file = require(pathToProjectConfig);
-    } catch (err) {
-        // It's not a problem if the file is non-existent.
-        if (err.code == 'MODULE_NOT_FOUND') {
-            return;
-        }
-        throw err;
-    }
-    return file;
-}
+var pathToProjectConfig = null;
+var file = null;
 
-var file = configFile();
 module.exports = config;
-
 function config(options, args) 
 {
     var getKey = options.get;
@@ -48,8 +34,16 @@ function config(options, args)
     return Q.fcall( () => {
         if (options.list)
         {
-			return console.log(file);
-		}
+            file = getConfigFile();
+            if (!file)
+            {
+                return console.log("No valid config file found.");
+            }
+            else
+            {
+                return console.log(file);
+            }
+        }
         if (options.get)
         {
             return console.log(getValueFromConfig(getKey));
@@ -62,23 +56,55 @@ function config(options, args)
         {
             return removeKeyFromConfig(unsetKey);
         }
+        else
+        {
+            help(null, "config");
+        }
     });
 }
 
 module.exports.getValueFromConfig = getValueFromConfig;
 function getValueFromConfig(key)
 {
-    return file[`${key}`];
+    return getConfigFile()[`${key}`];
 }
 
 function setValueInConfig(key, value)
 {
+    file = getConfigFile();
     file[`${key}`] = value;
-    jsonfile.writeFileSync(pathToProjectConfig, file);
+    jsonfile.writeFileSync(getPathToProjectConfig(), file);
 }
 
 function removeKeyFromConfig(key)
 {
+    file = getConfigFile();
     delete file[`${key}`];
-    jsonfile.writeFileSync(pathToProjectConfig, file);
+    jsonfile.writeFileSync(getPathToProjectConfig(), file);
+}
+
+function getPathToProjectConfig()
+{
+    if (!pathToProjectConfig)
+    {
+        pathToProjectConfig = path.join(project.projectRootPath(), "config.json");
+    }
+    return pathToProjectConfig;
+}
+
+function getConfigFile()
+{
+    if (!file)
+    {
+        try {
+            file = require(getPathToProjectConfig());
+        } catch (err) {
+            // It's not a problem if the file is non-existent, just give them an empty object to get started.
+            if (err.code == 'MODULE_NOT_FOUND') {
+                return {};
+            }
+            throw err;
+        }
+    }
+    return file;
 }
