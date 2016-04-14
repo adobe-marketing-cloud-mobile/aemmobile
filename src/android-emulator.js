@@ -31,7 +31,16 @@ module.exports = {
                 return;
             }
 
-            var checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' shell pm path android | findstr package:/system/framework/framework-res.apk';
+            var checkCmd = null;
+            if (process.platform == 'win32') {
+                checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' shell pm path android | findstr package:/system/framework/framework-res.apk';
+            } else if (process.platform == 'darwin') {
+                checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' shell pm path android | grep package:/system/framework/framework-res.apk';
+            } else {
+                deferred.reject(new Error("Plaform not supported: ", process.platform));
+                return;
+            }
+
             shell.exec(checkCmd, {
                 silent: true
             }, function(code, output) {

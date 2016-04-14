@@ -26,15 +26,20 @@ module.exports = function (sourceUrl, filePath)
 	var deferred = Q.defer();
 
 	var fileFolderPath = path.dirname(filePath);
-	
+
 	mkdirp(fileFolderPath)
 	.then(function () {
 		try {
+			console.log("Requesting file: " + sourceUrl);
+
 			request(sourceUrl, { encoding : null })
-			.on('error', function (error) { 
+			.on('error', function (error) {
+				console.log("Request failed with error: " + error);
 				deferred.reject(error);	
 			})
 			.on('response', function(response) {
+				console.log("Server response: " + response.statusCode);
+
 				if (response.statusCode === 404)
 				{
 					deferred.reject(new Error(`URL(${sourceUrl}) Not Found`));
@@ -47,10 +52,12 @@ module.exports = function (sourceUrl, filePath)
 				}
 			})
 			.pipe(fs.createWriteStream(filePath))
-			.on('finish', function () { 
-				deferred.resolve();	
+			.on('finish', function () {
+				console.log("Request completed.");
+				deferred.resolve();
 			});
 		} catch (err) {
+			console.log("Request failed with error: " + error);
 			deferred.reject(err);
 		}
 

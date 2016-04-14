@@ -101,9 +101,21 @@ function installSdk() {
 
 function updateSdk() {
     var deferred = Q.defer();
+    var command = null;
+    var script = null;
 
-    var androidCmd = path.join(getUserHome(), 'platforms/android/sdk/tools/android');
-    var proc = spawn(androidCmd, ['--silent', 'update', 'sdk', '--all',
+    if (process.platform == 'win32') {
+        command = "powershell";
+        script = path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat');
+    } else if (process.platform == 'darwin') {
+        command = "sh";
+        script = path.join(getUserHome(), 'platforms/android/sdk/tools/android');
+    } else {
+        console.log("Platform not supported: " + process.platform);
+        return;
+    }
+
+    var proc = spawn(command, [script, '--silent', 'update', 'sdk', '--all',
         '--no-ui', '--filter', 'platform-tool,tool,android-23,sys-img-x86_64-android-23,extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
 
     proc.on("error", function (error) {
@@ -162,7 +174,16 @@ function createAvd() {
         .then( () => {
             var deferred = Q.defer();
 
-            var command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-23" --abi default/x86_64 --skin "Nexus-7" --sdcard 1024M';
+            var command =  null;
+            if (process.platform == 'win32') {
+                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-23" --abi default/x86_64 --skin "Nexus-7" --sdcard 1024M';
+            } else if (process.platform == 'darwin') {
+                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-23" --abi default/x86_64 --skin "Nexus-7" --sdcard 1024M';
+            } else {
+                deferred.reject(new Error("Platform not supported: " + process.platform));
+                return;
+            }
+
             shell.exec(command, {
                 silent: false
             }, function (code, output) {

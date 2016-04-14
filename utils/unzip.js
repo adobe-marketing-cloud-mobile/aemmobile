@@ -20,17 +20,19 @@ var decompressZip = require('decompress-zip');
 
 module.exports = function(zipFile, outputPath)
 {
-    console.log("Extracting app");
-
     var deferred = Q.defer();
+
+    console.log("unzipping file: " + zipFile);
 
     var unzipper = new decompressZip(zipFile)
 
     unzipper.on('error', function (err) {
+        console.log("unzip failed: " + err);
         deferred.reject(new Error("Failed to unzip file: " + zipFile));
     });
 
     unzipper.on('extract', function (log) {
+        console.log("unzip completed.");
         deferred.resolve(outputPath);
     });
 
