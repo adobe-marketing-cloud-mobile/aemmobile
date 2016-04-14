@@ -2,17 +2,34 @@
 
 Command line tool for building AEM Mobile apps with Cordova content
 
-## Prerequisites
-* npm(v4.1 or greater) must be installed
-* Java must be installed for developing Android Application:
-  https://support.apple.com/downloads/java
-* On iOS, Xcode(v7.0 or greater) must be installed
-
 ## Operating System
-* Mac OS X 
+* Mac OS X(iOS and Android)
+* Windows(Android only)
 
-## Installation 
+## Prerequisites
+Mac OS X:
+* npm(v4.1 or greater) must be installed
+* For iOS, Xcode(v7.0 or greater) must be installed
+* For Android, Java must be installed:
+  https://support.apple.com/downloads/java
+* For Android, Chrome needs to be installed for debugging via chrome://inspect
 
+Windows:
+* Java:
+  https://java.com/en/download/manual.jsp
+
+* VisualStudio Community 2015:
+  https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx
+
+* npm(v4.4.2 LTS is recommended):
+  https://nodejs.org/en/
+
+* Python 2.7:
+  https://www.python.org/download/releases/2.7/
+
+* Chrome for debugging via chrome://inspect
+
+## Installation
 You need npm installed to run the command line tool
 
 1.  Install npm:
