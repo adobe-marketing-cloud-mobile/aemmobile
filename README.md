@@ -26,7 +26,7 @@ Windows:
 * Chrome for debugging via chrome://inspect
 
 ## Installation
-You need npm installed to run the command line tool
+You need npm installed to run the command line tool. On Windows, run commands in PowerShell instead of Command Prompt.
 
 1.  Install npm:
     https://nodejs.org/en/
