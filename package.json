@@ -17,6 +17,7 @@
     "child-process-promise": "^1.1.0",
     "connect-aemmobile": "^0.1.0",
     "continuation-local-storage": "^3.1.6",
+    "cordova": "^6.0.0",
     "cordova-lib": "^6.0.0",
     "decompress-zip": "^0.2.0",
     "ios-sim": "5.0.8",

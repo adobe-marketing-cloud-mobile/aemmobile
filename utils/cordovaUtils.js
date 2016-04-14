@@ -14,8 +14,16 @@
 	limitations under the License.
  */
 var cordova = require('cordova');
+var path = require('path');
 
 module.exports.cordovaProjectRoot = function ()
 {
 	return cordova.cordova_lib.cordova.findProjectRoot(process.cwd());	
+}
+
+module.exports.getPathToCordovaBinary = getPathToCordovaBinary;
+function getPathToCordovaBinary() {
+    var aemmBinDir = path.dirname(process.mainModule.filename);
+    var cordovaBin = path.join(aemmBinDir, "../node_modules/cordova/bin/cordova");
+    return cordovaBin;
 }
