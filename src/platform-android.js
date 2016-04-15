@@ -55,6 +55,12 @@ function installSdk() {
     var tempSdkUnzipRoot = path.join(os.tmpdir(), 'platform');
     var tempSdkUnzipPath = null;
 
+    // It's ok to hard code specific SDK download link since we will attempt to update
+    // to the latest SDK each time user runs "aemm platform install android".
+    //
+    // We just need to install an initial version to begin with. Android community keeps
+    // download links for all prior version of SDKs since it's introduction at:
+    // http://developer.android.com/tools/sdk/tools-notes.html
     if (process.platform == 'win32') {
         sdkDownloadUrl = 'http://dl.google.com/android/android-sdk_r24.4.1-windows.zip';
         tempSdkUnzipPath = path.join(tempSdkUnzipRoot, 'android-sdk-windows');

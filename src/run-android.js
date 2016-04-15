@@ -49,7 +49,7 @@ function run(args)
                 if (code == 0) {
                     defer.resolve();
                 } else {
-                    deferred.reject(new Error("Launching AEMM app in emulator failed."));
+                    deferred.reject(new Error("Launching AEM Mobile app in emulator failed."));
                 }
             });
 

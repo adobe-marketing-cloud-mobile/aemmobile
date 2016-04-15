@@ -28,6 +28,7 @@ module.exports = {
 
         function checkBooted(port) {
             if (defer.promise.isRejected()) {
+                spinner.stop();
                 return;
             }
 
@@ -37,7 +38,8 @@ module.exports = {
             } else if (process.platform == 'darwin') {
                 checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' shell pm path android | grep package:/system/framework/framework-res.apk';
             } else {
-                deferred.reject(new Error("Plaform not supported: ", process.platform));
+                spinner.stop();
+                deferred.reject(new Error("Platform not supported: ", process.platform));
                 return;
             }
 
