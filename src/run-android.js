@@ -70,7 +70,7 @@ function installApk()
                 if (code == 0) {
                     defer.resolve();
                 } else {
-                    deferred.reject(new Error("Installing AEMM apk failed."));
+                    deferred.reject(new Error("Installing AEM Mobile app apk failed: " + jupiterPath));
                 }
             });
 
