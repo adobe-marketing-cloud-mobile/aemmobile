@@ -51,7 +51,7 @@ function run(args)
 			.then( (response) => {
 				let xcode = response.stdout.trim();
 				let simsInstalled = iossim.getdevicetypes().join("\n");
-				throw new Error(`No valid simulator devices installed in Xcode(${xcode}).
+				throw new AEMMError(`No valid simulator devices installed in Xcode(${xcode}).
 The following devices are installed\n${simsInstalled}
 Valid devices must be iPhone or iPad and run iOS 8 or iOS 9.2 or greater.
 Install simulator devices from Xcode.`);			
@@ -63,7 +63,7 @@ Install simulator devices from Xcode.`);
 			let filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith(target) );
 			if (filteredList.length == 0)
 			{
-				throw Error(`Target device specified(${target}) could not be found in the list of available devices.  Run 'aemm run ios --list' for device list.`);
+				throw AEMMError(`Target device specified(${target}) could not be found in the list of available devices.  Run 'aemm run ios --list' for device list.`);
 			}
 			
 			target = filteredList[0];

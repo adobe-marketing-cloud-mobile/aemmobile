@@ -27,6 +27,7 @@ var os = require('os');
 var app = require('./app');
 var config = require('../config.json');
 var plist = require('plist');
+var AEMMError = require('./AEMMError');
 
 const aemmAppName = "AEMM.apk";
 const aemmVerName = "version.txt";
@@ -39,7 +40,7 @@ function getInstalledAppBinaryPath(deviceType)
 		let viewerPath = path.join(parentPath, aemmAppName);
 		if ( !fs.existsSync(viewerPath) )
 		{
-			throw new Error(`No application found at ${parentPath}`);			
+			throw new AEMMError(`No application found at ${parentPath}; try 'aemm app install android'.`);			
 		}
 		
 		return viewerPath;
@@ -56,7 +57,7 @@ function getAppVersion(deviceType)
 
 			if ( !fs.existsSync(versionPath) )
 			{
-				throw new Error(`No application found at ${appBinaryParentPath}`);
+				throw new AEMMError(`No application found at ${appBinaryParentPath}`);
 			}
 
 			return fs.readFileSync(versionPath,'utf8')

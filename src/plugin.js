@@ -18,18 +18,18 @@
 /**
  * Module dependencies.
  */
-var Q = require('q'),
-    util = require('util'),
-    shell = require('shelljs');
-
-var cordova = require('../utils/cordovaUtils');
+var Q = require('q');
+var cordova_lib = require('cordova-lib');
+var cordova = cordova_lib.cordova;
+var AEMMError = require('./AEMMError');
 
 module.exports = plugin;
-function plugin(argv) {
+function plugin(args, command) {
     return Q.fcall( () => {
-        var cmd = cordova.getPathToCordovaBinary() + " plugin " + argv.argv.remain.join(" ");
-        shell.exec(cmd);
+        var targets = args.argv.remain;
+        var command = targets.shift();
+        return cordova.plugin(command, targets);
     }).catch(function (err) {
-        console.log(util.inspect(err));
+        throw new AEMMError(err.message);
     }).done();
 }

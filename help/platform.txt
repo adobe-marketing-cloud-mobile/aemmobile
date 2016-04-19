@@ -11,3 +11,4 @@ Commands:
 Examples:
 
   $ aemm platform install android
+  $ aemm platform install ios

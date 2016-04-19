@@ -20,8 +20,10 @@ Additional Commands:
 
 Options:
 
-  -v, --version        output version number
+  -d, --verbose        display more information
   -h, --help           output usage information
+  -q, --silent         display less information
+  -v, --version        output version number
 
 Examples:
 

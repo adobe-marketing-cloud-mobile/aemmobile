@@ -34,7 +34,7 @@ function create(options, projectPath)
 	{
 		if (!projectPath)
 		{
-			throw Error(`At least the dir must be provided to create new project. See 'aemm help'.`)
+			throw AEMMError(`At least the dir must be provided to create new project. See 'aemm help'.`)
 		}
 		
 		fullProjectPath = path.resolve(projectPath);
@@ -52,7 +52,7 @@ function projectRootPath()
 	if (!projectRoot)
 	{
 		let cmdLineToolInfo = require('../package.json');
-		throw Error(`Current working directory is not a ${cmdLineToolInfo.name} based project.`);
+		throw AEMMError(`Current working directory is not a ${cmdLineToolInfo.name} based project.`);
 	}
 	return projectRoot;
 }

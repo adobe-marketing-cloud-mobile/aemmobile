@@ -27,6 +27,7 @@ var rp = require('request-promise');
 var os = require('os');
 var downloadFile = require('../utils/downloadFile');
 var url = require('url');
+var AEMMError = require('./AEMMError');
 
 module.exports.getApplicationSupportPath = getApplicationSupportPath;
 function getApplicationSupportPath()
@@ -47,7 +48,7 @@ function getInstalledAppBinaryPath(platform, deviceType)
 
 		if (!platformAppBinary)
 		{
-			throw new Error(`Invalid platform(${platform}) sent to getInstalledAppBinaryPath())`);
+			throw new AEMMError(`Invalid platform(${platform}) sent to getInstalledAppBinaryPath())`);
 		}
 		return platformAppBinary.getInstalledAppBinaryPath(deviceType);
 	})
@@ -78,7 +79,7 @@ function ensureInstalledBinary(platform, deviceName)
 		return binaryPath;
 	})
 	.catch( (err) => {
-		throw Error("You must install downloaded app binary before using this command.  See 'aemm app install'.");
+		throw AEMMError("You must install downloaded app binary before using this command.  See 'aemm app install'.");
 	})
 }
 
@@ -139,7 +140,7 @@ function installFromServerInConfig(platform, deviceType, specificVersion)
 			
 			if (!appUrl)
 			{
-				throw new Error("Could not determine latest update.  Please install specific version.  See 'aemm help app' for more info");
+				throw new AEMMError("Could not determine latest update.  Please install specific version.  See 'aemm help app' for more info");
 			}
 
 			console.log(specificVersion ? `Downloading version ${specificVersion}` : `Downloading latest version(${getVersion})`);
@@ -180,7 +181,7 @@ function installFromFile(version, urlOrFilepath, deviceType)
 			}
 		} else
 		{
-			throw new Error("Could not find a platform for the specifed file path.  Are you sure the path is correct?");
+			throw new AEMMError("Could not find a platform for the specifed file path.  Are you sure the path is correct?");
 		}
 	});
 }
@@ -215,7 +216,7 @@ function listAppVersions(platform)
 			}			
 		})
 		.catch( (err) => {
-			throw new Error(`Error getting versions from server: ${err}`);
+			throw new AEMMError(`Error getting versions from server: ${err}`);
 		});
 	});
 }
@@ -266,7 +267,7 @@ function update(options, optionalPlatform)
 						let latest = platformVersions[platformVersions["latest"]];
 						if (!latest)
 						{
-							throw new Error("Could not determine latest update.  Please install specific version.  See 'aemm help app' for more info");
+							throw new AEMMError("Could not determine latest update.  Please install specific version.  See 'aemm help app' for more info");
 						}
 						return installFromFile(platformVersions["latest"], latest, deviceType);
 					} else {

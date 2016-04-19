@@ -18,13 +18,13 @@
 
 var semver = require('semver');
 var engines = require('../package').engines;
-var ansi = require('ansi');
+var events = require('cordova-lib').events;
+var AEMMError = require('../src/AEMMError');
 
 // Check node version		
 if (!semver.satisfies(process.version, engines["node"]))
 {
-	var stderrCursor = ansi(process.stderr);
-	stderrCursor.fg.red().bold().write("Invalid Node.js version(" + process.version + ").  AEMM requires " + engines["node"] + "\n").reset();
+	throw new AEMMError("Invalid Node.js version(" + process.version + ").  AEMM requires " + engines["node"] + "\n");
 	process.exit(1);
 }
 

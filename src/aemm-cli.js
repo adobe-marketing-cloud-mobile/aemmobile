@@ -20,7 +20,10 @@
 
 var nopt = require('nopt');
 var Q = require('q');
-var ansi = require('ansi');
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
+var AEMMError = require('./AEMMError');
+var logger = require('cordova-common').CordovaLogger.get();
 
 var commands = {
     app: require('./app.js'),
@@ -45,7 +48,9 @@ function cli(inputArgs, callback)
         'get' : String,
         'set' : String,
         'unset' : String,
-        'list' : Boolean
+        'list' : Boolean,
+        'verbose' : Boolean,
+        'silent' : Boolean
 	};
 
     var shortHands =
@@ -55,12 +60,8 @@ function cli(inputArgs, callback)
         };
 
     var args = nopt(knownOpts, shortHands, inputArgs);
-	
-	var remain = args.argv.remain;
-	var commandName = remain[0];
-	var subCommandName = remain[1];
 
-	// Check for version
+    // Check for version
 	if (args.version)
 	{
 		let cmdLineToolInfo = require('../package.json');
@@ -68,6 +69,25 @@ function cli(inputArgs, callback)
 		console.log(`Version ${cmdLineToolInfo.version}`);
 		return;
 	}
+/*    
+    process.on('uncaughtException', function(err) {
+        logger.error(err);
+        process.exit(1);
+    });
+*/
+    logger.subscribe(events);
+
+    if (args.silent) {
+        logger.setLevel('error');
+    }
+
+    if (args.verbose) {
+        logger.setLevel('verbose');
+    }
+    
+	var remain = args.argv.remain;
+	var commandName = remain[0];
+	var subCommandName = remain[1];
 	
 	if ( !commandName || args.help ) 
 	{
@@ -76,11 +96,14 @@ function cli(inputArgs, callback)
     }
 	
 	Q.fcall( () => {
+
 		// Make sure we have a command with the right name
 		if (!commands.hasOwnProperty(commandName))
 		{
 			let cmdLineToolInfo = require('../package.json');
-			throw Error(`${cmdLineToolInfo.name} does not know '${commandName}'; try '${cmdLineToolInfo.name} help' for a list of all the available commands.`);
+			var message = '`' + cmdLineToolInfo.name + '` does not know `' + commandName + '`; try `' +
+				cmdLineToolInfo.name + ' help` for a list of all the available commands.';
+			throw new AEMMError(message);
 		}
 		
 		let cmd = commands[commandName];
@@ -98,7 +121,10 @@ function cli(inputArgs, callback)
 			if (!cmd.hasOwnProperty(subCommandName))
 			{
 				let cmdLineToolInfo = require('../package.json');
-				throw Error(`${cmdLineToolInfo.name} ${commandName} does not have a subcommand of '${subCommandName}'; try '${cmdLineToolInfo.name} help ${commandName}' for a list of all the available sub commands within ${commandName}.`);
+				var message = '`' + cmdLineToolInfo.name + ' ' + commandName + '` does not have a subcommand of `' +
+					subCommandName + '`; try `' + cmdLineToolInfo.name + ' help ' + commandName +
+					'` for a list of all the available sub commands within ' + commandName + '.';
+				throw new AEMMError(message);
 			}
 			let subCommand = cmd[subCommandName];
 			remain.shift();
@@ -115,29 +141,20 @@ function cli(inputArgs, callback)
 			result.forEach( (item) => {
 				if (item.state && item.state === "rejected" && item.reason)
 				{
-					outputError(item.reason);
+				    throw new AEMMError(item.reason);
 				}
 			});
 		}
+	})
+	.catch( (err) => {
+		throw new AEMMError(err.message);
+	})
+	.finally( function () {
 		if (callback)
 		{
 			callback();
 		}
-	})
-	.catch( (err) => {
-		outputError(err);
-		
-		if (callback)
-		{
-			callback(err);
-		}
-	});		
+	}).done();
 	
 	
-}
-
-function outputError(error)
-{
-	var stderrCursor = ansi(process.stderr);
-	stderrCursor.fg.red().bold().write(`Error: ${error.message}\n`).reset();
 }

@@ -21,6 +21,7 @@ var Q = require('q');
 var path = require("path");
 var project = require('./project');
 var pathToNewArticleTemplate = path.join(__dirname, '..', 'templates', 'new_article');
+var AEMMError = require('./AEMMError');
 
 module.exports.testing = {};
 
@@ -32,7 +33,7 @@ function create(options /*, list of article names  */ )
 		let articleNamesList = Array.prototype.slice.call(arguments, 1).filter( (item) => item && item.length > 0) ;
 		if (articleNamesList.length <= 0)
 		{
-			throw Error( `You must specify an article name with the 'article create' command.`);
+			throw AEMMError( `You must specify an article name with the 'article create' command.`);
 		}
 		let projectPath = project.projectRootPath();
 		let articlePromises = articleNamesList.map( (articleName) => createSingleArticle(projectPath, articleName) );
@@ -47,7 +48,7 @@ function createSingleArticle(projectPath, articleName)
 	{
 		if (!isArticleNameValid(articleName))
 		{
-			throw new Error("Article name has a limit of 64 alphanumeric characters. The value must start and end with a letter or number and can also contain dots, dashes and underscores.");
+			throw new AEMMError("Article name has a limit of 64 alphanumeric characters. The value must start and end with a letter or number and can also contain dots, dashes and underscores.");
 		}
 		
 		articleFolder = path.join(projectPath, "/www", articleName);
@@ -57,7 +58,7 @@ function createSingleArticle(projectPath, articleName)
 	.then(function(exists) {
 		if (exists)
 		{
-			throw Error(`Cannot create article ${articleName}.  An article with that name already exists at ${articleFolder}.`);
+			throw AEMMError(`Cannot create article ${articleName}.  An article with that name already exists at ${articleFolder}.`);
 		}
 		return articleFolder;
 	})

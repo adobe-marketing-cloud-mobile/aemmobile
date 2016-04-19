@@ -21,6 +21,7 @@
 var Q = require('q');
 var platformRequire = require('../utils/platformRequire');
 var path = require("path");
+var CordovaError = require('cordova-lib').CordovaError;
 
 module.exports.install = install;
 function install(options, platform)
@@ -33,7 +34,8 @@ function install(options, platform)
             return platformInstallBinary.install();
         } else
         {
-            throw new Error("Could not find a platform for the specifed file path.  Are you sure the path is correct?");
+            let cmdLineToolName = require('../package.json').name;
+            throw new CordovaError(`You must specify a platform.  See '${cmdLineToolName} help platform' for more info.`);
         }
     });
 

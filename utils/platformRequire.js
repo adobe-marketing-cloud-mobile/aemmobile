@@ -15,17 +15,19 @@
  */
 "use strict";
 
+var AEMMError = require('../src/AEMMError');
+
 module.exports = function(packageName, platform) 
 {
 	if (!platform)
 	{
 		let cmdLineToolName = require('../package.json').name;
-		throw Error(`You must specify a platform.  See '${cmdLineToolName} help run' for more info.`);
+		throw new AEMMError(`You must specify a platform.  See '${cmdLineToolName} help run' for more info.`);
 	}
 	try {
 		var platformRun = require(`../src/${packageName}-${platform}`);
 		return platformRun;
 	} catch (error) {
-		throw Error(`Invalid platform - ${platform}`);
+        throw new AEMMError(`Invalid platform - ${platform}`);
 	}
 }
