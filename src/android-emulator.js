@@ -22,7 +22,7 @@ var Q = require('q');
 var spinner = require('simple-spinner');
 
 module.exports = {
-    start: function(name) {
+    start: function(name, port) {
         var defer = Q.defer();
         var userHome = process.env.HOME;
 
@@ -33,10 +33,13 @@ module.exports = {
             }
 
             var checkCmd = null;
+            var serialNum = 'emulator-' + port;
             if (process.platform == 'win32') {
-                checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' shell pm path android | findstr package:/system/framework/framework-res.apk';
+                checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + serialNum + 
+                    ' shell pm path android | findstr package:/system/framework/framework-res.apk';
             } else if (process.platform == 'darwin') {
-                checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' shell pm path android | grep package:/system/framework/framework-res.apk';
+                checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + serialNum + 
+                    ' shell pm path android | grep package:/system/framework/framework-res.apk';
             } else {
                 spinner.stop();
                 deferred.reject(new Error("Platform not supported: ", process.platform));
@@ -58,13 +61,12 @@ module.exports = {
 
                     setTimeout(function () {
                         spinner.stop();
-                        defer.resolve({port: port});
+                        defer.resolve(serialNum);
                     }, wait);
                 }
             });
         }
         
-        var port = 5554;
         var cmd = userHome + '/platforms/android/sdk/tools/emulator -wipe-data -avd ' + name + ' -port ' + port + ' -gpu on';
 
         shell.exec(cmd, {
