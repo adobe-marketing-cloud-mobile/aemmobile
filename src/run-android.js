@@ -25,49 +25,60 @@ var serve = require('./serve');
 var emulator = require('./android-emulator');
 var shell = require('shelljs');
 var androidApp = require('./app-android');
+var randomPort = require('./random-port');
 
+var deviceSerialNum = null;
 module.exports = run;
 
 function run(args)
 {
-    return emulator.start('AEMM_Tablet')
+    return randomPort()
         .then(function(port) {
-            return installApk();
+            return emulator.start('AEMM_Tablet', port);
         })
-        .then (function() {
+        .then(function (emulatorId) {
+            deviceSerialNum = emulatorId;
+            return installApk(deviceSerialNum);
+        })
+        .then(function () {
             return serve({}, "android");
         })
-        .then(function(servResponse) {
+        .then(function (servResponse) {
             var defer = Q.defer();
 
             var userHome = process.env.HOME;
-            var launchCmd = userHome + '/platforms/android/sdk/platform-tools/adb shell am start -n "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity" ' +
-                '-e phonegapServer 10.0.2.2:3000';
+            var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
+                ' shell am start -n "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity" ' +
+                    '-e phonegapServer 10.0.2.2:3000';
             shell.exec(launchCmd, {
                 silent: false
-            }, function(code, output) {
+            }, function (code, output) {
                 if (code == 0) {
                     defer.resolve();
-                };
+                } else {
+                    deferred.reject(new Error("Launching AEM Mobile app in emulator failed."));
+                }
             });
 
             return defer.promise;
-        })
+        });
 };
 
-function installApk()
+function installApk(deviceSerialNum)
 {
     return androidApp.getInstalledAppBinaryPath("emulator")
         .then((jupiterPath) => {
             var defer = Q.defer();
 
-            var userHome = process.env.HOME;
-            var checkCmd = userHome + '/platforms/android/sdk/platform-tools/adb install ' + '"' + jupiterPath + '"';
+            var checkCmd = path.join(process.env.HOME, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
+                ' install ' + '"' + jupiterPath + '"';
             shell.exec(checkCmd, {
                 silent: false
             }, function(code, output) {
                 if (code == 0) {
                     defer.resolve();
+                } else {
+                    deferred.reject(new Error("Installing AEM Mobile app apk failed: " + jupiterPath));
                 }
             });
 

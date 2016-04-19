@@ -31,13 +31,19 @@ var url = require('url');
 module.exports.getApplicationSupportPath = getApplicationSupportPath;
 function getApplicationSupportPath()
 {
-	return exec('osascript -e "posix path of (path to application support folder from user domain)"')
-	.then( function(processResponse) {
-		let appSupportPath = path.join( processResponse.stdout.trim(), "com.adobe.aemmobile");
-		return appSupportPath;
-	});
+	if (process.platform == 'win32') {
+		return exec('echo path')
+			.then( function(processResponse) {
+				return path.join(getUserHome(), 'aemm/app/');
+			});
+	} else if (process.platform == 'darwin') {
+		return exec('osascript -e "posix path of (path to application support folder from user domain)"')
+			.then(function (processResponse) {
+				let appSupportPath = path.join(processResponse.stdout.trim(), "com.adobe.aemmobile");
+				return appSupportPath;
+			});
+	}
 }
-
 
 module.exports.getInstalledAppBinaryPath = getInstalledAppBinaryPath;
 function getInstalledAppBinaryPath(platform, deviceType)
@@ -293,4 +299,8 @@ function remoteBinaryVersionsUrl()
 function resolveTemplatedEnvironmentUrl(templatedUrl)
 {
 	return templatedUrl.replace( "{AEMM_ENV}", aemmConfig.get().AEMM_ENV);
+}
+
+function getUserHome() {
+	return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 }

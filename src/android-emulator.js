@@ -15,38 +15,59 @@
  */
 "use strict";
 
-var fs = require('fs'),
-    path = require('path'),
-    shell = require('shelljs'),
-    Q = require('q')
+var fs = require('fs');
+var path = require('path');
+var shell = require('shelljs');
+var Q = require('q');
+var spinner = require('simple-spinner');
 
 module.exports = {
-    start: function(name) {
+    start: function(name, port) {
         var defer = Q.defer();
         var userHome = process.env.HOME;
 
         function checkBooted(port) {
             if (defer.promise.isRejected()) {
+                spinner.stop();
                 return;
             }
-            console.info('emulator.start: poll port', port);
-            var checkCmd = userHome + '/platforms/android/sdk/platform-tools/adb shell pm path android | grep package:/system/framework/framework-res.apk';
+
+            var checkCmd = null;
+            var serialNum = 'emulator-' + port;
+            if (process.platform == 'win32') {
+                checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + serialNum + 
+                    ' shell pm path android | findstr package:/system/framework/framework-res.apk';
+            } else if (process.platform == 'darwin') {
+                checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + serialNum + 
+                    ' shell pm path android | grep package:/system/framework/framework-res.apk';
+            } else {
+                spinner.stop();
+                deferred.reject(new Error("Platform not supported: ", process.platform));
+                return;
+            }
+
             shell.exec(checkCmd, {
                 silent: true
             }, function(code, output) {
                 if (code !== 0) {
                     setTimeout(checkBooted.bind(this, port), 500);
                 } else {
-                    defer.resolve({
-                        port: port
-                    });
+                    var wait = 0;
+                    if (process.platform == 'win32') {
+                        wait = 30000;
+                    } else if (process.platform == 'darwin') {
+                        wait = 3000;
+                    }
+
+                    setTimeout(function () {
+                        spinner.stop();
+                        defer.resolve(serialNum);
+                    }, wait);
                 }
             });
         }
         
-        var port = 5554;
         var cmd = userHome + '/platforms/android/sdk/tools/emulator -wipe-data -avd ' + name + ' -port ' + port + ' -gpu on';
-        console.info('emulator.start:', cmd);
 
         shell.exec(cmd, {
             async: true
@@ -57,6 +78,7 @@ module.exports = {
         });
 
         // start polling for device ready
+        spinner.start();
         checkBooted(port);
 
         return defer.promise;

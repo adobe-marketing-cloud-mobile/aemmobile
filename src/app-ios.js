@@ -18,16 +18,14 @@
 /**
  * Module dependencies.
  */
-var Q = require('q');
 var path = require("path");
 var FS = require('q-io/fs');
 var fs = require("fs");
-var DecompressZip = require('decompress-zip');
 var os = require('os');
 var app = require('./app');
 var config = require('../config.json');
-var rp = require('request-promise');
 var plist = require('plist');
+var unzip = require('../utils/unzip');
 
 const aemmAppName = "AEMM.app";
 
@@ -55,37 +53,6 @@ function getInstalledAppBinaryPath(deviceType)
 	});
 }
 
-
-
-function unzipFile(zipFile, outputPath)
-{
-	console.log("Extracting app");
-	
-	var deferred = Q.defer();
-
-	var unzipper = new DecompressZip(zipFile)
-
-	unzipper.on('error', function (err) {
-		deferred.reject(new Error("Failed to extract the app from the specified ipa"));	
-	});
-	
-	unzipper.on('extract', function (log) {
-		deferred.resolve(outputPath);
-	});
-	
-	unzipper.on('progress', function (fileIndex, fileCount) {
-		// console.log('Extracted file ' + (fileIndex + 1) + ' of ' + fileCount);
-	});
-	
-	unzipper.extract({
-		path: outputPath
-	});
-		
-	return deferred.promise;
-}
-
-
-
 module.exports.getAppVersion = getAppVersion;
 function getAppVersion(deviceType)
 {
@@ -108,7 +75,7 @@ function installFromFilePath(version, filepath, deviceType)
 		let unzipPath = path.join(os.tmpdir(), "AEMMDownload");
 		return FS.removeTree(unzipPath)
 		.catch(() => {}) // Don't care if it is not there and errors
-		.then( () => unzipFile(filepath, unzipPath) ); 
+		.then( () => unzip(filepath, unzipPath) ); 
 	}).then(function(unzipPath) {
 		let targetPath = path.join(binaryParentPath, aemmAppName);
 		const payloadPath = path.join(unzipPath, "Payload");							

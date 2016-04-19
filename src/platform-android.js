@@ -24,30 +24,104 @@ var fs = require("fs");
 var FS = require('q-io/fs');
 var app = require('./app');
 var shell = require('shelljs');
+var os = require('os');
+var downloadFile = require('../utils/downloadFile');
+var getUserHome = require('../utils/getUserHome');
+var unzip = require('../utils/unzip');
+var spawn = require('cross-spawn-async');
+var spinner = require('simple-spinner');
 
 const skinName = "Nexus-7";
 
 module.exports.install = install;
 function install() {
     return installSdk()
-        .then(function() {
+        .then( () => {
             return updateSdk();
         })
-        .then(function() {
+        .then( () => {
             return createAvd();
         })
-        .then(function() {
+        .then( () => {
             return installHAXM();
         })
 }
 
+function installSdk() {
+    var deferred = Q.defer();
+    var sdkDownloadUrl = null;
+    var sdkInstallPath = path.join(getUserHome(), 'platforms/android/sdk');
+    var tempSdkDownloadFilePath = path.join(os.tmpdir(), 'android_sdk.zip');
+    var tempSdkUnzipRoot = path.join(os.tmpdir(), 'platform');
+    var tempSdkUnzipPath = null;
+
+    // It's ok to hard code specific SDK download link since we will attempt to update
+    // to the latest SDK each time user runs "aemm platform install android".
+    //
+    // We just need to install an initial version to begin with. Android community keeps
+    // download links for all prior version of SDKs since it's introduction at:
+    // http://developer.android.com/tools/sdk/tools-notes.html
+    if (process.platform == 'win32') {
+        sdkDownloadUrl = 'http://dl.google.com/android/android-sdk_r24.4.1-windows.zip';
+        tempSdkUnzipPath = path.join(tempSdkUnzipRoot, 'android-sdk-windows');
+    } else if (process.platform == 'darwin') {
+        sdkDownloadUrl = 'http://dl.google.com/android/android-sdk_r24.4.1-macosx.zip';
+        tempSdkUnzipPath = path.join(tempSdkUnzipRoot, 'android-sdk-macosx');
+    } else {
+        console.log("Unsupported OS: %s", process.platform);
+        return;
+    }
+
+    // Check whether SDK is installed already
+    fs.access(sdkInstallPath, fs.F_OK, function(err) {
+        if (!err) {
+            deferred.resolve();
+        } else {
+            spinner.start();
+
+            FS.makeTree(sdkInstallPath)
+            .then( () => {
+                return downloadFile(sdkDownloadUrl, tempSdkDownloadFilePath)
+            })
+            .then( () => {
+                return unzip(tempSdkDownloadFilePath, tempSdkUnzipRoot)
+            })
+            .then( () => {
+                return FS.copyTree(tempSdkUnzipPath, sdkInstallPath)
+            })
+            .then ( () => {
+                return FS.removeTree(tempSdkUnzipRoot)
+                    .catch( (err) => false ); // We don't care if it does not exist when we try to delete it
+            })
+            .then( () => {
+                spinner.stop();
+
+                console.log("Android SDK is installed successfully.");
+                deferred.resolve();
+            })
+        }
+    });
+
+    return deferred.promise;
+}
+
 function updateSdk() {
     var deferred = Q.defer();
+    var command = null;
+    var script = null;
 
-    var userHome = process.env.HOME;
-    var androidCmd = userHome + '/platforms/android/sdk/tools/android';
-    var spawn = require('child_process').spawn;
-    var proc = spawn(androidCmd, ['--silent', 'update', 'sdk', '--all',
+    if (process.platform == 'win32') {
+        command = "powershell";
+        script = path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat');
+    } else if (process.platform == 'darwin') {
+        command = "sh";
+        script = path.join(getUserHome(), 'platforms/android/sdk/tools/android');
+    } else {
+        console.log("Platform not supported: " + process.platform);
+        return;
+    }
+
+    var proc = spawn(command, [script, '--silent', 'update', 'sdk', '--all',
         '--no-ui', '--filter', 'platform-tool,tool,android-23,sys-img-x86_64-android-23,extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
 
     proc.on("error", function (error) {
@@ -57,6 +131,7 @@ function updateSdk() {
         if (code !== 0) {
             deferred.reject(new Error("Installing Android platform exited with code " + code));
         } else {
+            console.log("Android SDK is updated successfully.");
             deferred.resolve();
         }
     });
@@ -64,38 +139,30 @@ function updateSdk() {
     return deferred.promise;
 }
 
-function installSdk() {
-    var defer = Q.defer();
-
-    var pathToInstallSdkScript = path.join(__dirname, '..', 'platforms/android/shell_scripts/install-android-sdk.sh');
-
-    shell.exec(pathToInstallSdkScript, {
-        silent: false
-    }, function(code, output) {
-        if (code == 0) {
-            defer.resolve();
-        }
-    });
-
-    return defer.promise;
-}
-
 function installHAXM() {
     var deferred = Q.defer();
+    var command = null;
 
-    var userHome = process.env.HOME;
-    var installCmd = 'sudo ' + userHome + '/platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/silent_install.sh';
-    var spawn = require('child_process').spawn;
-    var proc = spawn('sh', ['-c', installCmd], { stdio: 'inherit' });
+    if (process.platform == 'win32') {
+        command = path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/silent_install.bat');
+    } else if (process.platform == 'darwin') {
+        command = 'sudo ' + path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/silent_install.sh');
+    } else {
+        console.log("Unsupported OS: %s", process.platform);
+        return;
+    }
 
-    proc.on("error", function (error) {
-        deferred.reject(new Error("Installing Intel HAXM encountered error " + error.message));
-    });
-    proc.on("exit", function(code) {
-        if (code !== 0) {
-            deferred.reject(new Error("Installing Intel HAXM exited with code " + code));
-        } else {
+    spinner.start();
+    var workingDir = path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager');
+    shell.cd(workingDir);
+    shell.exec(command, {
+        silent: false
+    }, function (code, output) {
+        spinner.stop();
+        if (code == 0) {
             deferred.resolve();
+        } else {
+            deferred.reject(new Error("Installing Intel HAXM failed."));
         }
     });
 
@@ -104,25 +171,36 @@ function installHAXM() {
 
 function createAvd() {
     var skinFrom = path.join(__dirname, '..', 'platforms/android/skins', skinName);
-    var skinTo = path.join(process.env.HOME, 'platforms/android/sdk/platforms/android-23/skins', skinName);
+    var skinTo = path.join(getUserHome(), 'platforms/android/sdk/platforms/android-23/skins', skinName);
 
     return FS.makeTree(skinTo)
-    .then(function() {
-        return FS.copyTree(skinFrom, skinTo)
-            .then(function () {
-                var defer = Q.defer();
+        .then( () => {
+            return FS.copyTree(skinFrom, skinTo)
+        })
+        .then( () => {
+            var deferred = Q.defer();
 
-                var pathToInstallAvdScript = path.join(__dirname, '..', 'platforms/android/shell_scripts/install-android-avd.sh');
+            var command =  null;
+            if (process.platform == 'win32') {
+                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-23" --abi default/x86_64 --skin "Nexus-7" --sdcard 1024M';
+            } else if (process.platform == 'darwin') {
+                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-23" --abi default/x86_64 --skin "Nexus-7" --sdcard 1024M';
+            } else {
+                deferred.reject(new Error("Platform not supported: " + process.platform));
+                return;
+            }
 
-                shell.exec(pathToInstallAvdScript, {
-                    silent: false
-                }, function (code, output) {
-                    if (code == 0) {
-                        defer.resolve();
-                    }
-                });
-
-                return defer.promise;
+            shell.exec(command, {
+                silent: false
+            }, function (code, output) {
+                if (code == 0) {
+                    console.log("AVD is created successfully.");
+                    deferred.resolve();
+                } else {
+                    deferred.reject(new Error("Creating AVD failed"));
+                }
             });
-    });
+
+            return deferred.promise;
+        });
 }

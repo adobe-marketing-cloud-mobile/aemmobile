@@ -15,25 +15,37 @@
  */
 "use strict";
 
+var Q = require('q');
 var net = require('net');
+var attempts = 6; // max. # of attempts
 
-/* return a free odd port number for android emulator */
-var random_port = function(cb) {
+/* return a free port number for android emulator */
+function random_port() {
+    var deferred = Q.defer();
+
+    // port range by Android emulator/device
     var from = 5554,
-        to = 5680,
+        to = 5584,
         range = (to - from) / 2,
         port = from + ~~(Math.random() * range) * 2;
 
     var server = net.createServer();
+    server.on('error', function(err) {
+        attempts -= 1;
+        if (attempts == 0) {
+            deferred.reject(new Error("No ports are available"));
+        } else {
+            random_port();
+        }
+    });
     server.listen(port, function (err) {
         server.once('close', function () {
-            cb(port);
+            deferred.resolve(port);
         });
         server.close();
     });
-    server.on('error', function (err) {
-        random_port(opts, cb);
-    });
+
+    return deferred.promise;
 };
 
 module.exports = random_port;

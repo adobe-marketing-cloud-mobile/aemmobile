@@ -18,6 +18,7 @@
     "connect-aemmobile": "^0.1.0",
     "continuation-local-storage": "^3.1.6",
     "cordova-lib": "^6.0.0",
+    "cross-spawn-async": "^2.1.9",
     "decompress-zip": "^0.2.0",
     "ios-sim": "5.0.8",
     "jsonfile": "^2.2.3",
@@ -30,7 +31,8 @@
     "request": "^2.67.0",
     "request-promise": "^1.0.2",
     "semver": "^5.1.0",
-    "shelljs": "^0.6.0"
+    "shelljs": "^0.6.0",
+    "simple-spinner": "0.0.5"
   },
   "devDependencies": {
     "jasmine": "^2.4.1"
