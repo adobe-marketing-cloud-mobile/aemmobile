@@ -31,7 +31,7 @@ function random_port() {
 
     var server = net.createServer();
     server.on('error', function(err) {
-        attempt -= 1;
+        attempts -= 1;
         if (attempts == 0) {
             deferred.reject(new Error("No ports are available"));
         } else {

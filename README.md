@@ -49,7 +49,8 @@ if that doesn't work, do the following...
 	npm link
 ~~~~
 
-
+For Android, you may see couple compilation errors related to node-gyp when running "npm install" on Mac OS X and Windows.
+It's safe to ignore them. They don't affect the functionalities of this tool.
 
 #### Usage
 
