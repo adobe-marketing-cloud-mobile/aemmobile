@@ -68,7 +68,7 @@ Accept several Android SDK license agreements.
 	
 	aemm app install --list
 	
-	aemm app install ios 2016.3.0
+	aemm app install ios <App Version>
 
 `aemm project create [PROJECT_NAME or PATH]`
 
