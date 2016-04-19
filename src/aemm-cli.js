@@ -69,12 +69,12 @@ function cli(inputArgs, callback)
 		console.log(`Version ${cmdLineToolInfo.version}`);
 		return;
 	}
-/*    
+    
     process.on('uncaughtException', function(err) {
         logger.error(err);
         process.exit(1);
     });
-*/
+
     logger.subscribe(events);
 
     if (args.silent) {
