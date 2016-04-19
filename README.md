@@ -68,7 +68,7 @@ Accept several Android SDK license agreements.
 	
 	aemm app install --list
 	
-	aemm app install ios <App Version>
+	aemm app install ios 2016.5
 
 `aemm project create [PROJECT_NAME or PATH]`
 
@@ -76,7 +76,7 @@ Accept several Android SDK license agreements.
 	
 	aemm project create /path/to/TestProject
 
-For the following commands, must be inside folder created with `aemm project create [PROJECT_NAME or PATH]`.  
+You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`.  
 
 `aemm article create [articleName]`
 
