@@ -20,11 +20,28 @@ var path = require('path');
 var shell = require('shelljs');
 var Q = require('q');
 var spinner = require('simple-spinner');
+var ini = require('ini');
+var config = require('./config');
 
 module.exports = {
     start: function(name, port) {
         var defer = Q.defer();
         var userHome = process.env.HOME;
+
+        var orientation = config.getValueFromConfig('screenOrientation');
+        if (!orientation) {
+            // portrait by default
+            orientation = 'portrait';
+        }
+
+        // launch emulator in the orientation specified in the config
+        var avdName = name + '.avd';
+        var avdConfigIni = path.join(userHome, ".android/avd/", avdName, 'config.ini');
+        var avdConfig = ini.parse(fs.readFileSync(avdConfigIni, 'utf-8'));
+
+        avdConfig['hw.initialOrientation'] = orientation;
+
+        fs.writeFileSync(avdConfigIni, ini.stringify(avdConfig, null));
 
         function checkBooted(port) {
             if (defer.promise.isRejected()) {

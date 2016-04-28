@@ -20,14 +20,14 @@ var project = require('./project');
 var path = require("path");
 var FS = require('q-io/fs');
 var fs = require("fs");
-var bplist = require('bplist');
 var serve = require('./serve');
 var emulator = require('./android-emulator');
 var shell = require('shelljs');
 var androidApp = require('./app-android');
 var randomPort = require('./random-port');
-
+var config = require('./config');
 var deviceSerialNum = null;
+
 module.exports = run;
 
 function run(args)
@@ -46,10 +46,16 @@ function run(args)
         .then(function (servResponse) {
             var defer = Q.defer();
 
+            var orientation = config.getValueFromConfig('screenOrientation');
+            if (!orientation) {
+                // portrait by default
+                orientation = 'portrait';
+            }
+
             var userHome = process.env.HOME;
             var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
-                ' shell am start -n "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity" ' +
-                    '-e phonegapServer 10.0.2.2:3000';
+                ' shell am start -n "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"' +
+                    ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
             shell.exec(launchCmd, {
                 silent: false
             }, function (code, output) {
