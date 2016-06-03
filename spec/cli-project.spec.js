@@ -60,6 +60,7 @@ describe("aemm cli project", function () {
 
     });
 /*
+        // Ignoring negative tests.
         it("will fail if an invalid subcommand is called", function (done) {
             cli(["node", "aemm", "project", "bogus"], (err) => {
                 expect(err.message).toBe("aemm project does not have a subcommand of 'bogus'; try 'aemm help project' for a list of all the available sub commands within project.");

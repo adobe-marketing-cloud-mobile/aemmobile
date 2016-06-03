@@ -65,7 +65,6 @@ module.exports = function (inputArgs, cb) {
     
     inputArgs = inputArgs || process.argv;
     var cmd = inputArgs[2]; // e.g: inputArgs= 'node aemm run ios'
-    var subcommand = getSubCommand(inputArgs, cmd);
     
     if(cmd === '--version' || cmd === '-v') {
         cmd = 'version';
@@ -81,13 +80,6 @@ module.exports = function (inputArgs, cb) {
         cb(err);
         throw err;
     }).done();
-}
-
-function getSubCommand(args, cmd) {
-    if(cmd === 'platform' || cmd === 'platforms' || cmd === 'plugin' || cmd === 'plugins') {
-        return args[3]; // e.g: args='node aemm platform rm ios'
-    }
-    return null;
 }
 
 function cli(inputArgs)

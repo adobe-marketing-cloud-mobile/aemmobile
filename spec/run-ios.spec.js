@@ -78,6 +78,7 @@ describe('run ios:', function()
         .finally(done);
     });
 /*  
+    // Ignoring negative tests. We may want to re-visit these later.
     describe('no simulators:', function() 
     {
         let fullDeviceList = [
@@ -196,6 +197,7 @@ describe('run ios:', function()
             .catch( (err) => done.fail(`Unexpected Error: ${err}`) );           
         });
 /*
+        // Ignoring negative tests. We may want to re-visit these later.
         // run ios --target invalidTarget
         it('should fail if the specified target is invalid', function(done) 
         {
@@ -210,6 +212,4 @@ describe('run ios:', function()
         });
 */      
     });
-
-
 });

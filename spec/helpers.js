@@ -81,10 +81,3 @@ var customMatchers = {
         };
     }
 };
-
-
-// Add the toExist matcher.
-beforeEach(function () 
-{   
-//  jasmine.addMatchers(customMatchers);
- });
