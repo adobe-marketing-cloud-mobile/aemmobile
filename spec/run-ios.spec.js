@@ -29,14 +29,38 @@ var Q = require('q');
 var app = require('../src/app');
 var iosApp = require('../src/app-ios');
 var phoneGap = require('connect-aemmobile');	
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
+var logger = require('cordova-common').CordovaLogger.get();
 
 describe('run ios:', function() 
 {
 	beforeEach(function(done) 
 	{
-		spyOn(iossim, "launch").and.returnValue( Q.resolve( true ) );
-		spyOn(app, "ensureInstalledBinary").and.returnValue( Q.resolve(true) );
-		spyOn(console, "log");
+		// Event registration is currently process-global. Since all jasmine
+        // tests in a directory run in a single process (and in parallel),
+        // logging events registered as a result of the "--verbose" flag in
+        // CLI testing below would cause lots of logging messages printed out by other specs.
+
+		// This is required so that fake events chaining works (events.on('log').on('verbose')...)
+		var FakeEvents = function FakeEvents() {};
+		FakeEvents.prototype.on = function fakeOn () {
+			return new FakeEvents();
+		};
+
+		spyOn(events, "on").andReturn(new FakeEvents());
+	   
+	    // Spy and mute output
+        spyOn(logger, 'results');
+		spyOn(logger, 'log');
+		spyOn(logger, 'info');
+        spyOn(logger, 'warn');
+        spyOn(console, 'log');
+		spyOn(process.stderr, 'write');
+		spyOn(events, 'emit');
+		
+		spyOn(iossim, "launch").andCallFake( function(value) {return Q.resolve(true);} );
+		spyOn(app, "ensureInstalledBinary").andCallFake( function(value) {return Q.resolve(true);} );
 		
 		FS.makeTree(tmpDir) 
 		.then( () => {
@@ -53,7 +77,7 @@ describe('run ios:', function()
 		FS.removeTree(tmpDir)
 		.finally(done);
 	});
-	
+/*	
 	describe('no simulators:', function() 
 	{
 		let fullDeviceList = [
@@ -87,7 +111,7 @@ describe('run ios:', function()
 
 		});
 	});
-
+*/
 				
 	describe('valid sims:', function() 
 	{
@@ -104,7 +128,7 @@ describe('run ios:', function()
 		];
 		beforeEach(function() 
 		{
-			spyOn(iossim, "getdevicetypes").and.returnValue( fullDeviceList );	
+			spyOn(iossim, "getdevicetypes").andCallFake(function(value) {return fullDeviceList;});	
 			
 			let serveStub = {
 				on: function(event, callback) {
@@ -115,7 +139,7 @@ describe('run ios:', function()
 					return this;
 				}
 			};
-			spyOn(phoneGap,"listen").and.returnValue( serveStub );
+			spyOn(phoneGap,"listen").andCallFake(function(value) {return serveStub;});
 			
 		});
 
@@ -124,10 +148,10 @@ describe('run ios:', function()
 		{
 			run({}, "ios")
 			.then( () => {
-				let path = iossim.launch.calls.mostRecent().args[0];
-				let target = iossim.launch.calls.mostRecent().args[1];
-				let logPath = iossim.launch.calls.mostRecent().args[2];
-				let cmdLineArgs = iossim.launch.calls.mostRecent().args[4];
+				let path = iossim.launch.calls[0].args[0];
+				let target = iossim.launch.calls[0].args[1];
+				let logPath = iossim.launch.calls[0].args[2];
+				let cmdLineArgs = iossim.launch.calls[0].args[4];
 				
 				expect(path).toMatch(/AEMM.app/);
 				expect(fullDeviceList.indexOf(target)).toBe(1);
@@ -147,13 +171,13 @@ describe('run ios:', function()
 		{
 			run({ list: true }, "ios")
 			.then( () => {
-				let count = console.log.calls.count();
-				let calls = console.log.calls.all();
-				expect( calls[count-5].args[0].trim() ).toBe("Available ios virtual devices");
-				expect( calls[count-4].args[0].trim() ).toBe("iPhone-6, 8.1");
-				expect( calls[count-3].args[0].trim() ).toBe("iPhone-6, 9.2");
-				expect( calls[count-2].args[0].trim() ).toBe("iPad-Retina, 8.2");
-				expect( calls[count-1].args[0].trim() ).toBe("iPad-Air-2, 9.2");
+				let count = events.emit.calls.length;
+				let calls = events.emit.calls;
+				expect( calls[count-5].args[1].trim() ).toBe("Available ios virtual devices");
+				expect( calls[count-4].args[1].trim() ).toBe("iPhone-6, 8.1");
+				expect( calls[count-3].args[1].trim() ).toBe("iPhone-6, 9.2");
+				expect( calls[count-2].args[1].trim() ).toBe("iPad-Retina, 8.2");
+				expect( calls[count-1].args[1].trim() ).toBe("iPad-Air-2, 9.2");
 				done();
 			})
 			.catch( (err) => done.fail(err) );
@@ -164,14 +188,14 @@ describe('run ios:', function()
 		{
 			run({target: "iPhone-6, 9.2"}, "ios")
 			.then( () => {
-				let target = iossim.launch.calls.mostRecent().args[1];
+				let target = iossim.launch.calls[0].args[1];
 				
 				expect(fullDeviceList.indexOf(target)).toBe(3);
 				done();
 			})
 			.catch( (err) => done.fail(`Unexpected Error: ${err}`) );			
 	    });
-
+/*
 		// run ios --target invalidTarget
 	    it('should fail if the specified target is invalid', function(done) 
 		{
@@ -184,7 +208,7 @@ describe('run ios:', function()
 				done();
 			});			
 	    });
-		
+*/		
 	});
 
 

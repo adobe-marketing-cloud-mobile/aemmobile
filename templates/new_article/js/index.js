@@ -16,6 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
+
 var app = {
     // Application Constructor
     initialize: function() {
@@ -44,7 +48,7 @@ var app = {
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
 
-        console.log('Received Event: ' + id);
+        events.emit("log", 'Received Event: ' + id);
     }
 };
 

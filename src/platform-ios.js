@@ -19,15 +19,17 @@
  * Module dependencies.
  */
 var exec = require('child-process-promise').exec;
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 module.exports.install = install;
 function install()
 {
 	return exec('xcodebuild -version')
 	.then( () => {
-		console.log("The ios platform is ready to use.")
+		events.emit("log", "The ios platform is ready to use.")
 	})
 	.catch( (err) => {
-		console.log("You must install Xcode to run in the simulator.  You can get it from the Mac App Store.")
+		events.emit("log", "You must install Xcode to run in the simulator.  You can get it from the Mac App Store.")
 	});
 }

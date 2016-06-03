@@ -15,13 +15,31 @@
  */
 "use strict"
 
-var helpers = require('./helpers');
 var cli = require("../src/aemm-cli");
 var Q = require('q');
 var article = require('../src/article');
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
+var logger = require('cordova-common').CordovaLogger.get();
 
 describe("aemm cli article:", function () {
     beforeEach(function () {
+        // Event registration is currently process-global. Since all jasmine
+        // tests in a directory run in a single process (and in parallel),
+        // logging events registered as a result of the "--verbose" flag in
+        // CLI testing below would cause lots of logging messages printed out by other specs.
+
+		// This is required so that fake events chaining works (events.on('log').on('verbose')...)
+		var FakeEvents = function FakeEvents() {};
+		FakeEvents.prototype.on = function fakeOn () {
+			return new FakeEvents();
+		};
+
+		spyOn(events, "on").andReturn(new FakeEvents());
+	   
+	    // Spy and mute output
+        spyOn(logger, 'results');
+        spyOn(logger, 'warn');
         spyOn(console, 'log');
 		spyOn(process.stderr, 'write');
     });
@@ -36,20 +54,18 @@ describe("aemm cli article:", function () {
 			let articleName = "TestArticle";
 			cli(["node", "aemm", "article", "create", articleName], (err) => {
 				expect(err).not.toBeTruthy();
-				expect(article.create.calls.mostRecent().args[0].argv).not.toBeNull();
-				expect(article.create.calls.mostRecent().args[1]).toMatch(articleName);
+				expect(article.create).toHaveBeenCalledWith({ argv : { remain : [ 'TestArticle' ], cooked : [ 'article', 'create', 'TestArticle' ], original : [ 'article', 'create', 'TestArticle' ] } }, 'TestArticle');
 				done();
 			});
 		});
 
 	});
-
+/*
 		it("will fail if an invalid subcommand is called", function (done) {
 			cli(["node", "aemm", "article", "bogus"], (err) => {
 				expect(err.message).toBe("aemm article does not have a subcommand of 'bogus'; try 'aemm help article' for a list of all the available sub commands within article.");
 				done();
 			});
 		});
-	
- 
+*/
 });

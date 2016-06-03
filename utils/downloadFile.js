@@ -20,6 +20,8 @@ var request = require('request');
 var fs = require('fs');
 var path = require("path");
 var mkdirp = Q.nfbind( require("mkdirp") );
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 module.exports = function (sourceUrl, filePath)
 {
@@ -30,15 +32,15 @@ module.exports = function (sourceUrl, filePath)
 	mkdirp(fileFolderPath)
 	.then(function () {
 		try {
-			console.log("Requesting file: " + sourceUrl);
+			events.emit("log", "Requesting file: " + sourceUrl);
 
 			request(sourceUrl, { encoding : null })
 			.on('error', function (error) {
-				console.log("Request failed with error: " + error);
+				events.emit("log", "Request failed with error: " + error);
 				deferred.reject(error);	
 			})
 			.on('response', function(response) {
-				console.log("Server response: " + response.statusCode);
+				events.emit("log", "Server response: " + response.statusCode);
 
 				if (response.statusCode === 404)
 				{
@@ -53,11 +55,11 @@ module.exports = function (sourceUrl, filePath)
 			})
 			.pipe(fs.createWriteStream(filePath))
 			.on('finish', function () {
-				console.log("Request completed.");
+				events.emit("log", "Request completed.");
 				deferred.resolve();
 			});
 		} catch (err) {
-			console.log("Request failed with error: " + error);
+			events.emit("log", "Request failed with error: " + error);
 			deferred.reject(err);
 		}
 

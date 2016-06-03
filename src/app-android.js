@@ -82,7 +82,7 @@ function installFromFilePath(version, filepath, deviceType)
 							var deferred = Q.defer();
 							fs.writeFile(versionPath, version, function(err) {
 								if(err) {
-									console.error("Could not write file: %s", err);
+									throw new Error(`Could not write file: ${err}`);
 								}
 								deferred.resolve();
 							});

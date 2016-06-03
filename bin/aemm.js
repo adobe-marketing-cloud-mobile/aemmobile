@@ -18,13 +18,11 @@
 
 var semver = require('semver');
 var engines = require('../package').engines;
-var ansi = require('ansi');
 
 // Check node version		
 if (!semver.satisfies(process.version, engines["node"]))
 {
-	var stderrCursor = ansi(process.stderr);
-	stderrCursor.fg.red().bold().write("Invalid Node.js version(" + process.version + ").  AEMM requires " + engines["node"] + "\n").reset();
+	throw new Error("Invalid Node.js version(" + process.version + ").  AEMM requires " + engines["node"] + "\n");
 	process.exit(1);
 }
 

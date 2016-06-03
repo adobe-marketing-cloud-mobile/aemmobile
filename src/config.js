@@ -37,16 +37,16 @@ function config(options, args)
             file = getConfigFile();
             if (!file)
             {
-                return console.log("No valid config file found.");
+                return events.emit("log", "No valid config file found.");
             }
             else
             {
-                return console.log(file);
+                return events.emit("log", file);
             }
         }
         if (options.get)
         {
-            return console.log(getValueFromConfig(getKey));
+            return events.emit("log", getValueFromConfig(getKey));
         }
         if (options.set)
         {

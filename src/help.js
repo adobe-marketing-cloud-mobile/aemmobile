@@ -18,25 +18,24 @@
 var FS = require('q-io/fs');
 var Q = require('q');
 var path = require('path');
-
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 module.exports = help;
 
-function help(args, command) 
+function help(args) 
 {
+	var args = args || [];
+	var command = ((args)[0] || 'general');
 	return Q.fcall( () => {
-		if (!command)
-		{
-			command = "general";
-		}
 		return FS.read( path.join(__dirname, "..", "help", `${command}.txt`))
 		.then(function (helpDoc) {
-			console.log(helpDoc);
+			events.emit("log", helpDoc);
 		});
 	})
 	.catch((error) => {
 		var name = require("../package").name;
-		console.error(`'help ${command}' is not a ${name} command. See '${name} help'`);
+		events.emit("error", `'help ${command}' is not a ${name} command. See '${name} help'`);
 	});
 };
 
