@@ -30,6 +30,8 @@ var getUserHome = require('../utils/getUserHome');
 var unzip = require('../utils/unzip');
 var spawn = require('cross-spawn-async');
 var spinner = require('simple-spinner');
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 const skinName = "Nexus-7";
 
@@ -68,7 +70,7 @@ function installSdk() {
         sdkDownloadUrl = 'http://dl.google.com/android/android-sdk_r24.4.1-macosx.zip';
         tempSdkUnzipPath = path.join(tempSdkUnzipRoot, 'android-sdk-macosx');
     } else {
-        console.log("Unsupported OS: %s", process.platform);
+        events.emit("log", "Unsupported OS: %s", process.platform);
         return;
     }
 
@@ -96,7 +98,7 @@ function installSdk() {
             .then( () => {
                 spinner.stop();
 
-                console.log("Android SDK is installed successfully.");
+                events.emit("log", "Android SDK is installed successfully.");
                 deferred.resolve();
             })
         }
@@ -117,7 +119,7 @@ function updateSdk() {
         command = "sh";
         script = path.join(getUserHome(), 'platforms/android/sdk/tools/android');
     } else {
-        console.log("Platform not supported: " + process.platform);
+        events.emit("log", "Platform not supported: " + process.platform);
         return;
     }
 
@@ -131,7 +133,7 @@ function updateSdk() {
         if (code !== 0) {
             deferred.reject(new Error("Installing Android platform exited with code " + code));
         } else {
-            console.log("Android SDK is updated successfully.");
+            events.emit("log", "Android SDK is updated successfully.");
             deferred.resolve();
         }
     });
@@ -148,7 +150,7 @@ function installHAXM() {
     } else if (process.platform == 'darwin') {
         command = 'sudo ' + path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/silent_install.sh');
     } else {
-        console.log("Unsupported OS: %s", process.platform);
+        events.emit("log", "Unsupported OS: %s", process.platform);
         return;
     }
 
@@ -194,7 +196,7 @@ function createAvd() {
                 silent: false
             }, function (code, output) {
                 if (code == 0) {
-                    console.log("AVD is created successfully.");
+                    events.emit("log", "AVD is created successfully.");
                     deferred.resolve();
                 } else {
                     deferred.reject(new Error("Creating AVD failed"));

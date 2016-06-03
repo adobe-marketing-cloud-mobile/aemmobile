@@ -24,6 +24,8 @@ var path = require("path");
 var FS = require('q-io/fs');
 var fs = require("fs");
 var appBinary = require('./app');
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 /**
  * Server Default Settings
@@ -40,8 +42,8 @@ function serve(options)
 {
 	return getCordovaRoot()
 	.then( (cordovaRootPath) => {
-		console.log('starting app server...');
-		console.log("Use Ctrl-C to exit")
+		events.emit("log", 'starting app server...');
+		events.emit("log", "Use Ctrl-C to exit")
 		
 		if (!options) throw new Error('requires option parameter');
 
@@ -83,7 +85,7 @@ function articleMiddleware(options)
 				res.end( JSON.stringify(articleList) );
 			}).catch( (err) => 
 			{
-				console.error(`Failed to get article list: ${err}`);
+				events.emit("error", `Failed to get article list: ${err}`);
 				next();
 			});
 			

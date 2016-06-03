@@ -27,6 +27,8 @@ var app = require('./app');
 var config = require('./config');
 var bplist = require('bplist');
 var exec = require('child-process-promise').exec;
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 module.exports = run;
 
@@ -72,7 +74,7 @@ Install simulator devices from Xcode.`);
 			// Look first for an iPhone-6s.  No reason other than it is most popular phone
 			let filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith("iPhone-6s") );
 			target = filteredList.length > 0 ? filteredList[0] : allValidTargets[0];
-			console.log(`No target specified for emulator. Deploying to ${target} simulator`);
+			events.emit("info", `No target specified for emulator. Deploying to ${target} simulator`);
 		}
 
 	})
@@ -90,8 +92,8 @@ function listSimulators(args)
 	return Q.fcall( () => 
 	{
 		let sims = aemmSimulatorList();
-		console.log("Available ios virtual devices");
-		sims.forEach((target) => console.log(target) );
+		events.emit("results", "Available ios virtual devices");
+		sims.forEach((target) => events.emit("results", target) );
 	});
 }
 

@@ -16,7 +16,6 @@ Commands:
 Additional Commands:
 
   emulate <platforms>  runs the project with the flag --emulator
-  cordova              execute of any cordova command
 
 Options:
 
@@ -25,7 +24,7 @@ Options:
 
 Examples:
 
-  $ aemm help create
+  $ aemm help project
   $ aemm project create path/to/my-app
   $ cd my-app/
   $ aemm article create my-article

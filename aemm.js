@@ -13,19 +13,5 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
-module.exports = function(packageName, platform) 
-{
-	if (!platform)
-	{
-		let cmdLineToolName = require('../package.json').name;
-		throw Error(`You must specify a platform.  See '${cmdLineToolName} help ${packageName}' for more info.`);
-	}
-	try {
-		var platformRun = require(`../src/${packageName}-${platform}`);
-		return platformRun;
-	} catch (error) {
-		throw Error(`Invalid platform - ${platform}`);
-	}
-}
+module.exports.cli = require('./src/aemm-cli.js');

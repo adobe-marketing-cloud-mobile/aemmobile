@@ -22,7 +22,9 @@ var FS = require('q-io/fs');
 var fs = require('fs');
 var Q = require('q');
 var path = require('path');
-var cordova = require('cordova-lib').cordova;
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
+var cordova = cordova_lib.cordova;
 var article = require('./article');
 
 
@@ -38,7 +40,7 @@ function create(options, projectPath)
 		}
 		
 		fullProjectPath = path.resolve(projectPath);
-		console.log(`Creating project ${path.basename(fullProjectPath)}`);
+		events.emit("log", `Creating project ${path.basename(fullProjectPath)}`);
 	})
 	.then( () => createCordovaApp(projectPath) )
 	.then( () => removeUnwantedCordovaArtifacts(fullProjectPath) )
@@ -89,7 +91,7 @@ function metadataForArticle(articlePath)
 			return updateMetadata(json, articlePath);
 		})
 		.catch( (err) => {
-			console.log(`Could not get metadata from ${articlePath}/metadata.json file: ${err}`);
+			events.emit("log", `Could not get metadata from ${articlePath}/metadata.json file: ${err}`);
 		})
 	})
 	.catch( () =>  updateMetadata({}, articlePath) );	// Don't fail over this, just don't use metadata		

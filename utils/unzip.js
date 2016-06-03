@@ -17,27 +17,29 @@
 
 var Q = require('q');
 var decompressZip = require('decompress-zip');
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 module.exports = function(zipFile, outputPath)
 {
     var deferred = Q.defer();
 
-    console.log("unzipping file: " + zipFile);
+    events.emit("log", "unzipping file: " + zipFile);
 
     var unzipper = new decompressZip(zipFile)
 
     unzipper.on('error', function (err) {
-        console.log("unzip failed: " + err);
+        events.emit("log", "unzip failed: " + err);
         deferred.reject(new Error("Failed to unzip file: " + zipFile));
     });
 
     unzipper.on('extract', function (log) {
-        console.log("unzip completed.");
+        events.emit("log", "unzip completed.");
         deferred.resolve(outputPath);
     });
 
     unzipper.on('progress', function (fileIndex, fileCount) {
-        // console.log('Extracted file ' + (fileIndex + 1) + ' of ' + fileCount);
+        // events.emit("log", 'Extracted file ' + (fileIndex + 1) + ' of ' + fileCount);
     });
 
     unzipper.extract({

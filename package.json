@@ -3,20 +3,22 @@
   "version": "1.0.5-dev",
   "description": "Command line utility for building AEMM apps",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run jshint && npm run jasmine",
+    "jshint": "node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint spec",
+    "jasmine": "node node_modules/jasmine-node/bin/jasmine-node --captureExceptions --color spec"
   },
-  "author": "",
+  "author": "Adobe",
   "preferGlobal": true,
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bin": {
     "aemm": "./bin/aemm.js"
   },
   "dependencies": {
-    "ansi": "^0.3.1",
     "bplist": "0.0.4",
     "child-process-promise": "^1.1.0",
     "connect-aemmobile": "^0.1.0",
     "continuation-local-storage": "^3.1.6",
+    "cordova-common": "^1.1.1",
     "cordova-lib": "^6.0.0",
     "cross-spawn-async": "^2.1.9",
     "decompress-zip": "^0.2.0",
@@ -36,7 +38,8 @@
     "simple-spinner": "0.0.5"
   },
   "devDependencies": {
-    "jasmine": "^2.4.1"
+    "jasmine-node": "^1.14.5",
+    "jshint": "^2.9.2"
   },
   "engines": {
     "node": ">=4.1.0"
@@ -44,5 +47,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/adobe-marketing-cloud-mobile/aemmobile.git"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues"
+  },
+  "homepage": "https://github.com/adobe-marketing-cloud-mobile/aemmobile#readme",
+  "main": "aemm"
 }

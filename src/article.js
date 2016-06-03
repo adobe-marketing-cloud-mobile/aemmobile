@@ -21,6 +21,8 @@ var Q = require('q');
 var path = require("path");
 var project = require('./project');
 var pathToNewArticleTemplate = path.join(__dirname, '..', 'templates', 'new_article');
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 module.exports.testing = {};
 
@@ -67,7 +69,7 @@ function createSingleArticle(projectPath, articleName)
 	.then( function() {
 		return FS.copyTree(pathToNewArticleTemplate, articleFolder); 
 	})
-	.then( () => console.log("Created Article: " + articleName));
+	.then( () => events.emit("log", "Created Article: " + articleName));
 }
 
 

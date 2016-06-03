@@ -27,6 +27,8 @@ var rp = require('request-promise');
 var os = require('os');
 var downloadFile = require('../utils/downloadFile');
 var url = require('url');
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 module.exports.getApplicationSupportPath = getApplicationSupportPath;
 function getApplicationSupportPath()
@@ -99,7 +101,7 @@ function displayAppVersion(options, platform)
 			const platformAppBinary = platformRequire("app", platform);
 			return platformAppBinary.getAppVersion(deviceType)
 			.then( (appVersion) => {
-				console.log(`${platform} version:\n${appVersion ? appVersion : "No app install for ios."}\n`);
+				events.emit('log', `${platform} version:\n${appVersion ? appVersion : "No app install for ios."}\n`);
 			})	
 		});
 		
@@ -122,12 +124,18 @@ function install(options, urlOrFilepathOrPlatform, appVersion)
 		if (urlOrFilepathOrPlatform === "ios" || urlOrFilepathOrPlatform === "android")
 		{
 			installPromise =  installFromServerInConfig(urlOrFilepathOrPlatform, deviceType, appVersion);
-		} else
+		} 
+		else if (urlOrFilepathOrPlatform) 
 		{
 			installPromise = installFromFile(appVersion, urlOrFilepathOrPlatform, deviceType);
 		}
+		else
+		{
+			events.emit("warn", `You need to indicate a plaftorm for the app you would like to install.\n\tPlease see your options below:`)
+			return listAppVersions();
+		}
 	
-		return installPromise.then( () => console.log("Install complete"));
+		return installPromise.then( () => events.emit("log", "Install complete"));
 	});
 	
 }
@@ -148,7 +156,7 @@ function installFromServerInConfig(platform, deviceType, specificVersion)
 				throw new Error("Could not determine latest update.  Please install specific version.  See 'aemm help app' for more info");
 			}
 
-			console.log(specificVersion ? `Downloading version ${specificVersion}` : `Downloading latest version(${getVersion})`);
+			events.emit("log", specificVersion ? `Downloading version ${specificVersion}` : `Downloading latest version(${getVersion})`);
 			return installFromUrl(platform, getVersion, resolvedUrl, deviceType);
 		});
 	});
@@ -177,7 +185,7 @@ function installFromFile(version, urlOrFilepath, deviceType)
 			let foundUrl = urlOrFilepath.match(/http[s]?:\/\//);
 			if (foundUrl)
 			{
-				console.log(`Downloading ${urlOrFilepath}`);
+				events.emit("log", `Downloading ${urlOrFilepath}`);
 				return installFromUrl(platform, version, urlOrFilepath, deviceType);
 			} else
 			{
@@ -228,13 +236,13 @@ function listAppVersions(platform)
 
 function logVersions(platform, versionDict)
 {
-	console.log(`Available app versions for ${platform}...`);
+	events.emit("log", `Available app versions for ${platform}...`);
 	for (const version in versionDict)
 	{
 		// Don't write out "latest"
 		if (version !== "latest")
 		{
-			console.log(version);
+			events.emit("log", version);
 		}
 	}
 	
@@ -257,7 +265,7 @@ function update(options, optionalPlatform)
 				const platformAppBinary = platformRequire("app", platform);
 				return platformAppBinary.getAppVersion(deviceType)
 				.catch( (err) => {
-					console.log(`No app found for ${platform}`);
+					events.emit("log", `No app found for ${platform}`);
 					return null;
 				})
 				.then( (appVersion) => {					
@@ -276,7 +284,7 @@ function update(options, optionalPlatform)
 						}
 						return installFromFile(platformVersions["latest"], latest, deviceType);
 					} else {
-						console.log(`${platform} app binary is up to date.`)
+						events.emit("log", `${platform} app binary is up to date.`)
 					}
 					return false;
 				});
@@ -287,7 +295,7 @@ function update(options, optionalPlatform)
 
 	})
 	.then( () => {
-		console.log("Update Complete");
+		events.emit("log", "Update Complete");
 	});
 }
 
