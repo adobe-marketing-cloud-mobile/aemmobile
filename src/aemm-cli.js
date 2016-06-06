@@ -53,7 +53,7 @@ var commands = {
     config: require("./config.js"),
     help: require("./help.js"),
     platform: require("./platform.js"),
-	plugin: require("./plugin.js"),
+    plugin: require("./plugin.js"),
     project: require('./project.js'),
     run: require('./run.js'),
     serve: require('./serve.js')
