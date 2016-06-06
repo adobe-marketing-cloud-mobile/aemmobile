@@ -53,9 +53,11 @@ function run(args)
             }
 
             var userHome = process.env.HOME;
+            //var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
+            //    ' shell am start -n "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"' +
+            //        ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
             var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
-                ' shell am start -n "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"' +
-                    ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
+                ' shell am start -n "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity"'
             shell.exec(launchCmd, {
                 silent: false
             }, function (code, output) {

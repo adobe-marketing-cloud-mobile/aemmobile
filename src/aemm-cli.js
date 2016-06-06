@@ -55,7 +55,8 @@ var commands = {
     project: require('./project.js'),
     help: require("./help.js"),
     platform: require("./platform.js"),
-    config: require("./config.js")
+    config: require("./config.js"),
+    build: require("./build.js")
 }
 
 module.exports = function (inputArgs, cb) {

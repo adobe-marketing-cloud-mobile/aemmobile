@@ -32,10 +32,12 @@ var spawn = require('cross-spawn-async');
 var spinner = require('simple-spinner');
 var cordova_lib = require('cordova-lib');
 var events = cordova_lib.events;
-
+var cordova = cordova_lib.cordova;
 const skinName = "Nexus-7";
 
 module.exports.install = install;
+module.exports.add = add;
+
 function install() {
     return installSdk()
         .then( () => {
@@ -46,6 +48,9 @@ function install() {
         })
         .then( () => {
             return installHAXM();
+        })
+        .then( () => {
+            return installAemmAndroid();
         })
 }
 
@@ -205,4 +210,59 @@ function createAvd() {
 
             return deferred.promise;
         });
+}
+
+// Temporary solution, download aemm-android straight from github
+function installAemmAndroid() {
+    var deferred = Q.defer();
+    var aemmAndroidDownloadUrl = null;
+    var aemmAndroidInstallPath = path.join(getUserHome(), 'platforms/android/aemm');
+    var tempDownloadFilePath = path.join(os.tmpdir(), 'aemm_android.zip');
+    var tempUnzipRoot = path.join(os.tmpdir(), 'platform');
+    var tempUnzipPath = null;
+
+    aemmAndroidDownloadUrl = 'https://github.com/adobe-marketing-cloud-mobile/aemm-android/archive/aar.zip';
+    tempUnzipPath = path.join(tempUnzipRoot, 'aemm-android-aar');
+
+    // Check whether aemm_android is installed already
+    fs.access(aemmAndroidInstallPath, fs.F_OK, function(err) {
+        if (!err) {
+            deferred.resolve();
+        } else {
+            spinner.start();
+
+            FS.makeTree(aemmAndroidInstallPath)
+                .then( () => {
+                    return downloadFile(aemmAndroidDownloadUrl, tempDownloadFilePath)
+                })
+                .then( () => {
+                    return unzip(tempDownloadFilePath, tempUnzipRoot)
+                })
+                .then( () => {
+                    return FS.copyTree(tempUnzipPath, aemmAndroidInstallPath)
+                })
+                .then ( () => {
+                    return FS.removeTree(tempUnzipRoot)
+                        .catch( (err) => false ); // We don't care if it does not exist when we try to delete it
+                })
+                .then( () => {
+                    spinner.stop();
+
+                    events.emit("log", "aemm android is installed successfully.");
+                    deferred.resolve();
+                })
+        }
+    });
+
+    return deferred.promise;
+}
+
+function add() {
+    var cmd = "platform";
+    var subcommand = "add"; // sub-command like "add", "ls", "rm" etc.
+    var targets = path.join(getUserHome(), 'platforms/android/aemm');
+
+    var download_opts = {};
+
+    return cordova.raw[cmd](subcommand, targets, download_opts);
 }
