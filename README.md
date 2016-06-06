@@ -93,3 +93,8 @@ You must run the following commands inside the directory created with `aemm proj
 	aemm run ios --list
 	
 	aemm run ios --target "iPhone-6s, 9.2"
+
+## NOTE
+
+aemm was built on cordova and delegates many commands to cordova-lib. You may experience errors that recommend that you try to run a cordova command.
+In most of such cases, please first try to replace cordova with aemm, then execute the recommended action.
