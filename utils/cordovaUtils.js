@@ -13,9 +13,9 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-var cordova = require('cordova');
+var cordova_lib = require('cordova_lib');
 
 module.exports.cordovaProjectRoot = function ()
 {
-	return cordova.cordova_lib.cordova.findProjectRoot(process.cwd());	
+	return cordova_lib.cordova.findProjectRoot(process.cwd());	
 }
