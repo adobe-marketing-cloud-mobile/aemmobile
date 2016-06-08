@@ -50,12 +50,13 @@ function init() {
 var commands = {
     app: require('./app.js'),
     article: require('./article.js'),
-    serve: require('./serve.js'),
-    run: require('./run.js'),
-    project: require('./project.js'),
+    config: require("./config.js"),
     help: require("./help.js"),
     platform: require("./platform.js"),
-    config: require("./config.js")
+    plugin: require("./plugin.js"),
+    project: require('./project.js'),
+    run: require('./run.js'),
+    serve: require('./serve.js')
 }
 
 module.exports = function (inputArgs, cb) {
