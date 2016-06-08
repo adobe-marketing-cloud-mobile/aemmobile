@@ -1,0 +1,19 @@
+Usage: aemm plugin <command>
+
+Description:
+
+  Perform commands that apply to plugins.
+
+Commands:
+
+  add <plugin-spec> [...]               Adds specified plugins to the plugins directory.
+  remove <pluginid>|<name> [...]        Removes plugins with the specified ID or name.
+  list                                  Lists the installed plugins
+  search <keyword>                      Searches cordova website for plugins.
+
+Examples:
+
+  $ aemm plugin add my.plugin
+  $ aemm plugin remove my.plugin
+  $ aemm plugin list
+  $ aemm plugin search geolocation
