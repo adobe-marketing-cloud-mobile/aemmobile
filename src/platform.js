@@ -27,19 +27,13 @@ var cordova_lib = require('cordova-lib'),
 module.exports.install = install;
 module.exports.add = add;
 module.exports.remove = remove;
+module.exports.rm = remove;
 
 function install(options, platform)
 {
     return Q.fcall( () => {
-        if (platform)
-        {
-            var platformInstallBinary = platformRequire("platform", platform);
-
-            return platformInstallBinary.install();
-        } else
-        {
-            throw new Error("Could not find a platform for the specifed file path.  Are you sure the path is correct?");
-        }
+        var platformInstallBinary = platformRequire("platform", platform);
+        return platformInstallBinary.install();
     });
 }
 
