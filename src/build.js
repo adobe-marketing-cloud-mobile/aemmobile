@@ -24,7 +24,7 @@ function build(args, platform)
 {
     return Q.fcall( () => {
         var platformBuildModule = platformRequire("build", platform);
-        return platformBuildModule.build();
+        return platformBuildModule.build(args);
     });
 };
 

@@ -21,12 +21,12 @@ var cordova_lib = require('cordova-lib'),
 
 module.exports.build = build;
 
-function build(args, platform)
+function build(args)
 {
     return Q.fcall( () => {
         var cmd = "build";
         var opts = {
-            platforms: [ platform ],
+            platforms: [ "android" ],
             options: { },
             verbose: false,
             silent: false,
