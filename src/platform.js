@@ -37,14 +37,17 @@ function install(options, platform)
     });
 }
 
-function add(options, platform)
+function add(options, target)
 {
     return Q.fcall( () => {
-        if (platform)
+        if (target)
         {
+            var parts = target.split('@');
+            var platform = parts[0];
+            var spec = parts[1];
             var platformAddBinary = platformRequire("platform", platform);
 
-            return platformAddBinary.add();
+            return platformAddBinary.add(spec);
         } else
         {
             throw new Error("Could not find a platform for the specifed file path.  Are you sure the path is correct?");

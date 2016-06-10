@@ -37,10 +37,12 @@ function install()
 }
 
 module.exports.add = add;
-function add()
+function add(spec)
 {
+	let target_repo = "https://github.com/adobe-marketing-cloud-mobile/aemm-ios.git";
     return Q.fcall( () => {
-        return cordova.raw.platform("add", "https://github.com/adobe-marketing-cloud-mobile/aemm-ios.git");
+		var target = spec ? target_repo + "@" + spec : target_repo; 
+        return cordova.raw.platform("add", target);
     }).then( function () {
 		events.emit("results", "Finished installing ios platform.");	
 	});

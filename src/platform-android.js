@@ -257,7 +257,8 @@ function installAemmAndroid() {
     return deferred.promise;
 }
 
-function add() {
+function add(spec) {
+    // TODO: Make spec work for Android, so people can declare a version they'd like to use, e.g. android@5.0.0
     var cmd = "platform";
     var subcommand = "add"; // sub-command like "add", "ls", "rm" etc.
     var targets = path.join(getUserHome(), 'platforms/android/aemm');
