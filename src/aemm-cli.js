@@ -50,11 +50,11 @@ function init() {
 var commands = {
     app: require('./app.js'),
     article: require('./article.js'),
-    build: require("./build.js"),
-    config: require("./config.js"),
-    help: require("./help.js"),
-    platform: require("./platform.js"),
-    plugin: require("./plugin.js"),
+    build: require('./build.js'),
+    config: require('./config.js'),
+    help: require('./help.js'),
+    platform: require('./platform.js'),
+    plugin: require('./plugin.js'),
     project: require('./project.js'),
     run: require('./run.js'),
     serve: require('./serve.js')
@@ -97,6 +97,10 @@ function cli(inputArgs)
         , 'set' : String
         , 'unset' : String
         , 'list' : Boolean
+        , 'device' : Boolean
+        , 'emulator' : Boolean
+        , 'debug' : Boolean
+        , 'release' : Boolean
         };
 
     var shortHands =

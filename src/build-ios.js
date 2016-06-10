@@ -16,15 +16,34 @@
 "use strict";
 
 var Q = require('q');
-var platformRequire = require('../utils/platformRequire');
+var cordova_lib = require('cordova-lib'),
+    cordova = cordova_lib.cordova;
 
-module.exports = build;
+module.exports.build = build;
 
 function build(args, platform)
 {
     return Q.fcall( () => {
-        var platformBuildModule = platformRequire("build", platform);
-        return platformBuildModule.build();
+        var cmd = "build";
+        var opts = {
+            platforms: [ platform ],
+            options: {
+                debug: false,
+                release: false,
+                device: false,
+                emulator: false,
+                codeSignIdentity: "Don't Code Sign",
+                noSign: true
+            },
+            verbose: false,
+            silent: false,
+            browserify: false,
+            fetch: false,
+            nohooks: [],
+            searchpath : ""
+        };
+
+        return cordova.raw[cmd].call(null, opts);
     });
 };
 
