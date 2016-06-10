@@ -49,9 +49,6 @@ function install() {
         .then( () => {
             return installHAXM();
         })
-        .then( () => {
-            return installAemmAndroid();
-        })
 }
 
 function installSdk() {
@@ -212,58 +209,13 @@ function createAvd() {
         });
 }
 
-// Temporary solution, download aemm-android straight from github
-function installAemmAndroid() {
-    var deferred = Q.defer();
-    var aemmAndroidDownloadUrl = null;
-    var aemmAndroidInstallPath = path.join(getUserHome(), 'platforms/android/aemm');
-    var tempDownloadFilePath = path.join(os.tmpdir(), 'aemm_android.zip');
-    var tempUnzipRoot = path.join(os.tmpdir(), 'platform');
-    var tempUnzipPath = null;
-
-    aemmAndroidDownloadUrl = 'https://github.com/adobe-marketing-cloud-mobile/aemm-android/archive/aar.zip';
-    tempUnzipPath = path.join(tempUnzipRoot, 'aemm-android-aar');
-
-    // Check whether aemm_android is installed already
-    fs.access(aemmAndroidInstallPath, fs.F_OK, function(err) {
-        if (!err) {
-            deferred.resolve();
-        } else {
-            spinner.start();
-
-            FS.makeTree(aemmAndroidInstallPath)
-                .then( () => {
-                    return downloadFile(aemmAndroidDownloadUrl, tempDownloadFilePath)
-                })
-                .then( () => {
-                    return unzip(tempDownloadFilePath, tempUnzipRoot)
-                })
-                .then( () => {
-                    return FS.copyTree(tempUnzipPath, aemmAndroidInstallPath)
-                })
-                .then ( () => {
-                    return FS.removeTree(tempUnzipRoot)
-                        .catch( (err) => false ); // We don't care if it does not exist when we try to delete it
-                })
-                .then( () => {
-                    spinner.stop();
-
-                    events.emit("log", "aemm android is installed successfully.");
-                    deferred.resolve();
-                })
-        }
+function add(spec)
+{
+    let target_repo = "https://github.com/adobe-marketing-cloud-mobile/aemm-android.git";
+    return Q.fcall( () => {
+        var target = spec ? target_repo + "#" + spec : target_repo;
+        return cordova.raw.platform("add", target);
+    }).then( function () {
+        events.emit("results", "Finished adding Android platform.");
     });
-
-    return deferred.promise;
-}
-
-function add(spec) {
-    // TODO: Make spec work for Android, so people can declare a version they'd like to use, e.g. android@5.0.0
-    var cmd = "platform";
-    var subcommand = "add"; // sub-command like "add", "ls", "rm" etc.
-    var targets = path.join(getUserHome(), 'platforms/android/aemm');
-
-    var download_opts = {};
-
-    return cordova.raw[cmd](subcommand, targets, download_opts);
 }
