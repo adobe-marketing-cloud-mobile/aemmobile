@@ -27,7 +27,7 @@ function build(args)
         var cmd = "build";
         var opts = {
             platforms: [ "android" ],
-            options: { },
+            options: [],
             verbose: false,
             silent: false,
             browserify: false,
@@ -35,6 +35,9 @@ function build(args)
             nohooks: [],
             searchpath : ""
         };
+
+        opts.options = args;
+        opts.options.argv = [];
 
         return cordova.raw[cmd].call(null, opts);
     });
