@@ -23,17 +23,32 @@ var exec = require('child-process-promise').exec;
 var cordova_lib = require('cordova-lib');
 var cordova = cordova_lib.cordova;
 var events = cordova_lib.events;
+var path = require('path');
 
 module.exports.install = install;
 function install()
 {
-    return exec('xcodebuild -version')
-    .then( () => {
-        events.emit("log", "The ios platform is ready to use.")
-    })
-    .catch( (err) => {
-        events.emit("log", "You must install Xcode to run in the simulator.  You can get it from the Mac App Store.")
-    });
+	return Q().then( () => {
+		return exec('xcodebuild -version')
+		.then( (result) => {
+			return Q();
+		})
+		.catch( (err) => {
+			events.emit("warn", "You must install Xcode to run in the simulator.  You can get it from the Mac App Store.");
+		});
+	})
+	.then( () => {
+		return checkForCodeSignRequired();
+	})
+	.then( (required) => {
+		if (required) {
+			return changeCodeSignPolicy(required);
+		}	
+	})
+	.then( () => {
+		events.emit("log", "The ios platform is ready to use.");
+		return Q();
+	});
 }
 
 module.exports.add = add;
@@ -45,5 +60,35 @@ function add(spec)
         return cordova.raw.platform("add", target);
     }).then( function () {
 		events.emit("results", "Finished installing ios platform.");	
+	});
+}
+
+function checkForCodeSignRequired() {
+	return Q()
+	.then( () => {
+		var settingsPlist;
+		return exec('xcode-select -p')
+		.then( (result) => {
+			settingsPlist = path.resolve(result.stdout.trim(), 'Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist');
+			return exec('/usr/libexec/PlistBuddy -c "Print DefaultProperties:CODE_SIGNING_REQUIRED" ' + settingsPlist)
+			.then( (codeSignRequired) => {
+				if (codeSignRequired.stdout.trim() === "NO") {
+					return Q(false);
+				} else {
+					return Q(settingsPlist);
+				}
+			}).catch( (err) => {
+				console.log("Error!");
+			});
+		});
+	});
+}
+
+function changeCodeSignPolicy(settingsPlist) {
+	return Q().then( () => {
+		events.emit("info", "You may need to enter your admin password to change Xcode's code signing policy.\naemm requires Xcode to allow building unsigned frameworks.")
+	})
+	.then( () => {
+		return exec('/usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED NO" ' + settingsPlist);
 	});
 }

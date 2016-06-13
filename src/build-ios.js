@@ -23,15 +23,15 @@ module.exports.build = build;
 
 function build(args)
 {
-    return Q.fcall( () => {
+    return Q().then( function() {
         var cmd = "build";
         var opts = {
             platforms: [ "ios" ],
             options: {
-                debug: false,
-                release: false,
-                device: false,
-                emulator: false,
+                debug: args.debug,
+                release: args.release,
+                device: args.device,
+                emulator: args.emulator,
                 codeSignIdentity: "Don't Code Sign",
                 noSign: true
             },

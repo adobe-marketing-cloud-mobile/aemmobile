@@ -194,18 +194,6 @@ function cli(inputArgs)
         remain.shift();
 
         let newArgs = [args].concat(remain);
-        return subCommand.apply(this, newArgs)
+        return subCommand.apply(this, newArgs);
     }
-
-    // if the result is a list from Q.allSettled, then we may have a mixture of errors and successes.  Check for this and write out errors
-    if (Array.isArray(result))
-    {
-        result.forEach( (item) => {
-            if (item.state && item.state === "rejected" && item.reason)
-            {
-                throw new CordovaError(item.reason);
-            }
-        });
-    }
-   
 }
