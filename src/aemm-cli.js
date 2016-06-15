@@ -53,6 +53,7 @@ var commands = {
     build: require('./build.js'),
     config: require('./config.js'),
     help: require('./help.js'),
+    package: require('./package.js'),
     platform: require('./platform.js'),
     plugin: require('./plugin.js'),
     project: require('./project.js'),
@@ -156,6 +157,7 @@ function cli(inputArgs)
     var undashed = remain.slice(0, remain.length - unparsedArgs.length);
     var commandName = undashed[0];
     var subCommandName;
+    args.argv.undashed = undashed;
     
     if ( !commandName || commandName == 'help' || args.help ) {
         if (!args.help && remain[0] == 'help') {
