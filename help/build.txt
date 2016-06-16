@@ -1,0 +1,20 @@
+Usage: aemm build <platform>
+
+Description:
+
+  Builds a binary for the indicated platform.
+
+Options:
+
+  --debug              Builds the debug configuration, this is the default configuration. May not be used with the --release option.
+  --release            Builds the release configuration. May not be used with the --debug option.
+  --emulator           Builds for emulator architectures (some platforms require different architectures for an emulator build). 
+                       May not be used with the --device option. This is the default option.
+  --device             Builds for device architectures. May not be used with the emulator option.
+
+Examples:
+
+  $ aemm build ios
+  $ aemm build android
+  $ aemm build ios --release --device
+  

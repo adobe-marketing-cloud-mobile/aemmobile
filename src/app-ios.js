@@ -49,7 +49,7 @@ function getInstalledAppBinaryPath(deviceType)
 			}
 		}
 		
-		throw new Error(`No application found at ${parentPath}`);			
+		throw new Error(`No application found at ${parentPath}, please run 'aemm app install ios'`);
 	});
 }
 
