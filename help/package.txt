@@ -1,0 +1,21 @@
+Usage: aemm package <platform> [opts] [<path to device binary>]
+
+Description:
+
+  Packages the custom plugin framework into a binary for the indicated platform.
+
+Options:
+
+  --emulator           Packages the custom plugin framework into the emulator binary. 
+                       May not be used with the --device option. This is the default option.
+  --device             Packages the custom plugin framework into the provided device binary.  
+                       May not be used with the emulator option.
+
+Note:
+  This command is currently only relevant for iOS.
+
+Examples:
+
+  $ aemm package ios
+  $ aemm package ios --device /Users/foo/MyAEMMobile.ipa
+  

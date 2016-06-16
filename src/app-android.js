@@ -27,24 +27,41 @@ var os = require('os');
 var app = require('./app');
 var config = require('../config.json');
 var plist = require('plist');
+var project = require('./project');
 
 const aemmAppName = "AEMM.apk";
 const aemmVerName = "version.txt";
 
+function getCustomAppBinaryPath()
+{
+	var customAppPath = path.join(project.projectRootPath(), 'platforms/android/build/outputs/apk/android-debug.apk');
+	if ( !fs.existsSync(customAppPath) )
+	{
+		return null;
+	}
+
+	return customAppPath;
+}
+
 module.exports.getInstalledAppBinaryPath = getInstalledAppBinaryPath;
 function getInstalledAppBinaryPath(deviceType)
 {
-	return app.getParentPathForAppBinary("android", deviceType)
-	.then( (parentPath) => {
-		let viewerPath = path.join(parentPath, aemmAppName);
-		if ( !fs.existsSync(viewerPath) )
-		{
-			throw new Error(`No application found at ${parentPath}`);			
+	return Q.fcall( () => {
+		var customAppPath = getCustomAppBinaryPath();
+		if (customAppPath != null) {
+			return customAppPath;
 		}
-		
-		return viewerPath;
-	});
 
+		return app.getParentPathForAppBinary("android", deviceType)
+			.then((parentPath) => {
+				let viewerPath = path.join(parentPath, aemmAppName);
+				if (!fs.existsSync(viewerPath)) {
+					throw new Error(`No application found at ${parentPath}`);
+				}
+
+				return viewerPath;
+			});
+	});
 }
 
 module.exports.getAppVersion = getAppVersion;

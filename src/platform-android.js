@@ -32,10 +32,12 @@ var spawn = require('cross-spawn-async');
 var spinner = require('simple-spinner');
 var cordova_lib = require('cordova-lib');
 var events = cordova_lib.events;
-
+var cordova = cordova_lib.cordova;
 const skinName = "Nexus-7";
 
 module.exports.install = install;
+module.exports.add = add;
+
 function install() {
     return installSdk()
         .then( () => {
@@ -205,4 +207,15 @@ function createAvd() {
 
             return deferred.promise;
         });
+}
+
+function add(spec)
+{
+    let target_repo = "https://github.com/adobe-marketing-cloud-mobile/aemm-android.git";
+    return Q.fcall( () => {
+        var target = spec ? target_repo + "#" + spec : target_repo;
+        return cordova.raw.platform("add", target);
+    }).then( function () {
+        events.emit("results", "Finished adding Android platform.");
+    });
 }

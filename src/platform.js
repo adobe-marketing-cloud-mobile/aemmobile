@@ -21,20 +21,50 @@
 var Q = require('q');
 var platformRequire = require('../utils/platformRequire');
 var path = require("path");
+var cordova_lib = require('cordova-lib'),
+    cordova = cordova_lib.cordova;
 
 module.exports.install = install;
+module.exports.add = add;
+module.exports.remove = remove;
+module.exports.rm = remove;
+
 function install(options, platform)
 {
     return Q.fcall( () => {
-        if (platform)
-        {
-            var platformInstallBinary = platformRequire("platform", platform);
+        var platformInstallBinary = platformRequire("platform", platform);
+        return platformInstallBinary.install();
+    });
+}
 
-            return platformInstallBinary.install();
+function add(options, target)
+{
+    return Q.fcall( () => {
+        if (target)
+        {
+            var parts = target.split('@');
+            var platform = parts[0];
+            var spec = parts[1];
+            var platformAddBinary = platformRequire("platform", platform);
+
+            return platformAddBinary.add(spec);
         } else
         {
             throw new Error("Could not find a platform for the specifed file path.  Are you sure the path is correct?");
         }
     });
-
 }
+
+function remove(options, platform)
+{
+    return Q.fcall( () => {
+        var cmd = "platform";
+        var subcommand = "remove"; // sub-command like "add", "ls", "rm" etc.
+        var targets = platform;
+
+        var download_opts = {};
+
+        return cordova.raw[cmd](subcommand, targets, download_opts);
+    });
+}
+

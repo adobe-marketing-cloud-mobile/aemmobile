@@ -23,8 +23,8 @@ module.exports = function(packageName, platform)
 		throw Error(`You must specify a platform.  See '${cmdLineToolName} help ${packageName}' for more info.`);
 	}
 	try {
-		var platformRun = require(`../src/${packageName}-${platform}`);
-		return platformRun;
+		var platformModule = require(`../src/${packageName}-${platform}`);
+		return platformModule;
 	} catch (error) {
 		throw Error(`Invalid platform - ${platform}`);
 	}

@@ -50,10 +50,12 @@ function init() {
 var commands = {
     app: require('./app.js'),
     article: require('./article.js'),
-    config: require("./config.js"),
-    help: require("./help.js"),
-    platform: require("./platform.js"),
-    plugin: require("./plugin.js"),
+    build: require('./build.js'),
+    config: require('./config.js'),
+    help: require('./help.js'),
+    package: require('./package.js'),
+    platform: require('./platform.js'),
+    plugin: require('./plugin.js'),
     project: require('./project.js'),
     run: require('./run.js'),
     serve: require('./serve.js')
@@ -96,6 +98,10 @@ function cli(inputArgs)
         , 'set' : String
         , 'unset' : String
         , 'list' : Boolean
+        , 'device' : Boolean
+        , 'emulator' : Boolean
+        , 'debug' : Boolean
+        , 'release' : Boolean
         };
 
     var shortHands =
@@ -151,6 +157,7 @@ function cli(inputArgs)
     var undashed = remain.slice(0, remain.length - unparsedArgs.length);
     var commandName = undashed[0];
     var subCommandName;
+    args.argv.undashed = undashed;
     
     if ( !commandName || commandName == 'help' || args.help ) {
         if (!args.help && remain[0] == 'help') {
@@ -189,18 +196,6 @@ function cli(inputArgs)
         remain.shift();
 
         let newArgs = [args].concat(remain);
-        return subCommand.apply(this, newArgs)
+        return subCommand.apply(this, newArgs);
     }
-
-    // if the result is a list from Q.allSettled, then we may have a mixture of errors and successes.  Check for this and write out errors
-    if (Array.isArray(result))
-    {
-        result.forEach( (item) => {
-            if (item.state && item.state === "rejected" && item.reason)
-            {
-                throw new CordovaError(item.reason);
-            }
-        });
-    }
-   
 }

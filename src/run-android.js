@@ -27,11 +27,18 @@ var androidApp = require('./app-android');
 var randomPort = require('./random-port');
 var config = require('./config');
 var deviceSerialNum = null;
+var cordova_lib = require('cordova-lib');
+var events = cordova_lib.events;
 
 module.exports = run;
 
 function run(args)
 {
+    if (args.release == true) {
+        var message = `release option is not supported for run command`;
+        throw new Error(message);
+    }
+
     return randomPort()
         .then(function(port) {
             return emulator.start('AEMM_Tablet', port);
@@ -53,9 +60,12 @@ function run(args)
             }
 
             var userHome = process.env.HOME;
+            //var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
+            //    ' shell am start -n "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"' +
+            //    ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
             var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
-                ' shell am start -n "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"' +
-                    ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
+                ' shell am start -n "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity"' +
+                ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
             shell.exec(launchCmd, {
                 silent: false
             }, function (code, output) {
