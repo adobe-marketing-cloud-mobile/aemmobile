@@ -21,14 +21,13 @@
 var Q = require('q');
 var cordova_lib = require('cordova-lib');
 var cordova = cordova_lib.cordova;
-var processCommandOpts = require('../utils/processCommandOpts');
 
 module.exports = plugin;
 function plugin(args, command) {
     return Q.fcall( () => {
         var targets = args.argv.remain;
         var command = targets.shift();
-        return cordova.plugin(command, targets, processCommandOpts(args));
+        return cordova.plugin(command, targets);
     }).catch(function (err) {
         throw new Error(err.message);
     }).done();
