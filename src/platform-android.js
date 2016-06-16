@@ -209,12 +209,12 @@ function createAvd() {
         });
 }
 
-function add(spec, opts)
+function add(spec)
 {
     let target_repo = "https://github.com/adobe-marketing-cloud-mobile/aemm-android.git";
     return Q.fcall( () => {
         var target = spec ? target_repo + "#" + spec : target_repo;
-        return cordova.raw.platform("add", target, opts);
+        return cordova.raw.platform("add", target);
     }).then( function () {
         events.emit("results", "Finished adding Android platform.");
     });
