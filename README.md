@@ -15,11 +15,11 @@ Mac OS X:
 * For Android, Chrome needs to be installed for debugging via chrome://inspect
 
 Windows:
-* Java:
-  https://java.com/en/download/manual.jsp
+* Java SDK:
+  http://www.oracle.com/technetwork/java/javase/downloads/index.html
 * VisualStudio Community 2015:
   https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx
-* npm(v4.4.2 LTS is recommended):
+* npm(v4.4.5 LTS is recommended):
   https://nodejs.org/en/
 * Python 2.7:
   https://www.python.org/download/releases/2.7/

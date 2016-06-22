@@ -44,6 +44,9 @@ function install() {
             return updateSdk();
         })
         .then( () => {
+            return setupEnv();
+        })
+        .then( () => {
             return createAvd();
         })
         .then( () => {
@@ -126,7 +129,9 @@ function updateSdk() {
     }
 
     var proc = spawn(command, [script, '--silent', 'update', 'sdk', '--all',
-        '--no-ui', '--filter', 'platform-tool,tool,android-23,sys-img-x86_64-android-23,extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
+        '--no-ui', '--filter', 'build-tools-23.0.2,platform-tool,tool,android-23,sys-img-x86_64-android-23,' +
+        'extra-android-m2repository,extra-android-support,extra-google-m2repository,' +
+        'extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
 
     proc.on("error", function (error) {
         deferred.reject(new Error("Installing Android platform encountered error " + error.message));
@@ -141,6 +146,53 @@ function updateSdk() {
     });
 
     return deferred.promise;
+}
+
+function setupEnvVariable(name, value) {
+    var deferred = Q.defer();
+    var command = null;
+    var script = null;
+
+    if (process.platform == 'win32') {
+        command = "powershell";
+        script = "[Environment]::SetEnvironmentVariable(" + '"' + name + '", "' + value + '", ' + "\"User\")";
+    } else if (process.platform == 'darwin') {
+        command = "sh";
+        script = "echo " + '"export ' + name + '=' + value + '"' + " >> ~/.bash_profile";
+    } else {
+        events.emit("log", "Platform not supported: " + process.platform);
+        return;
+    }
+
+    var proc = spawn(command, [script], { stdio: 'inherit' });
+
+    proc.on("error", function (error) {
+        deferred.reject(new Error("Failed to setup environment variable(" + name + ") " + error.message));
+    });
+    proc.on("exit", function(code) {
+        if (code !== 0) {
+            deferred.reject(new Error("Setup environment variable(" + name + ") exited with code " + code));
+        } else {
+            events.emit("log", "Setup environment variable(" + name + ") successfully");
+            deferred.resolve();
+        }
+    });
+
+    return deferred.promise;
+}
+
+function setupEnv() {
+    var android_home_env = path.join(getUserHome(), 'platforms/android/sdk');
+    return setupEnvVariable("ANDROID_HOME", android_home_env)
+        .then( () => {
+            var path_env = null;
+            if (process.platform == 'win32') {
+                path_env = "%PATH%;%ANDROID_HOME%\\tools;%ANDROID_HOME%\\platform-tools";
+            } else if (process.platform == 'darwin') {
+                path_env = "${PATH}:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools";
+            }
+            return setupEnvVariable("PATH", path_env)
+        })
 }
 
 function installHAXM() {

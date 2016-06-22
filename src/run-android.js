@@ -27,6 +27,7 @@ var androidApp = require('./app-android');
 var randomPort = require('./random-port');
 var config = require('./config');
 var deviceSerialNum = null;
+var getUserHome = require('../utils/getUserHome');
 
 module.exports = run;
 
@@ -52,12 +53,12 @@ function run(args)
                 orientation = 'portrait';
             }
 
-            var userHome = process.env.HOME;
-            //var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
-            //    ' shell am start -n "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"' +
-            //        ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
+            var userHome = getUserHome();
             var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
-                ' shell am start -n "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity"'
+                ' shell am start -n "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity"' +
+                    ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
+            //var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
+            //    ' shell am start -n "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity"'
             shell.exec(launchCmd, {
                 silent: false
             }, function (code, output) {
@@ -78,7 +79,7 @@ function installApk(deviceSerialNum)
         .then((jupiterPath) => {
             var defer = Q.defer();
 
-            var checkCmd = path.join(process.env.HOME, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
+            var checkCmd = path.join(getUserHome(), 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
                 ' install ' + '"' + jupiterPath + '"';
             shell.exec(checkCmd, {
                 silent: false
