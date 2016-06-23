@@ -123,7 +123,7 @@ function installFromProjectBuild()
 
 	if (process.platform == 'win32') {
 		command = "powershell";
-		script = path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat');
+		script = path.join(__dirname, '..', 'platforms/android/scripts/appInstall.bat');
 	} else if (process.platform == 'darwin') {
 		command = "sh";
 		script = path.join(__dirname, '..', 'platforms/android/scripts/appInstall.sh');
@@ -135,13 +135,12 @@ function installFromProjectBuild()
 	var proc = spawn(command, [script, process.cwd()], { stdio: 'inherit' });
 
 	proc.on("error", function (error) {
-		deferred.reject(new Error("nstall app from project build failed: " + error.message));
+		deferred.reject(new Error("Install app from project build failed: " + error.message));
 	});
 	proc.on("exit", function(code) {
 		if (code !== 0) {
-			deferred.reject(new Error("nstall app from project build exited with code: " + code));
+			deferred.reject(new Error("Install app from project build exited with code: " + code));
 		} else {
-			events.emit("log", "Install app from project build succeeded.");
 			deferred.resolve();
 		}
 	});
