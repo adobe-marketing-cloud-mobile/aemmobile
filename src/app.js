@@ -149,12 +149,13 @@ function installFromServerInConfig(platform, deviceType, specificVersion)
 			const versionDict = versions[platform];
 			const getVersion = specificVersion || versionDict["latest"];
 			const appUrl = versionDict[getVersion];
-			const resolvedUrl = resolveTemplatedEnvironmentUrl(appUrl);
 			
 			if (!appUrl)
 			{
-				throw new Error("Could not determine latest update.  Please install specific version.  See 'aemm help app' for more info");
+				throw new Error("Did not find specified version.  See 'aemm help app' for more info or run 'aemm app install --list' to see available versions.");
 			}
+
+			const resolvedUrl = resolveTemplatedEnvironmentUrl(appUrl);
 
 			events.emit("log", specificVersion ? `Downloading version ${specificVersion}` : `Downloading latest version(${getVersion})`);
 			return installFromUrl(platform, getVersion, resolvedUrl, deviceType);
