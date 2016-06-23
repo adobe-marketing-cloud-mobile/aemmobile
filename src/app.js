@@ -121,10 +121,15 @@ function install(options, urlOrFilepathOrPlatform, appVersion)
 		const deviceType = "emulator";
 
 		let installPromise = null;
-		if (urlOrFilepathOrPlatform === "ios" || urlOrFilepathOrPlatform === "android")
+		if (urlOrFilepathOrPlatform === "ios")
 		{
 			installPromise =  installFromServerInConfig(urlOrFilepathOrPlatform, deviceType, appVersion);
-		} 
+		}
+		else if (urlOrFilepathOrPlatform === "android")
+		{
+			const platformAppBinary = platformRequire("app", urlOrFilepathOrPlatform);
+			return platformAppBinary.installFromProjectBuild();
+		}
 		else if (urlOrFilepathOrPlatform) 
 		{
 			installPromise = installFromFile(appVersion, urlOrFilepathOrPlatform, deviceType);
