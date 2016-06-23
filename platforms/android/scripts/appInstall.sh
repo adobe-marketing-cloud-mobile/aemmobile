@@ -3,7 +3,7 @@
 projectRoot=$1
 
 # (1) prompt user, and read command line argument
-read -p "Build and install application with default set of plugins(Y/N)? " answer
+read -p "This will build application with default set of plugins[Y/N]? " answer
 
 # (2) handle the command line argument we were given
 while true

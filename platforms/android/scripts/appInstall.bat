@@ -2,7 +2,7 @@
 
 REM (1) prompt user, and read command line argument
 :choice
-set /P answer=Build and install application with default set of plugins[Y/N]?
+set /P answer=This will build application with default set of plugins[Y/N]?
 
 REM (2) handle the command line argument we were given
 if /I "%answer%" EQU "Y" goto :yes
