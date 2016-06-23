@@ -28,6 +28,8 @@ var os = require('os');
 var downloadFile = require('../utils/downloadFile');
 var getUserHome = require('../utils/getUserHome');
 var unzip = require('../utils/unzip');
+var setupEnv_win = require('../utils/setupEnv-android-win');
+var setupEnv_mac = require('../utils/setupEnv-android-mac');
 var spawn = require('cross-spawn-async');
 var spinner = require('simple-spinner');
 var cordova_lib = require('cordova-lib');
@@ -148,51 +150,15 @@ function updateSdk() {
     return deferred.promise;
 }
 
-function setupEnvVariable(name, value) {
-    var deferred = Q.defer();
-    var command = null;
-    var script = null;
-
+function setupEnv() {
     if (process.platform == 'win32') {
-        command = "powershell";
-        script = "[Environment]::SetEnvironmentVariable(" + '"' + name + '", "' + value + '", ' + "\"User\")";
+        return setupEnv_win();
     } else if (process.platform == 'darwin') {
-        command = "sh";
-        script = "echo " + '"export ' + name + '=' + value + '"' + " >> ~/.bash_profile";
+        return setupEnv_mac();
     } else {
-        events.emit("log", "Platform not supported: " + process.platform);
+        events.emit("log", "Unsupported OS: %s", process.platform);
         return;
     }
-
-    var proc = spawn(command, [script], { stdio: 'inherit' });
-
-    proc.on("error", function (error) {
-        deferred.reject(new Error("Failed to setup environment variable(" + name + ") " + error.message));
-    });
-    proc.on("exit", function(code) {
-        if (code !== 0) {
-            deferred.reject(new Error("Setup environment variable(" + name + ") exited with code " + code));
-        } else {
-            events.emit("log", "Setup environment variable(" + name + ") successfully");
-            deferred.resolve();
-        }
-    });
-
-    return deferred.promise;
-}
-
-function setupEnv() {
-    var android_home_env = path.join(getUserHome(), 'platforms/android/sdk');
-    return setupEnvVariable("ANDROID_HOME", android_home_env)
-        .then( () => {
-            var path_env = null;
-            if (process.platform == 'win32') {
-                path_env = "%PATH%;%ANDROID_HOME%\\tools;%ANDROID_HOME%\\platform-tools";
-            } else if (process.platform == 'darwin') {
-                path_env = "${PATH}:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools";
-            }
-            return setupEnvVariable("PATH", path_env)
-        })
 }
 
 function installHAXM() {
