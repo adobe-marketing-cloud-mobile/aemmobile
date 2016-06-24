@@ -55,8 +55,8 @@ It's safe to ignore them. They don't affect the functionalities of this tool.
 #### Usage
 
 There are 2 types of workflow this tool is designed for:
-1. Developing custom HTML content.
-2. Developing custom application with custom plugins.
+* Developing custom HTML content.
+* Developing custom application with custom plugins.
 
 Commands for both workflows:
 
@@ -82,7 +82,7 @@ You must run the following commands inside the directory created with `aemm proj
 	aemm article create Article1 Article2 Article3
  
  
-##### Developing custom HTML content
+###### 1. Developing custom HTML content
   
 `aemm app install <platform>`
 
@@ -108,7 +108,7 @@ You must run the following commands inside the directory created with `aemm proj
 	
 	aemm run ios --target "iPhone-6s, 9.2"
 
-##### Developing custom application with custom plugins.
+###### 2. Developing custom application with custom plugins.
 
 You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`.
 
