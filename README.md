@@ -64,8 +64,8 @@ Commands for both workflows:
 
     aemm platform install android
  
-Accept several Android SDK license agreements. This installs and updates various Android SDKs, build tools and setup system
-environment for developing Android application.
+Accept several Android SDK license agreements. This installs and updates various Android SDKs, build tools and setup system environment for developing Android application.
+You may need to open a new terminal to have the new system environment settings take effect.
 
 `aemm project create [PROJECT_NAME or PATH]`
 
