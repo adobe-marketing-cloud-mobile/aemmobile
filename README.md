@@ -94,7 +94,7 @@ You must run the following commands inside the directory created with `aemm proj
 	
 	aemm app install ios 2016.5
 
-For iOS, the test application is downloaded over the internet. For Android, this command needs to be run inside the project directory where it builds the test application locally, just answer 'Y' at the command prompt.
+For iOS, the test application is downloaded from the internet. For Android, this command needs to be run inside the project directory where it builds the test application locally, just answer 'Y' at the command prompt.
 
 You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`.  
 
@@ -130,7 +130,7 @@ Add plugins you want to be included in your application.
 
 	aemm build android
 	
-	aemm build ios
+	aemm build ios --device
 	
 `aemm run [platform]`
 

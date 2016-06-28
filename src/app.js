@@ -127,8 +127,8 @@ function install(options, urlOrFilepathOrPlatform, appVersion)
 		}
 		else if (urlOrFilepathOrPlatform === "android")
 		{
-			const platformAppBinary = platformRequire("app", urlOrFilepathOrPlatform);
-			return platformAppBinary.installFromProjectBuild();
+			const platformAppPromise = platformRequire("app", urlOrFilepathOrPlatform);
+			return platformAppPromise.installFromProjectBuild();
 		}
 		else if (urlOrFilepathOrPlatform) 
 		{
