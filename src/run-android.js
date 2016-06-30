@@ -28,20 +28,29 @@ var randomPort = require('./random-port');
 var config = require('./config');
 var deviceSerialNum = null;
 var getUserHome = require('../utils/getUserHome');
+var app = require('./app');
+
+const aemmAppName = "AEMM.apk";
 
 module.exports = run;
 
 function run(args)
 {
-    return randomPort()
-        .then(function(port) {
+    var apkInstalledType = 0;
+
+    return checkApk()
+        .then( () => {
+            return randomPort();
+        })
+        .then(function (port) {
             return emulator.start('AEMM_Tablet', port);
         })
         .then(function (emulatorId) {
             deviceSerialNum = emulatorId;
             return installApk(deviceSerialNum);
         })
-        .then(function () {
+        .then(function (apkType) {
+            apkInstalledType = apkType;
             return serve({}, "android");
         })
         .then(function (servResponse) {
@@ -54,9 +63,13 @@ function run(args)
             }
 
             var userHome = getUserHome();
+            var launchActivity = "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity";
+            if (apkInstalledType == 1) {
+                // prebuilt apk has different package name from custom apk
+                launchActivity = "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"
+            }
             var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
-                ' shell am start -n "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity"' +
-                    ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
+                ' shell am start -n ' + launchActivity + ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
             shell.exec(launchCmd, {
                 silent: false
             }, function (code, output) {
@@ -71,21 +84,53 @@ function run(args)
         });
 };
 
+function checkApk() {
+    var deferred = Q.defer();
+
+    var customAppPath = path.join(project.projectRootPath(), 'platforms/android');
+    var customApkPath = path.join(project.projectRootPath(), 'platforms/android/build/outputs/apk/android-debug.apk');
+    if ( fs.existsSync(customAppPath) ) {
+        if ( !fs.existsSync(customApkPath) ) {
+            deferred.reject(new Error("No custom apk found, please run 'aemm build android'."));
+        } else {
+            deferred.resolve();
+        }
+    } else {
+        app.getParentPathForAppBinary("android", "emulator")
+            .then((parentPath) => {
+                let prebuiltAppPath = path.join(parentPath, aemmAppName);
+                if (!fs.existsSync(prebuiltAppPath)) {
+                    deferred.reject(new Error(`No apk found, please run 'aemm app install android'.`));
+                } else {
+                    deferred.resolve();
+                }
+            });
+    }
+
+    return deferred.promise;
+}
+
 function installApk(deviceSerialNum)
 {
     return androidApp.getInstalledAppBinaryPath("emulator")
-        .then((jupiterPath) => {
+        .then((apkPath) => {
             var defer = Q.defer();
 
+            var apkType = 0;    // custom apk by default
+            if ( apkPath.indexOf(aemmAppName) > 0 ) {
+                // prebuilt apk
+                apkType = 1;
+            }
+
             var checkCmd = path.join(getUserHome(), 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
-                ' install ' + '"' + jupiterPath + '"';
+                ' install ' + '"' + apkPath + '"';
             shell.exec(checkCmd, {
                 silent: false
             }, function(code, output) {
                 if (code == 0) {
-                    defer.resolve();
+                    defer.resolve(apkType);
                 } else {
-                    deferred.reject(new Error("Installing AEM Mobile app apk failed: " + jupiterPath));
+                    deferred.reject(new Error("Installing AEM Mobile app apk failed: " + apkPath));
                 }
             });
 

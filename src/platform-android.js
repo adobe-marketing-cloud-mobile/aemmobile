@@ -233,7 +233,15 @@ function add(spec)
     return Q.fcall( () => {
         var target = spec ? target_repo + "#" + spec : target_repo;
         return cordova.raw.platform("add", target);
-    }).then( function () {
-        events.emit("results", "Finished adding Android platform.");
+    })
+    .then( () => {
+        // add aemm-plugin-navto by default to be consistent with our viewer app behavior.
+        return Q.fcall(() => {
+            var targets = ["aemm-plugin-navto"];
+            return cordova.raw.plugin("add", targets);
+        })
+        .then(() => {
+            events.emit("results", "Finished adding Android platform.");
+        });
     });
 }

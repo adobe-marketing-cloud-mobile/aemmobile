@@ -22,16 +22,12 @@ var Q = require('q');
 var path = require("path");
 var FS = require('q-io/fs');
 var fs = require("fs");
-var shell = require('shelljs');
-var spawn = require('cross-spawn-async');
 var downloadFile = require('../utils/downloadFile');
 var os = require('os');
 var app = require('./app');
 var config = require('../config.json');
 var plist = require('plist');
 var project = require('./project');
-var cordova_lib = require('cordova-lib');
-var events = cordova_lib.events;
 
 const aemmAppName = "AEMM.apk";
 const aemmVerName = "version.txt";
@@ -112,38 +108,4 @@ function installFromFilePath(version, filepath, deviceType)
 						});
 				});
 		});
-}
-
-module.exports.installFromProjectBuild = installFromProjectBuild;
-function installFromProjectBuild()
-{
-	var deferred = Q.defer();
-	var command = null;
-	var script = null;
-
-	if (process.platform == 'win32') {
-		command = "powershell";
-		script = path.join(__dirname, '..', 'platforms/android/scripts/appInstall.bat');
-	} else if (process.platform == 'darwin') {
-		command = "sh";
-		script = path.join(__dirname, '..', 'platforms/android/scripts/appInstall.sh');
-	} else {
-		events.emit("log", "Platform not supported: " + process.platform);
-		return;
-	}
-
-	var proc = spawn(command, [script, process.cwd()], { stdio: 'inherit' });
-
-	proc.on("error", function (error) {
-		deferred.reject(new Error("Install app from project build failed: " + error.message));
-	});
-	proc.on("exit", function(code) {
-		if (code !== 0) {
-			deferred.reject(new Error("Install app from project build exited with code: " + code));
-		} else {
-			deferred.resolve();
-		}
-	});
-
-	return deferred.promise;
 }

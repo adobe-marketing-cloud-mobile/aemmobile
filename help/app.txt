@@ -12,12 +12,10 @@ Commands:
   update [platform]                 Checks for an update to the app binaries and installs new binaries if update is available.
                                     If platform is provided, then only the specified platform is updated.  Otherwise all platforms are updated.
 
-  Note, for Android, install is the only command supported since it fresh builds the application locally.
-
 Examples:
 
-  $ aemm app install android        # Builds android app binary with default set of plugins locally
-  $ aemm app install ios --list     # List available app binaries for ios
+  $ aemm app install android        # Installs the latest version of android app binary
+  $ aemm app install ios --list     # Lists available app binaries for ios
   $ aemm app install ios 2016.3.0   # Installs app binary with version 2016.3.0 on ios
   $ aemm app version                # Displays installed app binary versions for all platforms
   $ aemm app update                 # Checks for updates to all platforms and installs new app binaries for platforms that are out of date

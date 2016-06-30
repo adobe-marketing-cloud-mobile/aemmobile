@@ -8,7 +8,8 @@ Commands:
 
   install <platform>        Install SDKs for a specific platform
 
-  Note, you may need to open a new terminal to have the new system environment settings take effect.
+Note:
+  You may need to open a new terminal to have the new system environment settings take effect.
 
 Examples:
 
