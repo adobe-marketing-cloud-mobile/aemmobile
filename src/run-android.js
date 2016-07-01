@@ -29,14 +29,13 @@ var config = require('./config');
 var deviceSerialNum = null;
 var getUserHome = require('../utils/getUserHome');
 var app = require('./app');
-
-const aemmAppName = "AEMM.apk";
+var constants = require('../utils/constants');
 
 module.exports = run;
 
 function run(args)
 {
-    var apkInstalledType = 0;
+    var apkInstalledType = constants.APK_TYPE_CUSTOM;
 
     return checkApk()
         .then( () => {
@@ -64,7 +63,7 @@ function run(args)
 
             var userHome = getUserHome();
             var launchActivity = "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity";
-            if (apkInstalledType == 1) {
+            if (apkInstalledType == constants.APK_TYPE_PREBUILT) {
                 // prebuilt apk has different package name from custom apk
                 launchActivity = "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"
             }
@@ -98,7 +97,7 @@ function checkApk() {
     } else {
         app.getParentPathForAppBinary("android", "emulator")
             .then((parentPath) => {
-                let prebuiltAppPath = path.join(parentPath, aemmAppName);
+                let prebuiltAppPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
                 if (!fs.existsSync(prebuiltAppPath)) {
                     deferred.reject(new Error(`No apk found, please run 'aemm app install android'.`));
                 } else {
@@ -116,10 +115,9 @@ function installApk(deviceSerialNum)
         .then((apkPath) => {
             var defer = Q.defer();
 
-            var apkType = 0;    // custom apk by default
-            if ( apkPath.indexOf(aemmAppName) > 0 ) {
-                // prebuilt apk
-                apkType = 1;
+            var apkType = constants.APK_TYPE_CUSTOM;    // custom apk by default
+            if ( apkPath.indexOf(constants.APP_NAME_PREBUILT) > 0 ) {
+                apkType = constants.APK_TYPE_PREBUILT;
             }
 
             var checkCmd = path.join(getUserHome(), 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
