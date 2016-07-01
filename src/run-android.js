@@ -86,6 +86,7 @@ function run(args)
 function checkApk() {
     var deferred = Q.defer();
 
+    var customPluginPath = path.join(project.projectRootPath(), 'plugins');
     var customAppPath = path.join(project.projectRootPath(), 'platforms/android');
     var customApkPath = path.join(project.projectRootPath(), 'platforms/android/build/outputs/apk/android-debug.apk');
     if ( fs.existsSync(customAppPath) ) {
@@ -94,6 +95,8 @@ function checkApk() {
         } else {
             deferred.resolve();
         }
+    } else if ( fs.existsSync(customPluginPath) ) {
+        deferred.reject(new Error("No platform found, please run 'aemm platform add android'."));
     } else {
         app.getParentPathForAppBinary("android", "emulator")
             .then((parentPath) => {
