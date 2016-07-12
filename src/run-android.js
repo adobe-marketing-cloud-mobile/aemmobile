@@ -176,7 +176,7 @@ function installApkOnDevice()
                 apkType = constants.APK_TYPE_PREBUILT;
             }
 
-            var checkCmd = path.join(getUserHome(), 'platforms/android/sdk/platform-tools/adb') + ' -d install '
+            var checkCmd = path.join(getUserHome(), 'platforms/android/sdk/platform-tools/adb') + ' -d install -r '
                 + '"' + apkPath + '"';
             shell.exec(checkCmd, {
                 silent: false
