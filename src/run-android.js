@@ -20,6 +20,7 @@ var project = require('./project');
 var path = require("path");
 var FS = require('q-io/fs');
 var fs = require("fs");
+var ip = require("ip");
 var serve = require('./serve');
 var emulator = require('./android-emulator');
 var shell = require('shelljs');
@@ -33,8 +34,60 @@ var constants = require('../utils/constants');
 
 module.exports = run;
 
-function run(args)
-{
+function run(args) {
+    var deviceName = args.device ? "device" : "emulator";
+
+    if (deviceName == "device") {
+        return runOnDevice();
+    } else {
+        return runOnEmulator();
+    }
+}
+
+function runOnDevice() {
+    var apkInstalledType = constants.APK_TYPE_CUSTOM;
+
+    return checkApk()
+        .then( () => {
+            return installApkOnDevice("device");
+        })
+        .then(function (apkType) {
+            apkInstalledType = apkType;
+            return serve({}, "android");
+        })
+        .then(function (servResponse) {
+            var defer = Q.defer();
+
+            var orientation = config.getValueFromConfig('screenOrientation');
+            if (!orientation) {
+                // portrait by default
+                orientation = 'portrait';
+            }
+
+            var userHome = getUserHome();
+            var launchActivity = "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity";
+            if (apkInstalledType == constants.APK_TYPE_PREBUILT) {
+                // prebuilt apk has different package name from custom apk
+                launchActivity = "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"
+            }
+            var serverIp = ip.address();
+            var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -d shell am start -n ' +
+                launchActivity + ' -e phonegapServer ' + serverIp + ':3000' + ' -e initialOrientation ' + orientation;
+            shell.exec(launchCmd, {
+                silent: false
+            }, function (code, output) {
+                if (code == 0) {
+                    defer.resolve();
+                } else {
+                    deferred.reject(new Error("Launching AEM Mobile app in emulator failed."));
+                }
+            });
+
+            return defer.promise;
+        });
+}
+
+function runOnEmulator() {
     var apkInstalledType = constants.APK_TYPE_CUSTOM;
 
     return checkApk()
@@ -46,7 +99,7 @@ function run(args)
         })
         .then(function (emulatorId) {
             deviceSerialNum = emulatorId;
-            return installApk(deviceSerialNum);
+            return installApkOnEmulator(deviceSerialNum);
         })
         .then(function (apkType) {
             apkInstalledType = apkType;
@@ -112,7 +165,34 @@ function checkApk() {
     return deferred.promise;
 }
 
-function installApk(deviceSerialNum)
+function installApkOnDevice()
+{
+    return androidApp.getInstalledAppBinaryPath("device")
+        .then((apkPath) => {
+            var defer = Q.defer();
+
+            var apkType = constants.APK_TYPE_CUSTOM;    // custom apk by default
+            if ( apkPath.indexOf(constants.APP_NAME_PREBUILT) > 0 ) {
+                apkType = constants.APK_TYPE_PREBUILT;
+            }
+
+            var checkCmd = path.join(getUserHome(), 'platforms/android/sdk/platform-tools/adb') + ' -d install '
+                + '"' + apkPath + '"';
+            shell.exec(checkCmd, {
+                silent: false
+            }, function(code, output) {
+                if (code == 0) {
+                    defer.resolve(apkType);
+                } else {
+                    deferred.reject(new Error("Installing AEM Mobile app apk failed: " + apkPath));
+                }
+            });
+
+            return defer.promise;
+        })
+}
+
+function installApkOnEmulator(deviceSerialNum)
 {
     return androidApp.getInstalledAppBinaryPath("emulator")
         .then((apkPath) => {
