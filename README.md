@@ -99,12 +99,18 @@ You must run the following commands inside the directory created with `aemm proj
 `aemm run [platform]`
 
 	aemm run ios
-	
+
+	aemm run ios -- device
+
 	aemm run android
-	
+
+	aemm run android --device
+
 	aemm run ios --list
 	
 	aemm run ios --target "iPhone-6s, 9.2"
+
+run command without device parameter will run application in emulator/simulator.
 
 ###### 2. Developing custom application with custom plugins.
 
@@ -129,16 +135,24 @@ Add plugins you want to be included in your application.
 	aemm build android
 	
 	aemm build ios --device
+
+build command with device parameter is for ios only.
 	
 `aemm run [platform]`
 
 	aemm run ios
-	
+
+	aemm run ios --device
+
 	aemm run android
-	
+
+	aemm run android --device
+
 	aemm run ios --list
 	
 	aemm run ios --target "iPhone-6s, 9.2"
+
+run command without device parameter will run application in emulator/simulator.
 
 ## NOTE
 
