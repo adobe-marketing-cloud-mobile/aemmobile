@@ -10,7 +10,9 @@ Commands:
   platform [command]            install platform specific dev tools(i.e. sdk)
   project create <path>         create a phonegap project
   article [command]             create articles
+  app [command]                 install a pre-built binary for a specific platform
   plugin [command]              add and remove plugins
+  build <platforms>             build binary for a specific platform
   package [command]             bundle the custom plugins into a binary (iOS only)
   run <platforms>               install and serve the project for a specific platform
   serve                         serve a phonegap project
