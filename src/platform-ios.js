@@ -38,12 +38,7 @@ function install()
 		});
 	})
 	.then( () => {
-		return checkForCodeSignRequired();
-	})
-	.then( (required) => {
-		if (required) {
-			return changeCodeSignPolicy(required);
-		}	
+		return disableCodeSigning();
 	})
 	.then( () => {
 		events.emit("log", "The ios platform is ready to use.");
@@ -58,37 +53,56 @@ function add(spec)
     return Q.fcall( () => {
 		var target = spec ? target_repo + "@" + spec : target_repo; 
         return cordova.raw.platform("add", target);
-    }).then( function () {
+    })
+	.then( function () {
 		events.emit("results", "Finished installing ios platform.");	
 	});
 }
 
-function checkForCodeSignRequired() {
-	return Q()
-	.then( () => {
-		var settingsPlist;
-		return exec('xcode-select -p')
-		.then( (result) => {
-			settingsPlist = path.resolve(result.stdout.trim(), 'Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist');
-			return exec('/usr/libexec/PlistBuddy -c "Print DefaultProperties:CODE_SIGNING_REQUIRED" ' + settingsPlist)
-			.then( (codeSignRequired) => {
-				if (codeSignRequired.stdout.trim() === "NO") {
-					return Q(false);
-				} else {
-					return Q(settingsPlist);
-				}
-			}).catch( (err) => {
-				console.log("Error!");
-			});
-		});
+function disableCodeSigning() {
+	var settingsPlist = null;
+	return getSDKSettingsPlist()
+	.then( (sdkSettingsPlist) => {
+		settingsPlist = sdkSettingsPlist;
+		return isCodeSigningDisabled(settingsPlist);
+	})
+	.then( (codeSigningDisabled) => {
+		if (!codeSigningDisabled) {
+			return changeCodeSigningPolicy(settingsPlist);
+		} 
 	});
 }
 
-function changeCodeSignPolicy(settingsPlist) {
+module.exports.isCodeSigningDisabled = isCodeSigningDisabled;
+function isCodeSigningDisabled(settingsPlist = null) {
+	return Q().then( () => {
+		return settingsPlist ? Q(settingsPlist) : getSDKSettingsPlist();
+	})
+	.then( (settingsPlist) => {
+		return exec('/usr/libexec/PlistBuddy -c "Print DefaultProperties:CODE_SIGNING_REQUIRED" ' + settingsPlist)
+	})
+	.then( (codeSigningRequired) => {
+		if (codeSigningRequired.stdout.trim() === "NO") {
+			return Q(true);
+		} else {
+			return Q(false);
+		}
+	});
+}
+
+function changeCodeSigningPolicy(settingsPlist, enabled = false) {
 	return Q().then( () => {
 		events.emit("info", "You may need to enter your admin password to change Xcode's code signing policy.\naemm requires Xcode to allow building unsigned frameworks.")
 	})
 	.then( () => {
-		return exec('/usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED NO" ' + settingsPlist);
+		var val = enabled ? "YES" : "NO";
+		return exec('/usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED ' + val + '" ' + settingsPlist);
+	});
+}
+
+function getSDKSettingsPlist() {
+	return exec('xcode-select -p')
+	.then( (result) => {
+		return Q(path.resolve(result.stdout.trim(), 'Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist'));
 	});
 }

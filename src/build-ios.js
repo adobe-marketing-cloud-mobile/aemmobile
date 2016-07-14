@@ -16,6 +16,7 @@
 "use strict";
 
 var Q = require('q');
+var platform = require('./platform-ios');
 var cordova_lib = require('cordova-lib'),
     cordova = cordova_lib.cordova;
 
@@ -23,9 +24,8 @@ module.exports.build = build;
 
 function build(args)
 {
-    return Q().then( function() {
-        var cmd = "build";
-        var opts = {
+    var cmd = "build";
+    var opts = {
             platforms: [ "ios" ],
             options: {
                 debug: args.debug,
@@ -42,7 +42,18 @@ function build(args)
             nohooks: [],
             searchpath : ""
         };
-
+    return Q()
+    .then( function() {
+        if (opts.options.device) {
+            return platform.isCodeSigningDisabled()
+            .then( (codeSignDisabled) => {
+                if (!codeSignDisabled) {
+                    throw new Error("CODE_SIGNING_REQUIRED must be set to NO in order to build for device.\nYou can resolve this by running `aemm platform install ios`.");
+                }
+            });
+        }
+    })
+    .then( () => {
         return cordova.raw[cmd].call(null, opts);
     });
 };
