@@ -28,9 +28,7 @@ var app = require('./app');
 var config = require('../config.json');
 var plist = require('plist');
 var project = require('./project');
-
-const aemmAppName = "AEMM.apk";
-const aemmVerName = "version.txt";
+var constants = require('../utils/constants');
 
 function getCustomAppBinaryPath()
 {
@@ -60,7 +58,7 @@ function getInstalledAppBinaryPath(deviceType)
 
 		return app.getParentPathForAppBinary("android", deviceType)
 			.then((parentPath) => {
-				let viewerPath = path.join(parentPath, aemmAppName);
+				let viewerPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
 				if (!fs.existsSync(viewerPath)) {
 					throw new Error(`No application found at ${parentPath}`);
 				}
@@ -75,7 +73,7 @@ function getAppVersion(deviceType)
 {
 	return app.getParentPathForAppBinary("android", deviceType)
 		.then(function (appBinaryParentPath) {
-			let versionPath = path.join(appBinaryParentPath, aemmVerName);
+			let versionPath = path.join(appBinaryParentPath, constants.APP_VERSION_FILE);
 
 			if ( !fs.existsSync(versionPath) )
 			{
@@ -97,10 +95,10 @@ function installFromFilePath(version, filepath, deviceType)
 			binaryParentPath = appBinaryParentPath;
 			return FS.makeTree(binaryParentPath)
 				.then(function() {
-					let targetPath = path.join(binaryParentPath, aemmAppName);
+					let targetPath = path.join(binaryParentPath, constants.APP_NAME_PREBUILT);
 					return FS.copy(apkAppPath, targetPath)
 						.then(function() {
-							let versionPath = path.join(binaryParentPath, aemmVerName);
+							let versionPath = path.join(binaryParentPath, constants.APP_VERSION_FILE);
 
 							var deferred = Q.defer();
 							fs.writeFile(versionPath, version, function(err) {

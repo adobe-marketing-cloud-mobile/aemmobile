@@ -124,7 +124,7 @@ function install(options, urlOrFilepathOrPlatform, appVersion)
 		if (urlOrFilepathOrPlatform === "ios" || urlOrFilepathOrPlatform === "android")
 		{
 			installPromise =  installFromServerInConfig(urlOrFilepathOrPlatform, deviceType, appVersion);
-		} 
+		}
 		else if (urlOrFilepathOrPlatform) 
 		{
 			installPromise = installFromFile(appVersion, urlOrFilepathOrPlatform, deviceType);

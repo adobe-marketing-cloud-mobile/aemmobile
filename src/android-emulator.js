@@ -22,14 +22,15 @@ var Q = require('q');
 var spinner = require('simple-spinner');
 var ini = require('ini');
 var config = require('./config');
+var getUserHome = require('../utils/getUserHome');
 
 module.exports = {
     start: function(name, port) {
         return config.getValueFromConfig('screenOrientation')
         .then( (orientation) => {
-
             var defer = Q.defer();
-            var userHome = process.env.HOME;
+            var userHome = getUserHome();
+
             if (!orientation) {
                 // portrait by default
                 orientation = 'portrait';
@@ -70,17 +71,11 @@ module.exports = {
                     if (code !== 0) {
                         setTimeout(checkBooted.bind(this, port), 500);
                     } else {
-                        var wait = 0;
-                        if (process.platform == 'win32') {
-                            wait = 30000;
-                        } else if (process.platform == 'darwin') {
-                            wait = 3000;
-                        }
-
+                        // Give the emulator a bit more time to initialize
                         setTimeout(function () {
                             spinner.stop();
                             defer.resolve(serialNum);
-                        }, wait);
+                        }, 3000);
                     }
                 });
             }

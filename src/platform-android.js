@@ -28,6 +28,8 @@ var os = require('os');
 var downloadFile = require('../utils/downloadFile');
 var getUserHome = require('../utils/getUserHome');
 var unzip = require('../utils/unzip');
+var setupEnv_win = require('../utils/setupEnv-android-win');
+var setupEnv_mac = require('../utils/setupEnv-android-mac');
 var spawn = require('cross-spawn-async');
 var spinner = require('simple-spinner');
 var cordova_lib = require('cordova-lib');
@@ -42,6 +44,9 @@ function install() {
     return installSdk()
         .then( () => {
             return updateSdk();
+        })
+        .then( () => {
+            return setupEnv();
         })
         .then( () => {
             return createAvd();
@@ -126,7 +131,9 @@ function updateSdk() {
     }
 
     var proc = spawn(command, [script, '--silent', 'update', 'sdk', '--all',
-        '--no-ui', '--filter', 'platform-tool,tool,android-23,sys-img-x86_64-android-23,extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
+        '--no-ui', '--filter', 'build-tools-23.0.2,platform-tool,tool,android-23,sys-img-x86_64-android-23,' +
+        'extra-android-m2repository,extra-android-support,extra-google-m2repository,' +
+        'extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
 
     proc.on("error", function (error) {
         deferred.reject(new Error("Installing Android platform encountered error " + error.message));
@@ -141,6 +148,17 @@ function updateSdk() {
     });
 
     return deferred.promise;
+}
+
+function setupEnv() {
+    if (process.platform == 'win32') {
+        return setupEnv_win();
+    } else if (process.platform == 'darwin') {
+        return setupEnv_mac();
+    } else {
+        events.emit("log", "Unsupported OS: %s", process.platform);
+        return;
+    }
 }
 
 function installHAXM() {
@@ -215,7 +233,15 @@ function add(spec)
     return Q.fcall( () => {
         var target = spec ? target_repo + "#" + spec : target_repo;
         return cordova.raw.platform("add", target);
-    }).then( function () {
-        events.emit("results", "Finished adding Android platform.");
+    })
+    .then( () => {
+        // add aemm-plugin-navto by default to be consistent with our viewer app behavior.
+        return Q.fcall(() => {
+            var targets = ["aemm-plugin-navto"];
+            return cordova.raw.plugin("add", targets);
+        })
+        .then(() => {
+            events.emit("results", "Finished adding Android platform.");
+        });
     });
 }

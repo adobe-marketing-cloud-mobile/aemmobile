@@ -12,18 +12,18 @@ Mac OS X:
 * For iOS, Xcode(v7.0 or greater) must be installed
 * For Android, Java must be installed:
   https://support.apple.com/downloads/java
-* For Android, Chrome needs to be installed for debugging via chrome://inspect
+* For Android, Chrome needs to be installed for debugging HTML content via chrome://inspect
 
 Windows:
-* Java:
-  https://java.com/en/download/manual.jsp
+* Java SDK:
+  http://www.oracle.com/technetwork/java/javase/downloads/index.html
 * VisualStudio Community 2015:
   https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx
-* npm(v4.4.2 LTS is recommended):
+* npm(v4.4.5 LTS is recommended):
   https://nodejs.org/en/
 * Python 2.7:
   https://www.python.org/download/releases/2.7/
-* Chrome for debugging via chrome://inspect
+* Chrome needs to be installed for debugging HTML content via chrome://inspect
 
 ## Installation
 You need npm installed to run the command line tool. On Windows, run commands in PowerShell instead of Command Prompt.
@@ -54,21 +54,18 @@ It's safe to ignore them. They don't affect the functionalities of this tool.
 
 #### Usage
 
+There are 2 types of workflow this tool is designed for:
+* Developing custom HTML content.
+* Developing custom application with custom plugins.
+
+Commands for both workflows:
+
 `aemm platform install <platform>`
 
     aemm platform install android
  
-Accept several Android SDK license agreements.
- 
-`aemm app install <platform>`
-
-	aemm app install ios
-
-	aemm app install android
-	
-	aemm app install --list
-	
-	aemm app install ios 2016.5
+Accept several Android SDK license agreements. This installs and updates various Android SDKs, build tools and setup system environment for developing Android application.
+You may need to open a new terminal to have the new system environment settings take effect.
 
 `aemm project create [PROJECT_NAME or PATH]`
 
@@ -83,16 +80,79 @@ You must run the following commands inside the directory created with `aemm proj
 	aemm article create Article1
 	
 	aemm article create Article1 Article2 Article3
+ 
+ 
+###### 1. Developing custom HTML content
+  
+`aemm app install <platform>`
+
+	aemm app install ios
+
+	aemm app install android
+	
+	aemm app install --list
+	
+	aemm app install ios 2016.5
+
+You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`.  
 
 `aemm run [platform]`
 
 	aemm run ios
-	
+
+	aemm run ios -- device
+
 	aemm run android
-	
+
+	aemm run android --device
+
 	aemm run ios --list
 	
 	aemm run ios --target "iPhone-6s, 9.2"
+
+run command without device parameter will run application in emulator/simulator.
+
+###### 2. Developing custom application with custom plugins.
+
+You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`.
+
+`aemm platform add [platform]`
+
+	aemm platform add android
+	
+	aemm platform add ios
+
+Add the platforms that you want to target your application at.
+
+`aemm plugin add [plugin_0] [plugin_1] [...]`
+
+	aemm plugin add cordova-plugin-device cordova-plugin-contacts
+
+Add plugins you want to be included in your application.
+
+`aemm build [platform]`
+
+	aemm build android
+	
+	aemm build ios --device
+
+build command with device parameter is for ios only.
+	
+`aemm run [platform]`
+
+	aemm run ios
+
+	aemm run ios --device
+
+	aemm run android
+
+	aemm run android --device
+
+	aemm run ios --list
+	
+	aemm run ios --target "iPhone-6s, 9.2"
+
+run command without device parameter will run application in emulator/simulator.
 
 ## NOTE
 
