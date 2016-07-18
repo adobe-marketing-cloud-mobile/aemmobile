@@ -17,12 +17,14 @@
 
 var Q = require('q');
 var platformRequire = require('../utils/platformRequire');
+var project = require('./project');
 
 module.exports = build;
 
 function build(args, platform)
 {
-    return Q.fcall( () => {
+    return project.projectRootPath()
+    .then( () => {
         var platformBuildModule = platformRequire("build", platform);
         return platformBuildModule.build(args);
     });

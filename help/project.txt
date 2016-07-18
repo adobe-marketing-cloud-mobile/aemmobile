@@ -1,4 +1,4 @@
-Usage: aemm project <command>
+Usage: aemm project <command> [options]
 
 Description:
 
@@ -8,7 +8,11 @@ Commands:
 
   create <path>        Creates a new project at the provided path.
 
+Options:
+
+  --no-samples         Creates the project without generating sample articles.
+
 Examples:
 
-  $ aemm project create my-project
-  $ aemm project create /local/path/to/plugin/
+  $ aemm project create my-project --no-samples
+  $ aemm project create /local/path/to/project/

@@ -17,12 +17,14 @@
 
 var Q = require('q');
 var platformRequire = require('../utils/platformRequire');
+var project = require('./project');
 
 module.exports = run;
 
 function run(args, platform) 
 {
-	return Q.fcall( () => {
+	return project.projectRootPath()
+	.then( () => {
 		var platformRun = platformRequire("run", platform);
 
 		// We don't want to kill the process after run returns

@@ -54,7 +54,7 @@ describe("aemm cli article:", function () {
             let articleName = "TestArticle";
             cli(["node", "aemm", "article", "create", articleName], (err) => {
                 expect(err).not.toBeTruthy();
-                expect(article.create).toHaveBeenCalledWith({ argv : { remain : [ 'TestArticle' ], cooked : [ 'article', 'create', 'TestArticle' ], original : [ 'article', 'create', 'TestArticle' ] } }, 'TestArticle');
+                expect(article.create).toHaveBeenCalledWith({ argv : { remain : [ 'TestArticle' ], cooked : [ 'article', 'create', 'TestArticle' ], original : [ 'article', 'create', 'TestArticle' ], undashed : [ 'article', 'create', 'TestArticle' ] } }, 'TestArticle');
                 done();
             });
         });

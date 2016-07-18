@@ -35,7 +35,8 @@
     "request-promise": "^1.0.2",
     "semver": "^5.1.0",
     "shelljs": "^0.6.0",
-    "simple-spinner": "0.0.5"
+    "simple-spinner": "0.0.5",
+    "xml2js": "^0.4.17"
   },
   "devDependencies": {
     "jasmine-node": "^1.14.5",

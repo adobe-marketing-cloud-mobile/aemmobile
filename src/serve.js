@@ -40,7 +40,8 @@ module.exports = serve;
 
 function serve(options) 
 {
-	return getCordovaRoot()
+	return project.projectRootPath()
+	.then( () => getCordovaRoot())
 	.then( (cordovaRootPath) => {
 		events.emit("log", 'starting app server...');
 		events.emit("log", "Use Ctrl-C to exit")
@@ -103,7 +104,7 @@ function getCordovaRoot()
 	// We use ios only here because Android does not need this.  If we have an iOS build
 	// we can use it and Android will work fine with it because they intercept the calls on the client
 	// side
-	return Q.fcall( () => {
+	return Q().then( () => {
 		return appBinary.getInstalledAppBinaryPath("ios", "emulator")
 		.catch( () => {
 			return appBinary.getInstalledAppBinaryPath("ios", "device")

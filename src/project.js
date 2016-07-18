@@ -26,6 +26,7 @@ var cordova_lib = require('cordova-lib');
 var events = cordova_lib.events;
 var cordova = cordova_lib.cordova;
 var article = require('./article');
+var xml2js = require('xml2js');
 
 
 module.exports.create = create;
@@ -36,7 +37,7 @@ function create(options, projectPath)
 	{
 		if (!projectPath)
 		{
-			throw Error(`At least the dir must be provided to create new project. See 'aemm help'.`)
+			throw Error(`At least the dir must be provided to create new project. See 'aemm help project'.`)
 		}
 		
 		fullProjectPath = path.resolve(projectPath);
@@ -44,27 +45,37 @@ function create(options, projectPath)
 	})
 	.then( () => createCordovaApp(projectPath) )
 	.then( () => removeUnwantedCordovaArtifacts(fullProjectPath) )
-	.then( () => createAEMMScaffolding(fullProjectPath) );
+	.then( () => {
+		// Only skip the samples if we are explicitly asked to skip them. (null is assumed to mean true)
+		return (options.samples !== false) ? createAEMMScaffolding(fullProjectPath) : Q(); 
+	});
 }
 
 module.exports.projectRootPath = projectRootPath;
 function projectRootPath()
 {
 	let projectRoot = cordova.findProjectRoot(process.cwd());
-	if (!projectRoot)
-	{
-		let cmdLineToolInfo = require('../package.json');
-		throw Error(`Current working directory is not a ${cmdLineToolInfo.name} based project.`);
-	}
-	return projectRoot;
+	return isAEMMProject(projectRoot)
+	.then( (isAEMM) => {
+		if (!projectRoot || !isAEMM)
+		{
+			let cmdLineToolInfo = require('../package.json');
+			throw Error("Current working directory is not an `aemm` based project. If you believe you are in the appropriate project directory, you may need to re-create the project using `aemm project create`.");
+		}
+		return Q(projectRoot);
+	});	
 }
 
 module.exports.articleList = articleList;
 function articleList() 
 {
-	// Get list of articles to serve
-	var wwwFolder = path.join(projectRootPath(), "/www");
-	return FS.list(wwwFolder)
+	var wwwFolder = null;
+	return projectRootPath()
+	.then( (projectRootPath) => {
+		// Get list of articles to serve
+		wwwFolder = path.join(projectRootPath, "www");
+		return FS.list(wwwFolder);
+	})
 	.then( function (fileArray) 
 	{
 		let sortedFileArray = fileArray.sort((a,b) => a.localeCompare(b));
@@ -136,7 +147,25 @@ function createAEMMScaffolding(fullProjectPath)
 
 function createCordovaApp(projectName) 
 {
-	return cordova.raw.create( projectName, "com.adobe.dps.CordovaPlugins", "CordovaPlugins", {});
+	return cordova.raw.create( projectName, "com.adobe.aemmobile.CordovaPlugins", "CordovaPlugins", {});
 }
 
-
+function isAEMMProject(projectRoot) {
+	if (!projectRoot) {
+		return Q(false);
+	}
+	return FS.read(path.join(projectRoot, "config.xml"), "r")
+	.then( (data) => {
+		var parser = new xml2js.Parser();
+		var deferred = Q.defer();
+		parser.parseString(data, function (err, result) {
+			if (result.widget.name[0] === "CordovaPlugins") {
+				deferred.resolve(true);
+			}
+			else {
+				deferred.resolve(false);
+			}
+		});
+		return deferred.promise;
+	});
+}

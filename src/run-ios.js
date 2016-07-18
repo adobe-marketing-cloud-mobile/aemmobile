@@ -41,10 +41,11 @@ function run(args)
 	{
 		return listSimulators();
 	}
-	return Q.fcall( () => 
+	return project.projectRootPath()
+	.then( (projectPath) => 
 	{
 		// Make sure we are in a Cordova project folder
-		projectRootPath = project.projectRootPath();
+		projectRootPath = projectPath;
 		
 		let allValidTargets = aemmSimulatorList();
 		if (allValidTargets.length === 0)
@@ -162,29 +163,31 @@ function modifyBinaryPlist(appPath)
 	.then( function(parseResults) {
 		var appConfig = parseResults[0];
 
-        var orientation = config.getValueFromConfig('screenOrientation');
-        if (orientation) {
-            appConfig.screenOrientation.tablet = orientation;
-            appConfig.screenOrientation.phone = orientation;
-        }
-        
-		delete appConfig.phoneIdKey;
-		delete appConfig.tabletIdKey;
-		delete appConfig.configServiceBaseURL;
-
-		var plistXML = bplist.create(appConfig);
-		
-		
-		var deferred = Q.defer();
-		fs.writeFile(appConfigPlistPath, new Buffer(plistXML), function (err) {
-			if (err) 
-			{
-				return deferred.reject(err);
+		return config.getValueFromConfig('screenOrientation')
+		.then( (orientation) => {
+			if (orientation) {
+				appConfig.screenOrientation.tablet = orientation;
+				appConfig.screenOrientation.phone = orientation;
 			}
-			return deferred.resolve(appConfigPlistPath);
+			
+			delete appConfig.phoneIdKey;
+			delete appConfig.tabletIdKey;
+			delete appConfig.configServiceBaseURL;
+
+			var plistXML = bplist.create(appConfig);
+			
+			
+			var deferred = Q.defer();
+			fs.writeFile(appConfigPlistPath, new Buffer(plistXML), function (err) {
+				if (err) 
+				{
+					return deferred.reject(err);
+				}
+				return deferred.resolve(appConfigPlistPath);
+			});
+			
+			return deferred.promise;
 		});
-		
-		return deferred.promise;			
 	});
 }
 

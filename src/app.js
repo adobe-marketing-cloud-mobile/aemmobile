@@ -83,7 +83,7 @@ function ensureInstalledBinary(platform, deviceName)
 {
 	return getInstalledAppBinaryPath(platform, deviceName)
 	.then( function(binaryPath) {
-		return binaryPath;
+		return Q(binaryPath);
 	})
 	.catch( (err) => {
 		throw Error("You must install downloaded app binary before using this command.  See 'aemm app install'.");

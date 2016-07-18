@@ -21,6 +21,7 @@
 var Q = require('q');
 var platformRequire = require('../utils/platformRequire');
 var path = require("path");
+var project = require('./project');
 var cordova_lib = require('cordova-lib'),
     cordova = cordova_lib.cordova;
 
@@ -39,7 +40,8 @@ function install(options, platform)
 
 function add(options, target)
 {
-    return Q.fcall( () => {
+    return project.projectRootPath()
+    .then( () => {
         if (target)
         {
             var parts = target.split('@');
@@ -57,7 +59,8 @@ function add(options, target)
 
 function remove(options, platform)
 {
-    return Q.fcall( () => {
+    return project.projectRootPath()
+    .then( () => {
         var cmd = "platform";
         var subcommand = "remove"; // sub-command like "add", "ls", "rm" etc.
         var targets = platform;

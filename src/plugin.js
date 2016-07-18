@@ -21,10 +21,12 @@
 var Q = require('q');
 var cordova_lib = require('cordova-lib');
 var cordova = cordova_lib.cordova;
+var project = require('./project');
 
 module.exports = plugin;
 function plugin(args, command) {
-    return Q.fcall( () => {
+    return project.projectRootPath()
+    .then( () => {
         var targets = args.argv.remain;
         var command = targets.shift();
         return cordova.plugin(command, targets);

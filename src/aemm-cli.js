@@ -102,6 +102,7 @@ function cli(inputArgs)
         , 'emulator' : Boolean
         , 'debug' : Boolean
         , 'release' : Boolean
+        , 'samples' : Boolean
         };
 
     var shortHands =

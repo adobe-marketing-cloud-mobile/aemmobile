@@ -19,7 +19,6 @@ var Q = require('q');
 var path = require('path');
 var jsonfile = require('jsonfile');
 var project = require('./project');
-var help = require('./help');
 
 var pathToProjectConfig = null;
 var file = null;
@@ -31,22 +30,27 @@ function config(options, args)
     var setKey = options.set;
     var unsetKey = options.unset;
 
-    return Q.fcall( () => {
+    return getConfigFile()
+    .then( (file) => {
         if (options.list)
         {
-            file = getConfigFile();
             if (!file)
             {
-                return events.emit("log", "No valid config file found.");
+                throw new Error("No valid config file found.");
             }
             else
             {
-                return events.emit("log", file);
+                events.emit("log", file);
+                return Q();
             }
         }
         if (options.get)
         {
-            return events.emit("log", getValueFromConfig(getKey));
+            return getValueFromConfig(getKey)
+            .then( (val) => {
+                events.emit("log", val);
+                return Q();
+            });
         }
         if (options.set)
         {
@@ -58,7 +62,7 @@ function config(options, args)
         }
         else
         {
-            help(null, "config");
+            throw new Error("Unrecognized command. See `aemm help config` for correct usage.")
         }
     });
 }
@@ -66,45 +70,69 @@ function config(options, args)
 module.exports.getValueFromConfig = getValueFromConfig;
 function getValueFromConfig(key)
 {
-    return getConfigFile()[`${key}`];
+    return getConfigFile()
+    .then( (file) => {
+        return Q(file[`${key}`]);
+    });
 }
 
 function setValueInConfig(key, value)
 {
-    file = getConfigFile();
-    file[`${key}`] = value;
-    jsonfile.writeFileSync(getPathToProjectConfig(), file);
+    var projectConfig = null;
+    return getPathToProjectConfig()
+    .then( (pathToProjectConfig) => {
+        projectConfig = pathToProjectConfig;
+        return getConfigFile()
+        .then( (file) => {
+            file[`${key}`] = value;
+            jsonfile.writeFileSync(pathToProjectConfig, file);
+            return Q();
+        });
+    });
 }
 
 function removeKeyFromConfig(key)
 {
-    file = getConfigFile();
-    delete file[`${key}`];
-    jsonfile.writeFileSync(getPathToProjectConfig(), file);
+    var projectConfig = null;
+    return getPathToProjectConfig()
+    .then( (pathToProjectConfig) => {
+        projectConfig = pathToProjectConfig;
+        return getConfigFile()
+        .then( (file) => {
+            delete file[`${key}`];
+            jsonfile.writeFileSync(projectConfig, file);
+            return Q();
+        });
+    });
 }
 
 function getPathToProjectConfig()
 {
-    if (!pathToProjectConfig)
-    {
-        pathToProjectConfig = path.join(project.projectRootPath(), "config.json");
-    }
-    return pathToProjectConfig;
+    return project.projectRootPath()
+    .then( (projectRootPath) => {
+        if (!pathToProjectConfig) {
+            pathToProjectConfig = path.join(projectRootPath, "config.json");
+        }
+        return Q(pathToProjectConfig);
+    });
 }
 
 function getConfigFile()
 {
-    if (!file)
-    {
-        try {
-            file = require(getPathToProjectConfig());
-        } catch (err) {
-            // It's not a problem if the file is non-existent, just give them an empty object to get started.
-            if (err.code == 'MODULE_NOT_FOUND') {
-                return {};
+    return getPathToProjectConfig()
+    .then( (pathToProjectConfig) => {
+        if (!file)
+        {
+            try {
+                file = require(pathToProjectConfig);
+            } catch (err) {
+                // It's not a problem if the file is non-existent, just give them an empty object to get started.
+                if (err.code == 'MODULE_NOT_FOUND') {
+                    return {};
+                }
+                throw err;
             }
-            throw err;
         }
-    }
-    return file;
+        return Q(file);
+    });
 }

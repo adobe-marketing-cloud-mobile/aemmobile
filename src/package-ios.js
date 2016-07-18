@@ -34,8 +34,8 @@ module.exports.package = packageBinary;
 
 function packageBinary(args, platform) {
     // Ensure we are in an AEMM project.
-    project.projectRootPath();
-    return Q().then(function () {
+    return project.projectRootPath()
+    .then(function () {
         if (args.device && args.emulator) {
             return Q.reject('Cannot specify "device" and "emulator" options together.');
         }
@@ -103,18 +103,23 @@ function packageBinary(args, platform) {
 }
 
 function replaceFramework(appPath, platform) {
-    var destinationPluginsPath = path.join(appPath, 'Frameworks', 'CordovaPlugins.framework');
-    var sourcePluginsPath = path.join(project.projectRootPath(), 'platforms', 'ios', 'build', platform, 'CordovaPlugins.framework');
-    
-    return FS.exists(sourcePluginsPath)
-    .then( (sourceExists) => {
-        if (!sourceExists) {
-            throw new Error("No built framework. Please run `aemm build ios`, see `aemm help build` for details.");
-        } else {
-            return FS.removeTree(destinationPluginsPath)
-        }
-    })
-    .then( () => {
-        return FS.copyTree(sourcePluginsPath, destinationPluginsPath);
+    var destinationPluginsPath = null;
+    var sourcePluginsPath = null;
+    return project.projectRootPath()
+    .then( (projectRootPath) => {
+        destinationPluginsPath = path.join(appPath, 'Frameworks', 'CordovaPlugins.framework');
+        sourcePluginsPath = path.join(projectRootPath, 'platforms', 'ios', 'build', platform, 'CordovaPlugins.framework');
+        
+        return FS.exists(sourcePluginsPath)
+        .then( (sourceExists) => {
+            if (!sourceExists) {
+                throw new Error("No built framework. Please run `aemm build ios`, see `aemm help build` for details.");
+            } else {
+                return FS.removeTree(destinationPluginsPath)
+            }
+        })
+        .then( () => {
+            return FS.copyTree(sourcePluginsPath, destinationPluginsPath);
+        });
     });
 }
