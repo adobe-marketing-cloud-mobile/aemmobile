@@ -1,6 +1,6 @@
 {
   "name": "aemm",
-  "version": "2.0.1",
+  "version": "2.0.2-dev",
   "description": "Command line utility for building AEMM apps",
   "scripts": {
     "test": "npm run jshint && npm run jasmine",
