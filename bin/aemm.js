@@ -18,12 +18,13 @@
 
 var semver = require('semver');
 var engines = require('../package').engines;
+var logger = require('cordova-common').CordovaLogger.get();
 
 // Check node version		
 if (!semver.satisfies(process.version, engines["node"]))
 {
-	throw new Error("Invalid Node.js version(" + process.version + ").  AEMM requires " + engines["node"] + "\n");
-	process.exit(1);
+    logger.error("Invalid Node.js version(" + process.version + ").  AEMM requires Node.js version(" + engines["node"] + ")");
+    process.exit(1);
 }
 
 var cli = require('../src/aemm-cli');

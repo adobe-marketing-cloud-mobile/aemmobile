@@ -20,6 +20,11 @@
 -->
 # aemm Release Notes
 
+## 2.0.1 (Jul 21, 2016)
+
+### Bug Fixes
+* [Issue 31](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/31) Require a minimum Node.js version of 6.2.2.
+
 ## 2.0.0 (Jul 18, 2016)
 
 ### Features

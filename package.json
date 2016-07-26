@@ -1,6 +1,6 @@
 {
   "name": "aemm",
-  "version": "2.0.0",
+  "version": "2.0.2-dev",
   "description": "Command line utility for building AEMM apps",
   "scripts": {
     "test": "npm run jshint && npm run jasmine",
@@ -44,7 +44,7 @@
     "jshint": "^2.9.2"
   },
   "engines": {
-    "node": ">=4.1.0"
+    "node": ">=6.2.2"
   },
   "repository": {
     "type": "git",
