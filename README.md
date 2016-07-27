@@ -8,7 +8,8 @@ Command line tool for building AEM Mobile apps with Cordova content
 
 ## Prerequisites
 Mac OS X:
-* npm(v4.4.2 LTS is recommended) must be installed
+* node (v6.2.2 or greater) must be installed
+* npm must be installed
 * For iOS, Xcode(v7.0 or greater) must be installed
 * For Android, Java must be installed:
   https://support.apple.com/downloads/java
@@ -19,7 +20,7 @@ Windows:
   http://www.oracle.com/technetwork/java/javase/downloads/index.html
 * VisualStudio Community 2015:
   https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx
-* npm(v4.4.5 LTS is recommended):
+* node (v6.2.2 or greater):
   https://nodejs.org/en/
 * Python 2.7:
   https://www.python.org/download/releases/2.7/
