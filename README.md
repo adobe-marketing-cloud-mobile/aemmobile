@@ -8,7 +8,7 @@ Command line tool for building AEM Mobile apps with Cordova content
 
 ## Prerequisites
 Mac OS X:
-* npm(v4.4.2 LTS is recommended) must be installed
+* node (v6.2.2 or greater) must be installed
 * For iOS, Xcode(v7.0 or greater) must be installed
 * For Android, Java must be installed:
   https://support.apple.com/downloads/java
@@ -19,7 +19,7 @@ Windows:
   http://www.oracle.com/technetwork/java/javase/downloads/index.html
 * VisualStudio Community 2015:
   https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx
-* npm(v4.4.5 LTS is recommended):
+* node (v6.2.2 or greater):
   https://nodejs.org/en/
 * Python 2.7:
   https://www.python.org/download/releases/2.7/
@@ -83,7 +83,7 @@ You must run the following commands inside the directory created with `aemm proj
  
  
 ###### 1. Developing custom HTML content
-  
+
 `aemm app install <platform>`
 
 	aemm app install ios
@@ -94,7 +94,7 @@ You must run the following commands inside the directory created with `aemm proj
 	
 	aemm app install ios 2016.5
 
-You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`.  
+You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`:
 
 `aemm run [platform]`
 
@@ -109,12 +109,15 @@ You must run the following commands inside the directory created with `aemm proj
 	aemm run ios --list
 	
 	aemm run ios --target "iPhone-6s, 9.2"
+	
+Note: The `run` command without the `--device` parameter will run the application in the emulator/simulator.
 
-run command without device parameter will run application in emulator/simulator.
 
 ###### 2. Developing custom application with custom plugins.
 
 You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`.
+
+Add the platforms you want to target your application for:
 
 `aemm platform add [platform]`
 
@@ -122,13 +125,12 @@ You must run the following commands inside the directory created with `aemm proj
 	
 	aemm platform add ios
 
-Add the platforms that you want to target your application at.
+Add the plugins you want to be included in your application:
 
 `aemm plugin add [plugin_0] [plugin_1] [...]`
 
 	aemm plugin add cordova-plugin-device cordova-plugin-contacts
 
-Add plugins you want to be included in your application.
 
 `aemm build [platform]`
 
@@ -136,7 +138,7 @@ Add plugins you want to be included in your application.
 	
 	aemm build ios --device
 
-build command with device parameter is for ios only.
+Note: the `--device` parameter for the `build` command is for ios only.
 	
 `aemm run [platform]`
 
@@ -152,7 +154,7 @@ build command with device parameter is for ios only.
 	
 	aemm run ios --target "iPhone-6s, 9.2"
 
-run command without device parameter will run application in emulator/simulator.
+Note: The `run` command without the `--device` parameter will run the application in the emulator/simulator.
 
 ## NOTE
 
