@@ -83,8 +83,6 @@ You must run the following commands inside the directory created with `aemm proj
  
  
 ###### 1. Developing custom HTML content
-  
-You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`:
 
 `aemm app install <platform>`
 
@@ -95,6 +93,8 @@ You must run the following commands inside the directory created with `aemm proj
 	aemm app install --list
 	
 	aemm app install ios 2016.5
+
+You must run the following commands inside the directory created with `aemm project create [PROJECT_NAME or PATH]`:
 
 `aemm run [platform]`
 
