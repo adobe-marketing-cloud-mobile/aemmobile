@@ -25,6 +25,13 @@ function build(args, platform)
     return Q.fcall( () => {
         var platformBuildModule = platformRequire("build", platform);
         return platformBuildModule.build(args);
+    }).catch( (err) => {
+        if (err.message == "No platforms added to this project. Please use `cordova platform add <platform>`.") {
+            throw new Error("No platforms added to this project. Please use `aemm platform add <platform>`.");
+        }
+        else {
+            throw err;
+        }
     });
 };
 
