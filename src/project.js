@@ -26,7 +26,6 @@ var cordova_lib = require('cordova-lib');
 var events = cordova_lib.events;
 var cordova = cordova_lib.cordova;
 var article = require('./article');
-var xml2js = require('xml2js');
 
 
 module.exports.create = create;
@@ -48,7 +47,8 @@ function create(options, projectPath)
 	.then( () => {
 		// Only skip the samples if we are explicitly asked to skip them. (null is assumed to mean true)
 		return (options.samples !== false) ? createAEMMScaffolding(fullProjectPath) : Q(); 
-	});
+	})
+	.then( () => populateProjectMetadata(fullProjectPath) );
 }
 
 module.exports.projectRootPath = projectRootPath;
@@ -145,6 +145,12 @@ function createAEMMScaffolding(fullProjectPath)
 	});
 }
 
+function populateProjectMetadata(fullProjectPath) {
+	let metadataJson = {};
+	metadataJson.createdByAemmVersion = require('../package.json').version;
+	return FS.write(path.join(fullProjectPath, '.aemm'), JSON.stringify(metadataJson, null , 2));
+}
+
 function createCordovaApp(projectName) 
 {
 	return cordova.raw.create( projectName, "com.adobe.aemmobile.CordovaPlugins", "CordovaPlugins", {});
@@ -154,18 +160,5 @@ function isAEMMProject(projectRoot) {
 	if (!projectRoot) {
 		return Q(false);
 	}
-	return FS.read(path.join(projectRoot, "config.xml"), "r")
-	.then( (data) => {
-		var parser = new xml2js.Parser();
-		var deferred = Q.defer();
-		parser.parseString(data, function (err, result) {
-			if (result.widget.name[0] === "CordovaPlugins") {
-				deferred.resolve(true);
-			}
-			else {
-				deferred.resolve(false);
-			}
-		});
-		return deferred.promise;
-	});
+	return FS.exists(path.join(projectRoot, ".aemm"), "r");
 }
