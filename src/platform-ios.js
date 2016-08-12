@@ -94,7 +94,7 @@ function isCodeSigningDisabled(settingsPlist = null) {
 function changeCodeSigningPolicy(settingsPlist, enabled = false) {
 	return Q().then( () => {
 		events.emit("info", "aemm requires Xcode to allow building unsigned frameworks.");
-		events.emit("info", "sudo may prompt your for your password to change Xcode's code signing policy.")
+		events.emit("info", "sudo may prompt you for your password to change Xcode's code signing policy.")
 	})
 	.then( () => {
 		var deferred = Q.defer();
