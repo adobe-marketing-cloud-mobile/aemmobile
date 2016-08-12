@@ -54,6 +54,16 @@ function add(spec)
 		var target = spec ? target_repo + "@" + spec : target_repo; 
         return cordova.raw.platform("add", target);
     })
+    .then( () => {
+		events.emit("info", "Ensuring core AEM Mobile plugins are installed.");
+        var targets = [
+			"aemm-plugin-navto",
+			"aemm-plugin-inappbrowser",
+			"aemm-plugin-fullscreen-video",
+			"aemm-plugin-html-contract"
+			];
+        return cordova.raw.plugin("add", targets);
+    })
 	.then( function () {
 		events.emit("results", "Finished installing ios platform.");	
 	});
