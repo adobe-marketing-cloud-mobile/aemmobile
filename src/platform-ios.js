@@ -24,6 +24,7 @@ var cordova_lib = require('cordova-lib');
 var cordova = cordova_lib.cordova;
 var events = cordova_lib.events;
 var path = require('path');
+var shell = require('shelljs');
 
 module.exports.install = install;
 function install()
@@ -102,11 +103,25 @@ function isCodeSigningDisabled(settingsPlist = null) {
 
 function changeCodeSigningPolicy(settingsPlist, enabled = false) {
 	return Q().then( () => {
-		events.emit("info", "You may need to enter your admin password to change Xcode's code signing policy.\naemm requires Xcode to allow building unsigned frameworks.")
+		events.emit("info", "aemm requires Xcode to allow building unsigned frameworks.");
+		events.emit("info", "sudo may prompt you for your password to change Xcode's code signing policy.")
 	})
 	.then( () => {
+		var deferred = Q.defer();
 		var val = enabled ? "YES" : "NO";
-		return exec('/usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED ' + val + '" ' + settingsPlist);
+		var command = 'sudo ' + '/usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED ' + val + '" ' + settingsPlist;
+		
+		shell.exec(command, {
+			silent: false
+		}, function (code, output) {
+			if (code == 0) {
+				deferred.resolve();
+			} else {
+				deferred.reject(new Error("Changing code signing policy failed. Please see the message above."));
+			}
+		});
+
+		return deferred.promise;
 	});
 }
 
