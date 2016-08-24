@@ -30,13 +30,13 @@ You need npm installed to run the command line tool. On Windows, run commands in
 
 1.  Install npm:
     https://nodejs.org/en/
-2.  Install aemm
+2.  Install aemm:
 	
 ~~~~
 	npm install -g aemm
 ~~~~
 	
-if that doesn't work, do the following...
+If that doesn't work, do the following...
 
 1.  Install npm
     https://nodejs.org/en/
