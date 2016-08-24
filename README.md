@@ -49,8 +49,19 @@ If that doesn't work, do the following...
 	npm link
 ~~~~
 
-For Android, you may see couple compilation errors related to node-gyp when running "npm install" on Mac OS X and Windows.
+For Android, you may see a couple compilation errors related to node-gyp when running "npm install" on Mac OS X and Windows.
 It's safe to ignore them. They don't affect the functionalities of this tool.
+
+If the installation fails due to errors with a specific module, troubleshoot by clearing your npm cache and reinstalling.  
+
+~~~~
+	npm remove -g aemm
+	npm cache clean
+	npm install -g aemm
+~~~~
+
+This will resolve current issues with the npm async module.
+
 
 #### Usage
 
