@@ -44,11 +44,12 @@ function create(options, projectPath)
 	})
 	.then( () => createCordovaApp(projectPath) )
 	.then( () => removeUnwantedCordovaArtifacts(fullProjectPath) )
+	.then( () => populateProjectMetadata(fullProjectPath) )
 	.then( () => {
 		// Only skip the samples if we are explicitly asked to skip them. (null is assumed to mean true)
 		return (options.samples !== false) ? createAEMMScaffolding(fullProjectPath) : Q(); 
-	})
-	.then( () => populateProjectMetadata(fullProjectPath) );
+	});
+	
 }
 
 module.exports.projectRootPath = projectRootPath;
