@@ -22,7 +22,6 @@ var Q = require('q');
 var path = require("path");
 var fs = require("fs");
 var FS = require('q-io/fs');
-var app = require('./app');
 var shell = require('shelljs');
 var os = require('os');
 var downloadFile = require('../utils/downloadFile');
@@ -38,7 +37,7 @@ var cordova = cordova_lib.cordova;
 const skinName = "Nexus-7";
 
 module.exports.install = install;
-module.exports.add = add;
+module.exports.post_add = post_add;
 
 function install() {
     return installSdk()
@@ -227,21 +226,14 @@ function createAvd() {
         });
 }
 
-function add(spec)
+function post_add()
 {
-    let target_repo = "https://github.com/adobe-marketing-cloud-mobile/aemm-android.git";
     return Q.fcall( () => {
-        var target = spec ? target_repo + "#" + spec : target_repo;
-        return cordova.raw.platform("add", target);
-    })
-    .then( () => {
         // add aemm-plugin-navto by default to be consistent with our viewer app behavior.
-        return Q.fcall(() => {
-            var targets = ["aemm-plugin-navto"];
-            return cordova.raw.plugin("add", targets);
-        })
-        .then(() => {
-            events.emit("results", "Finished adding Android platform.");
-        });
+        var targets = ["aemm-plugin-navto"];
+        return cordova.raw.plugin("add", targets);
+    })
+    .then(() => {
+        events.emit("results", "Finished adding Android platform.");
     });
 }

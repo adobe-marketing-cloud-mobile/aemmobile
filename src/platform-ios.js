@@ -47,13 +47,18 @@ function install()
 	});
 }
 
-module.exports.add = add;
-function add(spec)
+module.exports.post_add = post_add;
+function post_add()
 {
-	let target_repo = "https://github.com/adobe-marketing-cloud-mobile/aemm-ios.git";
     return Q.fcall( () => {
-		var target = spec ? target_repo + "@" + spec : target_repo; 
-        return cordova.raw.platform("add", target);
+		events.emit("info", "Ensuring core AEM Mobile plugins are installed.");
+        var targets = [
+			"aemm-plugin-navto",
+			"aemm-plugin-inappbrowser",
+			"aemm-plugin-fullscreen-video",
+			"aemm-plugin-html-contract"
+			];
+        return cordova.raw.plugin("add", targets);
     })
     .then( () => {
 		events.emit("info", "Ensuring core AEM Mobile plugins are installed.");
@@ -66,7 +71,7 @@ function add(spec)
         return cordova.raw.plugin("add", targets);
     })
 	.then( function () {
-		events.emit("results", "Finished installing ios platform.");	
+		events.emit("results", "Finished adding ios platform.");	
 	});
 }
 

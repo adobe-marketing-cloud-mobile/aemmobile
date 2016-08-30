@@ -8,13 +8,13 @@ Commands:
 
   help [command]                output usage information
   platform [command]            install platform specific dev tools(i.e. sdk)
-  project create <path>         create a phonegap project
+  project create <path>         create an aemm project
   article [command]             create articles
   app [command]                 install a pre-built binary for a specific platform
   plugin [command]              add and remove plugins
-  build <platforms>             build binary for a specific platform
+  build <platform>              build binary for a specific platform
   package [command]             bundle the custom plugins into a binary (iOS only)
-  run <platforms>               install and serve the project for a specific platform
+  run <platform>                install and serve the project for a specific platform
   serve                         serve a phonegap project
 
 Options:
@@ -24,8 +24,19 @@ Options:
 
 Examples:
 
-  $ aemm help project
-  $ aemm project create path/to/my-app
-  $ cd my-app/
-  $ aemm article create my-article
-  $ aemm run ios
+  Article Preview workflow:
+    $ aemm help project
+    $ aemm project create path/to/my-project
+    $ cd path/to/my-project/
+    $ aemm article create my-article
+    $ aemm run ios
+
+  Custom plugin workflow (tested in simulator):
+    $ aemm project create path/to/my-project
+    $ cd path/to/my-project/
+    $ aemm plugin add my-plugin
+    $ aemm platform add ios
+    $ aemm build ios
+    $ aemm app install ios
+    $ aemm package ios
+    $ aemm run ios
