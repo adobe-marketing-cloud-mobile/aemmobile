@@ -47,7 +47,8 @@ describe('run:', function()
 	// 	.finally(done);
 	// });
 
-
+/*
+    // Ignoring negative tests. We may want to re-visit these later.
 	// run (no platform specified)
     it('should fail if no platform is passed in', function(done) 
 	{
@@ -56,5 +57,5 @@ describe('run:', function()
 		.catch( (err) => expect(err.message).toBe("You must specify a platform.  See 'aemm help run' for more info.") )
 		.finally( done );
     });
-
+*/
 });

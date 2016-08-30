@@ -29,14 +29,14 @@ module.exports.testing = {};
 module.exports.create = create;
 function create(options /*, list of article names  */ )
 {
-	return Q.fcall( () => 
+	return project.projectRootPath()
+	.then( (projectPath) => 
 	{
 		let articleNamesList = Array.prototype.slice.call(arguments, 1).filter( (item) => item && item.length > 0) ;
 		if (articleNamesList.length <= 0)
 		{
 			throw Error( `You must specify an article name with the 'article create' command.`);
 		}
-		let projectPath = project.projectRootPath();
 		let articlePromises = articleNamesList.map( (articleName) => createSingleArticle(projectPath, articleName) );
 		return Q.allSettled(articlePromises);		
 	});

@@ -48,17 +48,18 @@ function runOnDevice() {
     var apkInstalledType = constants.APK_TYPE_CUSTOM;
 
     return checkApk()
-        .then( () => {
-            return installApkOnDevice("device");
-        })
-        .then(function (apkType) {
-            apkInstalledType = apkType;
-            return serve({}, "android");
-        })
-        .then(function (servResponse) {
+    .then( () => {
+        return installApkOnDevice("device");
+    })
+    .then(function (apkType) {
+        apkInstalledType = apkType;
+        return serve({}, "android");
+    })
+    .then(function (servResponse) {
+        return config.getValueFromConfig('screenOrientation')
+        .then( (orientation) => {
             var defer = Q.defer();
 
-            var orientation = config.getValueFromConfig('screenOrientation');
             if (!orientation) {
                 // portrait by default
                 orientation = 'portrait';
@@ -85,30 +86,32 @@ function runOnDevice() {
 
             return defer.promise;
         });
+    });
 }
 
 function runOnEmulator() {
     var apkInstalledType = constants.APK_TYPE_CUSTOM;
 
     return checkApk()
-        .then( () => {
-            return randomPort();
-        })
-        .then(function (port) {
-            return emulator.start('AEMM_Tablet', port);
-        })
-        .then(function (emulatorId) {
-            deviceSerialNum = emulatorId;
-            return installApkOnEmulator(deviceSerialNum);
-        })
-        .then(function (apkType) {
-            apkInstalledType = apkType;
-            return serve({}, "android");
-        })
-        .then(function (servResponse) {
+    .then( () => {
+        return randomPort();
+    })
+    .then(function (port) {
+        return emulator.start('AEMM_Tablet', port);
+    })
+    .then(function (emulatorId) {
+        deviceSerialNum = emulatorId;
+        return installApkOnEmulator(deviceSerialNum);
+    })
+    .then(function (apkType) {
+        apkInstalledType = apkType;
+        return serve({}, "android");
+    })
+    .then(function (servResponse) {
+        return config.getValueFromConfig('screenOrientation')
+        .then( (orientation) => {
             var defer = Q.defer();
 
-            var orientation = config.getValueFromConfig('screenOrientation');
             if (!orientation) {
                 // portrait by default
                 orientation = 'portrait';
@@ -134,35 +137,39 @@ function runOnEmulator() {
 
             return defer.promise;
         });
+    });
 };
 
 function checkApk() {
-    var deferred = Q.defer();
+    return project.projectRootPath()
+	.then( (projectRootPath) => {
+        var deferred = Q.defer();
 
-    var customPluginPath = path.join(project.projectRootPath(), 'plugins');
-    var customAppPath = path.join(project.projectRootPath(), 'platforms/android');
-    var customApkPath = path.join(project.projectRootPath(), 'platforms/android/build/outputs/apk/android-debug.apk');
-    if ( fs.existsSync(customAppPath) ) {
-        if ( !fs.existsSync(customApkPath) ) {
-            deferred.reject(new Error("No custom apk found, please run 'aemm build android'."));
+        var customPluginPath = path.join(projectRootPath, 'plugins');
+        var customAppPath = path.join(projectRootPath, 'platforms/android');
+        var customApkPath = path.join(projectRootPath, 'platforms/android/build/outputs/apk/android-debug.apk');
+        if ( fs.existsSync(customAppPath) ) {
+            if ( !fs.existsSync(customApkPath) ) {
+                deferred.reject(new Error("No custom apk found, please run 'aemm build android'."));
+            } else {
+                deferred.resolve();
+            }
+        } else if ( fs.existsSync(customPluginPath) ) {
+            deferred.reject(new Error("No platform found, please run 'aemm platform add android'."));
         } else {
-            deferred.resolve();
+            app.getParentPathForAppBinary("android", "emulator")
+                .then((parentPath) => {
+                    let prebuiltAppPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
+                    if (!fs.existsSync(prebuiltAppPath)) {
+                        deferred.reject(new Error(`No apk found, please run 'aemm app install android'.`));
+                    } else {
+                        deferred.resolve();
+                    }
+                });
         }
-    } else if ( fs.existsSync(customPluginPath) ) {
-        deferred.reject(new Error("No platform found, please run 'aemm platform add android'."));
-    } else {
-        app.getParentPathForAppBinary("android", "emulator")
-            .then((parentPath) => {
-                let prebuiltAppPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
-                if (!fs.existsSync(prebuiltAppPath)) {
-                    deferred.reject(new Error(`No apk found, please run 'aemm app install android'.`));
-                } else {
-                    deferred.resolve();
-                }
-            });
-    }
 
-    return deferred.promise;
+        return deferred.promise;
+    });
 }
 
 function installApkOnDevice()
@@ -221,10 +228,12 @@ function installApkOnEmulator(deviceSerialNum)
 
 var getArgs = function(ipAddress, port)
 {
-    var args;
-    // Get list of articles to serve
-    var wwwFolder = path.join(project.projectRootPath(), "/www");
-    return FS.list(wwwFolder)
+    return project.projectRootPath()
+	.then( (projectRootPath) => {
+        var args;
+        // Get list of articles to serve
+        var wwwFolder = path.join(projectRootPath, "www");
+        return FS.list(wwwFolder)
         .then( function (fileArray) {
             var i = 0;
             var fileArray2 = [];
@@ -240,6 +249,7 @@ var getArgs = function(ipAddress, port)
             // });
             let articles = fileArray2.join(" ");
             args = ["-phonegapServer", ipAddress + ":" + port, "-serveArticles", articles];
-            return args;
+            return Q(args);
         });
+    });
 }

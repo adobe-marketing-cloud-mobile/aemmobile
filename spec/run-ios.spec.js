@@ -108,8 +108,6 @@ describe('run ios:', function()
                 expect(lines[8]).toBe("Install simulator devices from Xcode.");
             })
             .finally( done );
-            
-
         });
     });
 */

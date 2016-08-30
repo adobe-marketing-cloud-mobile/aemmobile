@@ -53,7 +53,7 @@ describe("aemm cli project", function () {
         it("will call project create", function (done) {
             let projectName = "TestProject";
             cli(["node", "aemm", "project", "create", projectName], () => {
-                expect(project.create).toHaveBeenCalledWith({ argv : { remain : [ 'TestProject' ], cooked : [ 'project', 'create', 'TestProject' ], original : [ 'project', 'create', 'TestProject' ] } }, 'TestProject');
+                expect(project.create).toHaveBeenCalledWith({ argv : { remain : [ 'TestProject' ], cooked : [ 'project', 'create', 'TestProject' ], original : [ 'project', 'create', 'TestProject' ], undashed : [ 'project', 'create', 'TestProject' ] } }, 'TestProject');
                 done();
             });
         });

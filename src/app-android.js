@@ -32,22 +32,28 @@ var constants = require('../utils/constants');
 
 function getCustomAppBinaryPath()
 {
-	var customAppPath = path.join(project.projectRootPath(), 'platforms/android/build/outputs/apk/android-debug.apk');
-	if ( !fs.existsSync(customAppPath) )
-	{
-		return null;
-	}
-
-	return customAppPath;
+	return project.projectRootPath()
+	.then( (projectRootPath) => {
+		var customAppPath = path.join(projectRootPath, 'platforms/android/build/outputs/apk/android-debug.apk');
+		return FS.exists(customAppPath)
+		.then( (exists) => {
+			if (!exists) {
+				return Q(null);
+			}
+			else {
+				return Q(customAppPath);
+			}
+		});
+	});
 }
 
 module.exports.getInstalledAppBinaryPath = getInstalledAppBinaryPath;
 function getInstalledAppBinaryPath(deviceType)
 {
-	return Q.fcall( () => {
-		var customAppPath = getCustomAppBinaryPath();
+	return getCustomAppBinaryPath()
+	.then( (customAppPath) => {
 		if (customAppPath != null) {
-			return customAppPath;
+			return Q(customAppPath);
 		}
 
 		return app.getParentPathForAppBinary("android", deviceType)
@@ -57,7 +63,7 @@ function getInstalledAppBinaryPath(deviceType)
 					throw new Error(`No application found at ${parentPath}`);
 				}
 
-				return viewerPath;
+				return Q(viewerPath);
 			});
 	});
 }
