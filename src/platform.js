@@ -162,7 +162,7 @@ function getReleaseVersions(platform) {
     .then( (response) => {
         var versions = [];
         events.emit("verbose", `Response:\n${JSON.stringify(response)}`);
-        if (reponse) {
+        if (response) {
             response.forEach(function(release) {
                 versions.push(release.name);
             });
