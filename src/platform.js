@@ -157,12 +157,16 @@ function getReleaseVersions(platform) {
         },
         json: true
     }
+    events.emit("verbose", `Request:\n${JSON.stringify(options)}`);
     return rp(options)
     .then( (response) => {
         var versions = [];
-        response.forEach(function(release) {
-            versions.push(release.name);
-        });
+        events.emit("verbose", `Response:\n${JSON.stringify(response)}`);
+        if (reponse) {
+            response.forEach(function(release) {
+                versions.push(release.name);
+            });
+        }
         return Q(versions);
     });
 }
