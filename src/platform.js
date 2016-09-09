@@ -163,9 +163,9 @@ function getReleaseVersions(platform) {
         var versions = [];
         events.emit("verbose", `Response:\n${JSON.stringify(response)}`);
         if (response) {
-            response.forEach(function(release) {
-                versions.push(release.name);
-            });
+            for (var i=0, len = response.length; i < len; i++) {
+                versions.push(response[i].name);
+            };
         }
         return Q(versions);
     });
