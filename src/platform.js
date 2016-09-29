@@ -100,6 +100,7 @@ function add(options, target)
                     else if (!spec || semver.validRange(spec)) {
                         var range = spec ? spec : platforms[platform].version;
                         // Do a semver check here.
+                        events.emit("verbose", `Looking for a match for spec ${range} in versions: ${versions}`);
                         var tag_name = semver.maxSatisfying(versions, range);
                         if (!tag_name) {
                             throw new Error("No version of the platform found matching the supplied range.");
