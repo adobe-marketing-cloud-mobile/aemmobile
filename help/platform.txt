@@ -6,10 +6,21 @@ Description:
 
 Commands:
 
+  add <plat-spec>           Add specified platform
   install <platform>        Install SDKs for a specific platform
+  remove <platform>         Remove specified platform
+
+Syntax
+    <plat-spec> : <platform>[@<version>]|<path>|<url>[#<commit-ish>]
+
+    <platform> ........................ Platform name e.g. android, ios
+    <version> ......................... Major.minor.patch version specifier using semver
+    <path> ............................ Path to a directory containing a platform
+    <url> ............................. Url to a git repository containing a platform
+    <commit-ish> ...................... Commit/tag/branch reference. If none is specified, the default branch is used
 
 Note:
-  You may need to open a new terminal to have the new system environment settings take effect.
+  You may need to open a new terminal after `platform install` to have the new system environment settings take effect.
 
 Examples:
 
