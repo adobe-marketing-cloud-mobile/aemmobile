@@ -24,7 +24,7 @@ var events = cordova_lib.events;
 
 module.exports.package = packageBinary;
 
-function packageBinary(args, platform) {
+function packageBinary(opts) {
     events.emit('info', 'The package command is not required for android. Did you mean `aemm build android`?');
     return Q();
 }

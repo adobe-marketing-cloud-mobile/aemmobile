@@ -22,26 +22,13 @@ var cordova_lib = require('cordova-lib'),
 
 module.exports.build = build;
 
-function build(args)
+function build(opts)
 {
     var cmd = "build";
-    var opts = {
-            platforms: [ "ios" ],
-            options: {
-                debug: args.debug,
-                release: args.release,
-                device: args.device,
-                emulator: args.emulator,
-                codeSignIdentity: "Don't Code Sign",
-                noSign: true
-            },
-            verbose: false,
-            silent: false,
-            browserify: false,
-            fetch: false,
-            nohooks: [],
-            searchpath : ""
-        };
+    opts.platforms = [ "ios" ];
+    opts.options.codeSignIdentity = "Don't Code Sign";
+    opts.options.noSign = true;
+
     return Q()
     .then( function() {
         if (opts.options.device) {

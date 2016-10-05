@@ -32,7 +32,8 @@ var project = require('./project');
 
 module.exports.package = packageBinary;
 
-function packageBinary(args, platform) {
+function packageBinary(opts) {
+    var args = opts.options;
     // Ensure we are in an AEMM project.
     return project.projectRootPath()
     .then(function () {

@@ -38,8 +38,9 @@ var ServeDefaults = {
 
 module.exports = serve;
 
-function serve(options) 
+function serve(opts) 
 {
+	var options = opts.options;
 	return project.projectRootPath()
 	.then( () => getCordovaRoot())
 	.then( (cordovaRootPath) => {

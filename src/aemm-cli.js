@@ -157,7 +157,7 @@ function cli(inputArgs)
     var remain = args.argv.remain;
     var undashed = remain.slice(0, remain.length - unparsedArgs.length);
     var commandName = undashed[0];
-    var subCommandName;
+    var subcommandName;
     args.argv.undashed = undashed;
     
     if ( !commandName || commandName == 'help' || args.help ) {
@@ -174,29 +174,46 @@ function cli(inputArgs)
         var message = `${cmdLineToolInfo.name} does not know '${commandName}'; try '${cmdLineToolInfo.name} help' for a list of all the available commands.`;
         throw new CordovaError(message);
     }
+     
+    var opts = {
+        platforms: [],
+        options: [],
+        verbose: args.verbose || false,
+        silent: args.silent || false,
+        browserify: args.browserify || false,
+        fetch: args.fetch || false,
+        nohooks: args.nohooks || [],
+        searchpath : args.searchpath
+    };
     
     let cmd = commands[commandName];
     remain.shift();
     // if cmd is a function, call it
     if (typeof cmd === 'function')
     {
-        // Add args as first parameter.
-        let newArgs = [args].concat(remain);
-        return cmd.apply(this, newArgs);
-    } else
-    {
-        subCommandName = undashed[1];
+        if (cmd.name === 'plugin') {
+            subcommandName = undashed[1];
+            var targets = undashed.slice(2);
+            return cmd.call(null, subcommandName, targets);
+        } else {
+            opts.platforms = undashed.slice(1);
+            opts.options = args;
+            opts.options.argv = unparsedArgs;
+            return cmd.call(null, opts);
+        }
+    } else {
+        subcommandName = undashed[1];
         // Look for an appropriate sub command
-        if (!cmd.hasOwnProperty(subCommandName))
+        if (!cmd.hasOwnProperty(subcommandName))
         {
             let cmdLineToolInfo = require('../package.json');
-            var message = `${cmdLineToolInfo.name} ${commandName} does not have a subcommand of '${subCommandName}'; try '${cmdLineToolInfo.name} help ${commandName}' for a list of all the available sub commands within ${commandName}.`;
+            var message = `${cmdLineToolInfo.name} ${commandName} does not have a subcommand of '${subcommandName}'; try '${cmdLineToolInfo.name} help ${commandName}' for a list of all the available sub commands within ${commandName}.`;
             throw new CordovaError(message);
         }
-        let subCommand = cmd[subCommandName];
+        let subcommand = cmd[subcommandName];
         remain.shift();
 
         let newArgs = [args].concat(remain);
-        return subCommand.apply(this, newArgs);
+        return subcommand.apply(this, newArgs);
     }
 }

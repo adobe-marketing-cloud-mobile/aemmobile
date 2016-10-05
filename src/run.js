@@ -21,11 +21,12 @@ var project = require('./project');
 
 module.exports = run;
 
-function run(args, platform) 
+function run(opts) 
 {
+	var args = opts.options;
 	return project.projectRootPath()
 	.then( () => {
-		var platformRun = platformRequire("run", platform);
+		var platformRun = platformRequire("run", opts.platforms[0]);
 
 		// We don't want to kill the process after run returns
 		args.killProcessAfterCommand = false;

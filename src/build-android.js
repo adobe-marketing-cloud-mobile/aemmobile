@@ -21,23 +21,11 @@ var cordova_lib = require('cordova-lib'),
 
 module.exports.build = build;
 
-function build(args)
+function build(opts)
 {
     return Q.fcall( () => {
         var cmd = "build";
-        var opts = {
-            platforms: [ "android" ],
-            options: [],
-            verbose: false,
-            silent: false,
-            browserify: false,
-            fetch: false,
-            nohooks: [],
-            searchpath : ""
-        };
-
-        opts.options = args;
-        opts.options.argv = [];
+        opts.platforms = [ "android" ];
 
         return cordova.raw[cmd].call(null, opts);
     });

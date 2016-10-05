@@ -24,12 +24,10 @@ var cordova = cordova_lib.cordova;
 var project = require('./project');
 
 module.exports = plugin;
-function plugin(args, command) {
+function plugin(subcommand, targets) {
     return project.projectRootPath()
     .then( () => {
-        var targets = args.argv.remain;
-        var command = targets.shift();
-        return cordova.plugin(command, targets);
+        return cordova.plugin(subcommand, targets);
     }).catch(function (err) {
         throw new Error(err.message);
     }).done();

@@ -24,15 +24,15 @@ var pathToProjectConfig = null;
 var file = null;
 
 module.exports = config;
-function config(options, args)
+function config(opts)
 {
-    var getKey = options.get;
-    var setKey = options.set;
-    var unsetKey = options.unset;
+    var getKey = opts.options.get;
+    var setKey = opts.options.set;
+    var unsetKey = opts.options.unset;
 
     return getConfigFile()
     .then( (file) => {
-        if (options.list)
+        if (opts.options.list)
         {
             if (!file)
             {
@@ -44,7 +44,7 @@ function config(options, args)
                 return Q();
             }
         }
-        if (options.get)
+        if (opts.options.get)
         {
             return getValueFromConfig(getKey)
             .then( (val) => {
@@ -52,11 +52,11 @@ function config(options, args)
                 return Q();
             });
         }
-        if (options.set)
+        if (opts.options.set)
         {
-            return setValueInConfig(setKey, args);
+            return setValueInConfig(setKey, opts.options.argv);
         }
-        if (options.unset)
+        if (opts.options.unset)
         {
             return removeKeyFromConfig(unsetKey);
         }

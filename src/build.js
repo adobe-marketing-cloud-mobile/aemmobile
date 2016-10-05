@@ -18,16 +18,25 @@
 var Q = require('q');
 var platformRequire = require('../utils/platformRequire');
 var project = require('./project');
+var promise_util = require('cordova-lib/src/util/promise-util');
+var cordova_util = require('cordova-lib/src/cordova/util');
+var _ = require('underscore');
 
 module.exports = build;
 
-function build(args, platform)
+function build(opts)
 {
     return project.projectRootPath()
     .then( () => {
-        var platformBuildModule = platformRequire("build", platform);
-        return platformBuildModule.build(args);
-    }).catch( (err) => {
+        return cordova_util.preProcessOptions(opts);
+    })
+    .then( () => {
+        return promise_util.Q_chainmap(opts.platforms, function (platform) {
+            var platformBuildModule = platformRequire("build", platform);
+            return platformBuildModule.build(_.clone(opts));
+        });
+    })
+    .catch( (err) => {
         if (err.message == "No platforms added to this project. Please use `cordova platform add <platform>`.") {
             throw new Error("No platforms added to this project. Please use `aemm platform add <platform>`.");
         }

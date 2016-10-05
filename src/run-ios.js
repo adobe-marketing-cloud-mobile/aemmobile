@@ -81,7 +81,7 @@ Install simulator devices from Xcode.`);
 	})
 	.then( () => app.ensureInstalledBinary("ios", deviceName) )
 	.then( function() {
-		return serve({}, deviceName);
+		return serve({ options: {} }, deviceName);
 	})
 	.then( function(serveResponse) {
 		return startSimulator(target, deviceName, serveResponse.address, serveResponse.port, projectRootPath);	

@@ -60,16 +60,6 @@ function post_add()
 			];
         return cordova.raw.plugin("add", targets);
     })
-    .then( () => {
-		events.emit("info", "Ensuring core AEM Mobile plugins are installed.");
-        var targets = [
-			"aemm-plugin-navto",
-			"aemm-plugin-inappbrowser",
-			"aemm-plugin-fullscreen-video",
-			"aemm-plugin-html-contract"
-			];
-        return cordova.raw.plugin("add", targets);
-    })
 	.then( function () {
 		events.emit("results", "Finished adding ios platform.");	
 	});
