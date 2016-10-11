@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -85,7 +84,7 @@ function isCodeSigningDisabled(settingsPlist = null) {
 		return settingsPlist ? Q(settingsPlist) : getSDKSettingsPlist();
 	})
 	.then( (settingsPlist) => {
-		return exec('/usr/libexec/PlistBuddy -c "Print DefaultProperties:CODE_SIGNING_REQUIRED" ' + settingsPlist)
+		return exec('/usr/libexec/PlistBuddy -c "Print DefaultProperties:CODE_SIGNING_REQUIRED" ' + settingsPlist);
 	})
 	.then( (codeSigningRequired) => {
 		if (codeSigningRequired.stdout.trim() === "NO") {
@@ -99,7 +98,7 @@ function isCodeSigningDisabled(settingsPlist = null) {
 function changeCodeSigningPolicy(settingsPlist, enabled = false) {
 	return Q().then( () => {
 		events.emit("info", "aemm requires Xcode to allow building unsigned frameworks.");
-		events.emit("info", "sudo may prompt you for your password to change Xcode's code signing policy.")
+		events.emit("info", "sudo may prompt you for your password to change Xcode's code signing policy.");
 	})
 	.then( () => {
 		var deferred = Q.defer();
@@ -109,7 +108,7 @@ function changeCodeSigningPolicy(settingsPlist, enabled = false) {
 		shell.exec(command, {
 			silent: false
 		}, function (code, output) {
-			if (code == 0) {
+			if (code === 0) {
 				deferred.resolve();
 			} else {
 				deferred.reject(new Error("Changing code signing policy failed. Please see the message above."));

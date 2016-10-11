@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -33,7 +32,7 @@ var project = require('./project');
 module.exports.package = packageBinary;
 
 function packageBinary(opts) {
-    var args = opts.options;
+    var args = opts.options || {};
     // Ensure we are in an AEMM project.
     return project.projectRootPath()
     .then(function () {
@@ -73,7 +72,7 @@ function packageBinary(opts) {
                 var cmd = "zip -0 -y -r zipped.ipa Payload/";
                 events.emit('log', 'zipping Payload directory.');
                 shell.exec(cmd, {silent:true}, function(code, stdout, stderr) {
-                    if (code != 0) {
+                    if (code !== 0) {
                         deferred.reject(stderr);
                     } else {
                         events.emit('results', "zip complete.");
@@ -116,7 +115,7 @@ function replaceFramework(appPath, platform) {
             if (!sourceExists) {
                 throw new Error("No built framework. Please run `aemm build ios`, see `aemm help build` for details.");
             } else {
-                return FS.removeTree(destinationPluginsPath)
+                return FS.removeTree(destinationPluginsPath);
             }
         })
         .then( () => {

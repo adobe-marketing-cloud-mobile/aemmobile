@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict"
 
 var helpers = require('./helpers');
 var article = require('../src/article');
@@ -31,7 +30,6 @@ describe('article.create(options, articlename)', () =>
 	
     beforeEach( (done) => 
 	{
-		let err = undefined;
 		FS.makeTree(tmpDir) 
 		.then( () => {
 			process.chdir(tmpDir);
@@ -39,7 +37,7 @@ describe('article.create(options, articlename)', () =>
 			return project.create({}, projectPath)
 			.then( ()=> process.chdir(projectPath) );
 		})
-		.catch((error) => done.fail(err) )
+		.catch((err) => done.fail(err) )
 		.finally( done );
     });
 	
@@ -108,7 +106,6 @@ describe('article.create(options, articlename)', () =>
 		let existingArticle2 = "existingArticle2";
 		let newArticle1 = "newArticle1";
 		let newArticle2 = "newArticle2";
-		let err = undefined;
         article.create({}, existingArticle1, existingArticle2)
 		.then( () => {
 			article.create({}, existingArticle1, existingArticle2, newArticle1, newArticle2)

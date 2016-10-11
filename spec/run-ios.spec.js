@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict"
 
 var helpers = require('./helpers');
 var run = require('../src/run');
@@ -145,7 +144,7 @@ describe('run ios:', function()
         // run ios
         it('should call iossim launch', function(done) 
         {
-            run({}, "ios")
+            run({ 'platforms' : [ 'ios' ] })
             .then( () => {
                 let path = iossim.launch.calls[0].args[0];
                 let target = iossim.launch.calls[0].args[1];
@@ -168,7 +167,7 @@ describe('run ios:', function()
         // run ios --list
         it('should return filtered list of devices', function(done) 
         {
-            run({ list: true }, "ios")
+            run({ 'list': true, 'platforms' : [ 'ios' ] })
             .then( () => {
                 let count = events.emit.calls.length;
                 let calls = events.emit.calls;
@@ -185,7 +184,7 @@ describe('run ios:', function()
         // run ios --target validTarget
         it('should run a specific target if one is given', function(done) 
         {
-            run({target: "iPhone-6, 9.2"}, "ios")
+            run({ target: "iPhone-6, 9.2", 'platforms' : [ 'ios' ] })
             .then( () => {
                 let target = iossim.launch.calls[0].args[1];
                 

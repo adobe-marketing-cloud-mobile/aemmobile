@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
  /**
  * Module dependencies.
@@ -36,7 +35,7 @@ function create(options, projectPath)
 	{
 		if (!projectPath)
 		{
-			throw Error(`At least the dir must be provided to create new project. See 'aemm help project'.`)
+			throw Error(`At least the dir must be provided to create new project. See 'aemm help project'.`);
 		}
 		
 		fullProjectPath = path.resolve(projectPath);
@@ -82,8 +81,8 @@ function articleList()
 		let sortedFileArray = fileArray.sort((a,b) => a.localeCompare(b));
 		let articleNameList = sortedFileArray.filter( (fileName) => !fileName.startsWith(".") && fs.lstatSync(path.join(wwwFolder, fileName)).isDirectory());		
 		// Get metadata from article if it has any
-		let articleInfoPromiseList = articleNameList.map( (articleName) => metadataForArticle(path.join(wwwFolder, articleName)))
-		return Q.all(articleInfoPromiseList)
+		let articleInfoPromiseList = articleNameList.map( (articleName) => metadataForArticle(path.join(wwwFolder, articleName)));
+		return Q.all(articleInfoPromiseList);
 	});
 }
 
@@ -104,7 +103,7 @@ function metadataForArticle(articlePath)
 		})
 		.catch( (err) => {
 			events.emit("log", `Could not get metadata from ${articlePath}/metadata.json file: ${err}`);
-		})
+		});
 	})
 	.catch( () =>  updateMetadata({}, articlePath) );	// Don't fail over this, just don't use metadata		
 }

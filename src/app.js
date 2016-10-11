@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -58,7 +57,7 @@ function getInstalledAppBinaryPath(platform, deviceType)
 			throw new Error(`Invalid platform(${platform}) sent to getInstalledAppBinaryPath())`);
 		}
 		return platformAppBinary.getInstalledAppBinaryPath(deviceType);
-	})
+	});
 }
 
 module.exports.getParentPathForAppBinary = getParentPathForAppBinary;
@@ -87,7 +86,7 @@ function ensureInstalledBinary(platform, deviceName)
 	})
 	.catch( (err) => {
 		throw Error("You must install downloaded app binary before using this command.  See 'aemm app install'.");
-	})
+	});
 }
 
 module.exports.version = displayAppVersion;
@@ -102,7 +101,7 @@ function displayAppVersion(options, platform)
 			return platformAppBinary.getAppVersion(deviceType)
 			.then( (appVersion) => {
 				events.emit('log', `${platform} version:\n${appVersion ? appVersion : "No app install for ios."}\n`);
-			})	
+			});
 		});
 		
 		return Q.all(promises)
@@ -131,7 +130,7 @@ function install(options, urlOrFilepathOrPlatform, appVersion)
 		}
 		else
 		{
-			events.emit("warn", `You need to indicate a plaftorm for the app you would like to install.\n\tPlease see your options below:`)
+			events.emit("warn", `You need to indicate a plaftorm for the app you would like to install.\n\tPlease see your options below:`);
 			return listAppVersions();
 		}
 	
@@ -147,7 +146,7 @@ function installFromServerInConfig(platform, deviceType, specificVersion)
 		.then( (response) => {
 			let versions = JSON.parse( response );
 			const versionDict = versions[platform];
-			const getVersion = specificVersion || versionDict["latest"];
+			const getVersion = specificVersion || versionDict.latest;
 			const appUrl = versionDict[getVersion];
 			
 			if (!appUrl)
@@ -276,16 +275,16 @@ function update(options, optionalPlatform)
 						return false;
 					}
 					const platformVersions = versionInfo[platform];
-					if (appVersion !== platformVersions["latest"])
+					if (appVersion !== platformVersions.latest)
 					{
-						let latest = platformVersions[platformVersions["latest"]];
+						let latest = platformVersions[platformVersions.latest];
 						if (!latest)
 						{
 							throw new Error("Could not determine latest update.  Please install specific version.  See 'aemm help app' for more info");
 						}
-						return installFromFile(platformVersions["latest"], latest, deviceType);
+						return installFromFile(platformVersions.latest, latest, deviceType);
 					} else {
-						events.emit("log", `${platform} app binary is up to date.`)
+						events.emit("log", `${platform} app binary is up to date.`);
 					}
 					return false;
 				});

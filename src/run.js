@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
 var platformRequire = require('../utils/platformRequire');
@@ -23,15 +22,14 @@ module.exports = run;
 
 function run(opts) 
 {
-	var args = opts.options;
 	return project.projectRootPath()
 	.then( () => {
 		var platformRun = platformRequire("run", opts.platforms[0]);
 
 		// We don't want to kill the process after run returns
-		args.killProcessAfterCommand = false;
+		opts.killProcessAfterCommand = false;
 		
-		return platformRun(args);
+		return platformRun(opts);
 	});
-};
+}
 

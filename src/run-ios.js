@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
 var project = require('./project');
@@ -32,12 +31,12 @@ var events = cordova_lib.events;
 
 module.exports = run;
 
-function run(args) 
+function run(opts) 
 {
 	let projectRootPath = null;
-	var target = args.target;
-	var deviceName = args.device ? "device" : "emulator";
-	if (args.list)
+	var target = opts.target;
+	var deviceName = opts.device ? "device" : "emulator";
+	if (opts.list)
 	{
 		return listSimulators();
 	}
@@ -64,7 +63,7 @@ Install simulator devices from Xcode.`);
 		if (target)
 		{
 			let filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith(target) );
-			if (filteredList.length == 0)
+			if (filteredList.length === 0)
 			{
 				throw Error(`Target device specified(${target}) could not be found in the list of available devices.  Run 'aemm run ios --list' for device list.`);
 			}
@@ -86,9 +85,9 @@ Install simulator devices from Xcode.`);
 	.then( function(serveResponse) {
 		return startSimulator(target, deviceName, serveResponse.address, serveResponse.port, projectRootPath);	
 	});
-};
+}
 
-function listSimulators(args)
+function listSimulators()
 {
 	return Q.fcall( () => 
 	{
@@ -109,7 +108,7 @@ function aemmSimulatorList()
 		{
 			return false;
 		}
-		return item.startsWith("iPhone") || item.startsWith("iPad") 
+		return item.startsWith("iPhone") || item.startsWith("iPad");
 	});
 	
 	return filteredList;
@@ -134,10 +133,10 @@ var startSimulator = function(target, deviceName, ipAddress, port, projectRootPa
 					fs.unlinkSync(logPath);
 				}
 				return iossim.launch(jupiterPath, target, logPath, false, args);						
-			})
+			});
 		});
 	});
-}
+};
 
 var getArgs = function(ipAddress, port) 
 {
@@ -151,8 +150,7 @@ var getArgs = function(ipAddress, port)
 	
 // return ["-phonegapServer", ipAddress + ":" + port];
 
-}
-
+};
 
 function modifyBinaryPlist(appPath)
 {

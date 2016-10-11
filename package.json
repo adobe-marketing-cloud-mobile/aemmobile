@@ -3,7 +3,7 @@
   "version": "2.0.2-dev",
   "description": "Command line utility for building AEMM apps",
   "scripts": {
-    "test": "npm run jshint && npm run jasmine",
+    "test": "npm run jasmine && npm run jshint",
     "jshint": "node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint spec",
     "jasmine": "node node_modules/jasmine-node/bin/jasmine-node --captureExceptions --color spec"
   },

@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
 var FS = require('q-io/fs');
 var Q = require('q');
@@ -23,9 +22,9 @@ var events = cordova_lib.events;
 
 module.exports = help;
 
-function help(args) 
+function help(opts) 
 {
-	var args = args || [];
+	var args = opts || [];
 	var command = ((args)[0] || 'general');
 	return Q.fcall( () => {
 		return FS.read( path.join(__dirname, "..", "help", `${command}.txt`))
@@ -37,5 +36,5 @@ function help(args)
 		var name = require("../package").name;
 		events.emit("error", `'help ${command}' is not a ${name} command. See '${name} help'`);
 	});
-};
+}
 

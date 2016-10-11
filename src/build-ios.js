@@ -13,7 +13,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
 var platform = require('./platform-ios');
@@ -43,5 +42,4 @@ function build(opts)
     .then( () => {
         return cordova.raw[cmd].call(null, opts);
     });
-};
-
+}

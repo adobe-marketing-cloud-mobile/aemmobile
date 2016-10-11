@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -27,5 +26,5 @@ function packageBinary(opts) {
     return Q().then(function () {
         var platformPackageModule = platformRequire("package", opts.platforms[0]);
         return platformPackageModule.package(opts);   
-    });;
+    });
 }

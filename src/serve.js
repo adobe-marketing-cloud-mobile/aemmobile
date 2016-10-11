@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
 var aemmConfig = require('../config');
 var exec = require('child-process-promise').exec;
@@ -40,12 +39,12 @@ module.exports = serve;
 
 function serve(opts) 
 {
-	var options = opts.options;
+	var options = opts.options || {} ;
 	return project.projectRootPath()
 	.then( () => getCordovaRoot())
 	.then( (cordovaRootPath) => {
 		events.emit("log", 'starting app server...');
-		events.emit("log", "Use Ctrl-C to exit")
+		events.emit("log", "Use Ctrl-C to exit");
 		
 		if (!options) throw new Error('requires option parameter');
 
@@ -56,8 +55,7 @@ function serve(opts)
 		options.cordovaRoot = cordovaRootPath;
 		options.customMiddleware = [articleMiddleware];
 
-
-		var deferred = Q.defer()
+		var deferred = Q.defer();
 
 		phoneGap.listen(options)
 		.on('log', function() {
@@ -108,8 +106,8 @@ function getCordovaRoot()
 	return Q().then( () => {
 		return appBinary.getInstalledAppBinaryPath("ios", "emulator")
 		.catch( () => {
-			return appBinary.getInstalledAppBinaryPath("ios", "device")
-		})		
+			return appBinary.getInstalledAppBinaryPath("ios", "device");
+		});
 	})
 	.then( (appPath) => {
 		let cordovaRoot = path.join(appPath, "Frameworks", "CordovaPlugins.framework", "www");

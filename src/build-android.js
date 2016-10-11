@@ -13,7 +13,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
 var cordova_lib = require('cordova-lib'),
@@ -29,5 +28,5 @@ function build(opts)
 
         return cordova.raw[cmd].call(null, opts);
     });
-};
+}
 

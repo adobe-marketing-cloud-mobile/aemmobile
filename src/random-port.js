@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
 var net = require('net');
@@ -32,7 +31,7 @@ function random_port() {
     var server = net.createServer();
     server.on('error', function(err) {
         attempts -= 1;
-        if (attempts == 0) {
+        if (attempts === 0) {
             deferred.reject(new Error("No ports are available"));
         } else {
             random_port();
@@ -46,6 +45,6 @@ function random_port() {
     });
 
     return deferred.promise;
-};
+}
 
 module.exports = random_port;

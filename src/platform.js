@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -73,7 +72,7 @@ function add(options, target)
             .then( (platformsJson) => {
                 installedPlatformsList = _.map(platformsJson, function(num, key) { return key; });
                 return Q();
-            })
+            });
         }
         else { return Q(); }
     })
@@ -110,7 +109,7 @@ function add(options, target)
                     else {
                         throw new Error("No release found with supplied version.\nTo use the latest recommended version, please use `aemm platform add <platform>`.");
                     }
-                })
+                });
             }
         }
     })
@@ -157,7 +156,7 @@ function getReleaseVersions(platform) {
             "User-Agent": "aemm"
         },
         json: true
-    }
+    };
     events.emit("verbose", `Request:\n${JSON.stringify(options)}`);
     return rp(options)
     .then( (response) => {
@@ -166,7 +165,7 @@ function getReleaseVersions(platform) {
         if (response) {
             for (var i=0, len = response.length; i < len; i++) {
                 versions.push(response[i].name);
-            };
+            }
         }
         return Q(versions);
     });

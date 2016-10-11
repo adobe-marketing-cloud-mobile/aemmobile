@@ -13,7 +13,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
 var path = require('path');
@@ -62,7 +61,7 @@ function config(opts)
         }
         else
         {
-            throw new Error("Unrecognized command. See `aemm help config` for correct usage.")
+            throw new Error("Unrecognized command. See `aemm help config` for correct usage.");
         }
     });
 }

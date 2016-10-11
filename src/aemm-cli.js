@@ -13,7 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
+
 /**
  * Module dependencies.
  */
@@ -59,10 +59,10 @@ var commands = {
     project: require('./project.js'),
     run: require('./run.js'),
     serve: require('./serve.js')
-}
+};
 
 module.exports = function (inputArgs, cb) {
-    var cb = cb || function(){};
+    cb = cb || function(){};
     
     init();
     
@@ -83,7 +83,7 @@ module.exports = function (inputArgs, cb) {
         cb(err);
         throw err;
     }).done();
-}
+};
 
 function cli(inputArgs)
 {
@@ -171,8 +171,7 @@ function cli(inputArgs)
     if (!commands.hasOwnProperty(commandName))
     {
         let cmdLineToolInfo = require('../package.json');
-        var message = `${cmdLineToolInfo.name} does not know '${commandName}'; try '${cmdLineToolInfo.name} help' for a list of all the available commands.`;
-        throw new CordovaError(message);
+        throw new CordovaError(`${cmdLineToolInfo.name} does not know '${commandName}'; try '${cmdLineToolInfo.name} help' for a list of all the available commands.`);
     }
      
     var opts = {
@@ -207,8 +206,7 @@ function cli(inputArgs)
         if (!cmd.hasOwnProperty(subcommandName))
         {
             let cmdLineToolInfo = require('../package.json');
-            var message = `${cmdLineToolInfo.name} ${commandName} does not have a subcommand of '${subcommandName}'; try '${cmdLineToolInfo.name} help ${commandName}' for a list of all the available sub commands within ${commandName}.`;
-            throw new CordovaError(message);
+            throw new CordovaError(`${cmdLineToolInfo.name} ${commandName} does not have a subcommand of '${subcommandName}'; try '${cmdLineToolInfo.name} help ${commandName}' for a list of all the available sub commands within ${commandName}.`);
         }
         let subcommand = cmd[subcommandName];
         remain.shift();

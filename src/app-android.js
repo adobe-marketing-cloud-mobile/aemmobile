@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -52,7 +51,7 @@ function getInstalledAppBinaryPath(deviceType)
 {
 	return getCustomAppBinaryPath()
 	.then( (customAppPath) => {
-		if (customAppPath != null) {
+		if (customAppPath !== null) {
 			return Q(customAppPath);
 		}
 
@@ -80,7 +79,7 @@ function getAppVersion(deviceType)
 				throw new Error(`No application found at ${appBinaryParentPath}`);
 			}
 
-			return fs.readFileSync(versionPath,'utf8')
+			return fs.readFileSync(versionPath,'utf8');
 		});
 }
 

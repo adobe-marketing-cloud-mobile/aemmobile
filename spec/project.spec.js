@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict"
 
 var helpers = require('./helpers');
 var project = require('../src/project');
@@ -119,7 +118,7 @@ describe('project.create(options, projectPath)', function()
 			.catch( (err) => expect(err.message).toMatch(/Path already exists and is not empty/) )
 			.finally( done );
 		})
-		.catch( (err) => done.fail(err) )
+		.catch( (err) => done.fail(err) );
 
     });
 
@@ -148,7 +147,7 @@ describe('project.create(options, projectPath)', function()
 		.then( () => {
 			process.chdir(projectPath);
 			// create a file too
-			return FS.write(path.join(projectPath, "www", "Hello.txt"), "Hello, World!\n")	
+			return FS.write(path.join(projectPath, "www", "Hello.txt"), "Hello, World!\n");
 		})
 		.then( () => project.articleList() )
 		.then( (articleList) => {
