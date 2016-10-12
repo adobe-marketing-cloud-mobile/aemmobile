@@ -34,7 +34,7 @@ describe("aemm cli project", function () {
             return new FakeEvents();
         };
 
-        spyOn(events, "on").andReturn(new FakeEvents());
+        spyOn(events, "on").and.returnValue(new FakeEvents());
        
         // Spy and mute output
         spyOn(logger, 'results');

@@ -20,6 +20,7 @@ var article = require('../src/article');
 var path = require('path');
 var os = require('os');
 var FS = require('q-io/fs');
+var fs = require('fs');
 var projectName = 'TestProject';
 var tmpDir = path.join(os.tmpdir(), "AEMMTesting");
 var projectPath = path.join(tmpDir, projectName);
@@ -60,14 +61,14 @@ describe('project.create(options, projectPath)', function()
 			var cordovaDirs = ['hooks', 'platforms', 'plugins'];
 			let projectDir = path.join(process.cwd(), projectName);
 			cordovaDirs.forEach(function(d) {
-				expect(path.join(projectDir, d)).not.toExist();
+				expect(fs.existsSync(path.join(projectDir, d))).toBe(false);
 			});
 
 			// Expect config.xml
-			expect(path.join(projectDir, 'config.xml')).toExist();
+			expect(fs.existsSync(path.join(projectDir, 'config.xml'))).toBe(true);
 
 			// Check if Article file exists
-			expect(path.join(projectDir, 'www', "SampleArticle", 'index.html')).toExist();
+			expect(fs.existsSync(path.join(projectDir, 'www', "SampleArticle", 'index.html'))).toBe(true);
 
 		})
 		.catch( (err) => done.fail(err) )
@@ -83,7 +84,7 @@ describe('project.create(options, projectPath)', function()
 
         project.create({}, fullPathDir)
 		.then( () => {
-			expect(path.join(fullPathDir, 'config.xml')).toExist();
+			expect(fs.existsSync(path.join(fullPathDir, 'config.xml'))).toBe(true);
 		})
 		.catch( (err) => done.fail(err) )
 		.finally( () => {

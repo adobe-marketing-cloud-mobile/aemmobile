@@ -5,7 +5,8 @@
   "scripts": {
     "test": "npm run jasmine && npm run jshint",
     "jshint": "node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint spec",
-    "jasmine": "node node_modules/jasmine-node/bin/jasmine-node --captureExceptions --color spec"
+    "jasmine": "jasmine",
+    "cover": "node node_modules/istanbul/lib/cli.js cover --root src --print detail --include-all-sources true jasmine"
   },
   "author": "Adobe",
   "preferGlobal": true,
@@ -40,8 +41,10 @@
     "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "jasmine-node": "^1.14.5",
-    "jshint": "^2.9.2"
+    "istanbul": "^0.3.4",
+    "jasmine": "^2.5.2",
+    "jshint": "^2.9.2",
+    "rewire": "^2.5.2"
   },
   "engines": {
     "node": ">=6.2.2"

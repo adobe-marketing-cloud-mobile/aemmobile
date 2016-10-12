@@ -20,6 +20,7 @@ var project = require('../src/project');
 var path = require('path');
 var os = require('os');
 var FS = require('q-io/fs');
+var shell = require('shelljs'); 
 var projectName = 'TestProject';
 var tmpDir = path.join(os.tmpdir(), "AEMMTesting");
 var projectPath = path.join(tmpDir, projectName);
@@ -47,7 +48,7 @@ describe('run ios:', function()
             return new FakeEvents();
         };
 
-        spyOn(events, "on").andReturn(new FakeEvents());
+        spyOn(events, "on").and.returnValue(new FakeEvents());
        
         // Spy and mute output
         spyOn(logger, 'results');
@@ -58,9 +59,10 @@ describe('run ios:', function()
         spyOn(process.stderr, 'write');
         spyOn(events, 'emit');
         
-        spyOn(iossim, "launch").andCallFake( function(value) {return Q.resolve(true);} );
-        spyOn(app, "ensureInstalledBinary").andCallFake( function(value) {return Q.resolve(true);} );
+        spyOn(iossim, "launch").and.callFake( function(value) {return Q.resolve(true);} );
+        spyOn(app, "ensureInstalledBinary").and.callFake( function(value) {return Q.resolve(true);} );
         
+        shell.rm('-rf', tmpDir);
         FS.makeTree(tmpDir) 
         .then( () => {
             process.chdir(tmpDir);
@@ -76,40 +78,6 @@ describe('run ios:', function()
         FS.removeTree(tmpDir)
         .finally(done);
     });
-/*  
-    // Ignoring negative tests. We may want to re-visit these later.
-    describe('no simulators:', function() 
-    {
-        let fullDeviceList = [
-            "iPhone-6, 7.1",
-            "iPhone-6, 9.1",
-            "Apple-TV-1080p, tvOS 9.2",
-            "Apple-Watch-38mm, watchOS 2.1",
-            "Apple-Watch-42mm, watchOS 2.1"
-        ];
-        
-        it('should fail if no valid simulators are installed', function(done)
-        {
-            spyOn(iossim, "getdevicetypes").and.returnValue( fullDeviceList );      
-            
-            run({}, "ios")
-            .then( () => done.fail("Did not fail with no valid simulators"))
-            .catch( (err) => {
-                const lines = err.message.split('\n');
-                expect(lines[0]).toMatch(/No valid simulator devices installed in Xcode\([A-z\/.]*\)\./);
-                expect(lines[1]).toBe("The following devices are installed");
-                expect(lines[2]).toBe("iPhone-6, 7.1");
-                expect(lines[3]).toBe("iPhone-6, 9.1");
-                expect(lines[4]).toBe("Apple-TV-1080p, tvOS 9.2");
-                expect(lines[5]).toBe("Apple-Watch-38mm, watchOS 2.1");
-                expect(lines[6]).toBe("Apple-Watch-42mm, watchOS 2.1");
-                expect(lines[7]).toBe("Valid devices must be iPhone or iPad and run iOS 8 or iOS 9.2 or greater.");
-                expect(lines[8]).toBe("Install simulator devices from Xcode.");
-            })
-            .finally( done );
-        });
-    });
-*/
                 
     describe('valid sims:', function() 
     {
@@ -126,7 +94,7 @@ describe('run ios:', function()
         ];
         beforeEach(function() 
         {
-            spyOn(iossim, "getdevicetypes").andCallFake(function(value) {return fullDeviceList;});  
+            spyOn(iossim, "getdevicetypes").and.callFake(function(value) {return fullDeviceList;});  
             
             let serveStub = {
                 on: function(event, callback) {
@@ -137,7 +105,7 @@ describe('run ios:', function()
                     return this;
                 }
             };
-            spyOn(phoneGap,"listen").andCallFake(function(value) {return serveStub;});
+            spyOn(phoneGap,"listen").and.callFake(function(value) {return serveStub;});
             
         });
 
@@ -146,10 +114,10 @@ describe('run ios:', function()
         {
             run({ 'platforms' : [ 'ios' ] })
             .then( () => {
-                let path = iossim.launch.calls[0].args[0];
-                let target = iossim.launch.calls[0].args[1];
-                let logPath = iossim.launch.calls[0].args[2];
-                let cmdLineArgs = iossim.launch.calls[0].args[4];
+                let path = iossim.launch.calls.argsFor(0)[0];
+                let target = iossim.launch.calls.argsFor(0)[1];
+                let logPath = iossim.launch.calls.argsFor(0)[2];
+                let cmdLineArgs = iossim.launch.calls.argsFor(0)[4];
                 
                 expect(path).toMatch(/AEMM.app/);
                 expect(fullDeviceList.indexOf(target)).toBe(1);
@@ -162,20 +130,18 @@ describe('run ios:', function()
             
         });
 
-        
-
         // run ios --list
         it('should return filtered list of devices', function(done) 
         {
             run({ 'list': true, 'platforms' : [ 'ios' ] })
             .then( () => {
-                let count = events.emit.calls.length;
+                let count = events.emit.calls.count();
                 let calls = events.emit.calls;
-                expect( calls[count-5].args[1].trim() ).toBe("Available ios virtual devices");
-                expect( calls[count-4].args[1].trim() ).toBe("iPhone-6, 8.1");
-                expect( calls[count-3].args[1].trim() ).toBe("iPhone-6, 9.2");
-                expect( calls[count-2].args[1].trim() ).toBe("iPad-Retina, 8.2");
-                expect( calls[count-1].args[1].trim() ).toBe("iPad-Air-2, 9.2");
+                expect( calls.argsFor(count-5)[1].trim() ).toBe("Available ios virtual devices");
+                expect( calls.argsFor(count-4)[1].trim() ).toBe("iPhone-6, 8.1");
+                expect( calls.argsFor(count-3)[1].trim() ).toBe("iPhone-6, 9.2");
+                expect( calls.argsFor(count-2)[1].trim() ).toBe("iPad-Retina, 8.2");
+                expect( calls.argsFor(count-1)[1].trim() ).toBe("iPad-Air-2, 9.2");
                 done();
             })
             .catch( (err) => done.fail(err) );
@@ -186,27 +152,12 @@ describe('run ios:', function()
         {
             run({ target: "iPhone-6, 9.2", 'platforms' : [ 'ios' ] })
             .then( () => {
-                let target = iossim.launch.calls[0].args[1];
+                let target = iossim.launch.calls.argsFor(0)[1];
                 
                 expect(fullDeviceList.indexOf(target)).toBe(3);
                 done();
             })
             .catch( (err) => done.fail(`Unexpected Error: ${err}`) );           
         });
-/*
-        // Ignoring negative tests. We may want to re-visit these later.
-        // run ios --target invalidTarget
-        it('should fail if the specified target is invalid', function(done) 
-        {
-            run({target: "iPhone-6, 9.1"}, "ios")
-            .then( () => {
-                done.fail(`Expected Error but got success`);
-            })
-            .catch( (err) => {
-                expect(err.message).toBe("Target device specified(iPhone-6, 9.1) could not be found in the list of available devices.  Run 'aemm run ios --list' for device list.");
-                done();
-            });         
-        });
-*/      
     });
 });

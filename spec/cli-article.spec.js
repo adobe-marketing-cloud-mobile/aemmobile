@@ -34,7 +34,7 @@ describe("aemm cli article:", function () {
             return new FakeEvents();
         };
 
-        spyOn(events, "on").andReturn(new FakeEvents());
+        spyOn(events, "on").and.returnValue(new FakeEvents());
        
         // Spy and mute output
         spyOn(logger, 'results');
@@ -57,15 +57,5 @@ describe("aemm cli article:", function () {
                 done();
             });
         });
-
     });
-/*
-        // Ignoring negative tests.
-        it("will fail if an invalid subcommand is called", function (done) {
-            cli(["node", "aemm", "article", "bogus"], (err) => {
-                expect(err.message).toBe("aemm article does not have a subcommand of 'bogus'; try 'aemm help article' for a list of all the available sub commands within article.");
-                done();
-            });
-        });
-*/
 });

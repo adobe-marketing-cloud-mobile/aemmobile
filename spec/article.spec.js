@@ -20,6 +20,7 @@ var project = require('../src/project');
 var path = require('path');
 var os = require('os');
 var FS = require('q-io/fs');
+var fs = require('fs');
 var articleName = 'TestArticle';
 let tmpDir = path.join(os.tmpdir(), "AEMMTesting");
 var projectPath = path.join(tmpDir, "TestArticleProject");
@@ -62,7 +63,7 @@ describe('article.create(options, articlename)', () =>
         article.create({}, articleName)
 		.then( () => {
 			// Check if Article file exists
-			expect(path.join(projectPath, 'www', articleName, 'index.html')).toExist();
+			expect(fs.existsSync(path.join(projectPath, 'www', articleName, 'index.html'))).toBe(true);
 
 		})
 		.catch( (err) => done.fail(err) )
@@ -75,10 +76,9 @@ describe('article.create(options, articlename)', () =>
         article.create({}, articleName, `${articleName}2`, `${articleName}3`)
 		.then( () => {
 			// Check if Article file exists
-			expect(path.join(projectPath, 'www', articleName, 'index.html')).toExist();
-			expect(path.join(projectPath, 'www', `${articleName}2`, 'index.html')).toExist();
-			expect(path.join(projectPath, 'www', `${articleName}3`, 'index.html')).toExist();
-
+			expect(fs.existsSync(path.join(projectPath, 'www', articleName, 'index.html'))).toBe(true);
+			expect(fs.existsSync(path.join(projectPath, 'www', `${articleName}2`, 'index.html'))).toBe(true);
+			expect(fs.existsSync(path.join(projectPath, 'www', `${articleName}3`, 'index.html'))).toBe(true);
 		})
 		.catch( (err) => done.fail(err) )
 		.finally(done);
@@ -116,11 +116,9 @@ describe('article.create(options, articlename)', () =>
 				expect(results[1].reason).toMatch(/Cannot create article/);
 				expect(results[2].state).toBe("fulfilled");
 				expect(results[3].state).toBe("fulfilled");
-				
-				var x = expect(path.join(projectPath, 'www', newArticle1, 'index.html'));
-				x.toExist();
-				expect(path.join(projectPath, 'www', newArticle2, 'index.html')).toExist();
-				
+
+				expect(fs.existsSync(path.join(projectPath, 'www', newArticle1, 'index.html'))).toBe(true);
+				expect(fs.existsSync(path.join(projectPath, 'www', newArticle2, 'index.html'))).toBe(true);
 			})
 			.catch( (err) => done.fail(err) )
 			.finally( done );

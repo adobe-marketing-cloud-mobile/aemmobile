@@ -1,4 +1,5 @@
 node_modules
+coverage
 developmentConfig.json
 npm-debug.log
 .vscode
