@@ -25,6 +25,7 @@ function build(opts)
 {
     var cmd = "build";
     opts.platforms = [ "ios" ];
+    opts.options = opts.options || {};
     opts.options.codeSignIdentity = "Don't Code Sign";
     opts.options.noSign = true;
 

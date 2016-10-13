@@ -26,8 +26,6 @@ module.exports = plugin;
 function plugin(subcommand, targets) {
     return project.projectRootPath()
     .then( () => {
-        return cordova.plugin(subcommand, targets);
-    }).catch(function (err) {
-        throw new Error(err.message);
-    }).done();
+        return cordova.raw.plugin(subcommand, targets);
+    });
 }

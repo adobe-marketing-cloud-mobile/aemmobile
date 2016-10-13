@@ -25,6 +25,7 @@ module.exports = build;
 
 function build(opts)
 {
+    opts = opts || {};
     return project.projectRootPath()
     .then( () => {
         return cordova_util.preProcessOptions(opts);

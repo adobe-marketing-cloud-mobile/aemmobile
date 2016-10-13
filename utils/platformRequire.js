@@ -14,7 +14,8 @@
 	limitations under the License.
  */
 
-module.exports = function(packageName, platform) 
+module.exports = platformRequire; 
+function platformRequire(packageName, platform) 
 {
 	if (!platform)
 	{

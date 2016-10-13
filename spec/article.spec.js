@@ -14,7 +14,6 @@
 	limitations under the License.
  */
 
-var helpers = require('./helpers');
 var article = require('../src/article');
 var project = require('../src/project');
 var path = require('path');

@@ -14,16 +14,23 @@
     limitations under the License.
  */
 
-/**
- * Module dependencies.
- */
-var Q = require('q');
-var cordova_lib = require('cordova-lib');
-var events = cordova_lib.events;
+var rewire = require('rewire');
+var package = rewire('../src/package');
+var package_ios = require('../src/package-ios');
 
-module.exports.package = packageBinary;
+describe('package', function() {
 
-function packageBinary(opts) {
-    events.emit('info', 'The package command is not required for android. Did you mean `aemm build android`?');
-    return Q();
-}
+    describe('packageBinary method', function() {
+
+        var packageBinary = package.__get__('packageBinary');
+
+        it('should call package-ios', function(done) {
+            spyOn(package_ios, 'package');
+
+            this.wrapper(packageBinary({ 'platforms' : [ 'ios' ]}), done, function () {
+                expect(package_ios.calls.argsFor(0)[1].platforms).toEqual(['ios']);
+            });
+        });
+    });
+
+});

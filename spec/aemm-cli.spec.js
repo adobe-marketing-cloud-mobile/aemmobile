@@ -15,12 +15,14 @@
  */
 
 var rewire = require('rewire');
-var helpers = require('./helpers');
-var cli = rewire("../src/aemm-cli");
 var Q = require('q');
 var cordova_lib = require('cordova-lib');
 var events = cordova_lib.events;
 var logger = require('cordova-common').CordovaLogger.get();
+
+var cli = rewire("../src/aemm-cli");
+var build = require('../src/build');
+var plugin = require('../src/plugin');
 
 describe("aemm-cli", function () {
 
@@ -43,6 +45,9 @@ describe("aemm-cli", function () {
         spyOn(logger, 'warn');
         spyOn(console, 'log');
         spyOn(process.stderr, 'write');
+
+        // Prevent multiple listeners from getting attached to process.on('uncaughtException'). Jasmine will catch these instead.
+        spyOn(process, 'on');
     });
 
     describe("options", function () 
@@ -80,20 +85,116 @@ describe("aemm-cli", function () {
     describe("cli method", function() {
         var cliMethod = cli.__get__('cli');
         cli.__set__('nopt', require('nopt'));
+
         var helpSpy = {
             mockHelp: function() { }
         };
 
         beforeEach( function() {
-            spyOn(helpSpy, 'mockHelp').and.returnValue('help got called.');
+            spyOn(helpSpy, 'mockHelp');
             cli.__set__('help', helpSpy.mockHelp);
         });
 
-        it('should launch help if there is not a command', function(done) {
-            var ret = cliMethod([]);
-            expect(ret).toEqual('help got called.');
-            expect(helpSpy.mockHelp).toHaveBeenCalledWith([]);
+        it('should error if the platform has an illegal subcommand', function(done) {
+            var notRealSubCmdFn = function() {
+                cliMethod(['node', 'aemm', 'platform', 'notRealCmd']);
+            };
+            expect(notRealSubCmdFn).toThrowError("aemm platform does not have a subcommand of 'notRealCmd'; try 'aemm help platform' for a list of all the available sub commands within platform.");
             done();
+        });
+
+        it('should call the build command', function(done) {
+            spyOn(build, 'call');
+            cliMethod(['node', 'aemm', 'build', 'platform1', 'platform2', '--', 'unparsedSomething']);
+            expect(build.call.calls.argsFor(0)[1].platforms).toEqual([ 'platform1', 'platform2' ]);
+            expect(build.call.calls.argsFor(0)[1].options.argv).toEqual([ 'unparsedSomething' ]);
+            done();
+        });
+
+        it('should call the plugin command', function(done) {
+            spyOn(plugin, 'call');
+            cliMethod(['node', 'aemm', 'plugin', 'add', 'plugin1', 'plugin2']);
+            expect(plugin.call).toHaveBeenCalledWith(null, 'add', ['plugin1', 'plugin2']);
+            done();
+        });
+
+        it('should error if there is an invalid command', function(done) {
+            var notRealCmdFn = function() {
+                cliMethod(['node', 'aemm', 'notRealCmd']);
+            };
+            expect(notRealCmdFn).toThrowError("aemm does not know 'notRealCmd'; try 'aemm help' for a list of all the available commands.");
+            done();
+        });
+
+        describe('should set the logger level', function() {
+
+            beforeEach(function() {
+                spyOn(logger, 'setLevel');
+            });
+
+            it('to error when setting --silent', function(done) {
+                cliMethod(['node', 'aemm', '--silent']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith([]);
+                expect(logger.setLevel).toHaveBeenCalledWith('error');
+                done();
+            });
+            it('to verbose when setting --verbose', function(done) {
+                cliMethod(['node', 'aemm', '--verbose']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith([]);
+                expect(logger.setLevel).toHaveBeenCalledWith('verbose');
+                done();
+            });
+            it('to verbose when setting -d', function(done) {
+                cliMethod(['node', 'aemm', '-d']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith([]);
+                expect(logger.setLevel).toHaveBeenCalledWith('verbose');
+                done();
+            });
+        });
+
+        describe('should launch help', function() {
+
+            it('if there is not a command', function(done) {
+                cliMethod(['node', 'aemm']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith([]);
+                done();
+            });
+
+            it('if help is the command', function(done) {
+                cliMethod(['node', 'aemm', 'help']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith([]);
+                done();
+            });
+
+            it('if help is a flag', function(done) {
+                cliMethod(['node', 'aemm', '--help']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith([]);
+                done();
+            });
+
+            it('if help is a short hand flag', function(done) {
+                cliMethod(['node', 'aemm', '--h']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith([]);
+                done();
+            });
+
+            it('for a command if help is the first command', function(done) {
+                cliMethod(['node', 'aemm', 'help', 'myTestCommand']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith(['myTestCommand']);
+                done();
+            });
+
+            it('for a command if help is a flag', function(done) {
+                cliMethod(['node', 'aemm', '--help', 'myTestCommand']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith(['myTestCommand']);
+                done();
+            });
+
+            it('for a command if help is a short hand flag', function(done) {
+                cliMethod(['node', 'aemm', '--h', 'myTestCommand']);
+                expect(helpSpy.mockHelp).toHaveBeenCalledWith(['myTestCommand']);
+                done();
+            });
         });
     });
 
