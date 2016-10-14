@@ -39,7 +39,7 @@ describe('config', function() {
         });
 
         getPathToProjectConfigReset = config.__set__('getPathToProjectConfig', function() {
-            return Q('/fake/path/to/project/');
+            return Q(path.resolve('/fake/path/to/project/'));
         });
 
         fileResets.push(getConfigFileReset, getPathToProjectConfigReset);
@@ -176,7 +176,7 @@ describe('config', function() {
         it('should write the new setting to file.', function(done) { 
             spyOn(jsonfile, 'writeFileSync');
             this.wrapper(setValueInConfig('fakeKeyToSet', 'fakeValToSet'), done, function() {
-                expect(jsonfile.writeFileSync.calls.argsFor(0)[0]).toEqual('/fake/path/to/project/');
+                expect(jsonfile.writeFileSync.calls.argsFor(0)[0]).toEqual(path.resolve('/fake/path/to/project/'));
                 expect(jsonfile.writeFileSync.calls.argsFor(0)[1].fakeKey).toEqual('fakeValue');
                 expect(jsonfile.writeFileSync.calls.argsFor(0)[1].fakeKeyToSet).toEqual('fakeValToSet');
             });
@@ -189,7 +189,7 @@ describe('config', function() {
         it('should delete the key and value from the file.', function(done) {
             spyOn(jsonfile, 'writeFileSync');
             this.wrapper(removeKeyFromConfig('fakeKey'), done, function() {
-                expect(jsonfile.writeFileSync.calls.argsFor(0)[0]).toEqual('/fake/path/to/project/');
+                expect(jsonfile.writeFileSync.calls.argsFor(0)[0]).toEqual(path.resolve('/fake/path/to/project/'));
                 expect(jsonfile.writeFileSync.calls.argsFor(0)[1]).toEqual({});
             });
         });
@@ -206,17 +206,17 @@ describe('config', function() {
 
         it('should return the path of the config file, if one is not cached already.', function(done) {
             fileResets.push(config.__set__('pathToProjectConfig', null));
-            spyOn(project, 'projectRootPath').and.returnValue(Q('/path/to/project/config'));
+            spyOn(project, 'projectRootPath').and.returnValue(Q(path.resolve('/path/to/project/config')));
             this.wrapper(getPathToProjectConfig(), done, function(retVal) {
-                expect(retVal).toEqual('/path/to/project/config/config.json');
+                expect(retVal).toEqual(path.resolve('/path/to/project/config/config.json'));
             });
         });
 
         it('should return the cached path of the config file.', function(done) {
-            fileResets.push(config.__set__('pathToProjectConfig', '/cached/path/to/config.json'));
-            spyOn(project, 'projectRootPath').and.returnValue(Q('/path/to/project/config'));
+            fileResets.push(config.__set__('pathToProjectConfig', path.resolve('/cached/path/to/config.json')));
+            spyOn(project, 'projectRootPath').and.returnValue(Q(path.resolve('/path/to/project/config')));
             this.wrapper(getPathToProjectConfig(), done, function(retVal) {
-                expect(retVal).toEqual('/cached/path/to/config.json');
+                expect(retVal).toEqual(path.resolve('/cached/path/to/config.json'));
                 expect(project.projectRootPath).not.toHaveBeenCalled();
             });
         });
