@@ -1,3 +1,8 @@
+[![Build status](https://github.com/adobe-marketing-cloud-mobile/aemmobile?branch=master)](https://ci.appveyor.com/project/adzellman/aemmobile-ju6lf)
+[![Build Status](https://travis-ci.org/adobe-marketing-cloud-mobile/aemmobile.svg?branch=master)](https://travis-ci.org/adobe-marketing-cloud-mobile/aemmobile)
+[![codecov.io](https://codecov.io/github/adobe-marketing-cloud-mobile/aemmobile/coverage.svg?branch=master)](https://codecov.io/github/adobe-marketing-cloud-mobile/aemmobile?branch=master)
+[![NPM](https://nodei.co/npm/aemm.png)](https://nodei.co/npm/aemm/)
+
 # AEM Mobile
 
 Command line tool for building AEM Mobile apps with Cordova content
