@@ -32,7 +32,7 @@ var cordova_lib = require('cordova-lib');
 var events = cordova_lib.events;
 var logger = require('cordova-common').CordovaLogger.get();
 
-xdescribe('run ios:', function() 
+describe('run ios:', function() 
 {
     beforeEach(function(done) 
     {
