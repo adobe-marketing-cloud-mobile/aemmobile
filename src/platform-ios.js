@@ -95,14 +95,14 @@ function isCodeSigningDisabled(settingsPlist) {
 	});
 }
 
-function changeCodeSigningPolicy(settingsPlist, enabled = false) {
+function changeCodeSigningPolicy(settingsPlist, enabled) {
 	return Q().then( () => {
 		events.emit("info", "aemm requires Xcode to allow building unsigned frameworks.");
 		events.emit("info", "sudo may prompt you for your password to change Xcode's code signing policy.");
 	})
 	.then( () => {
 		var deferred = Q.defer();
-		var val = enabled ? "YES" : "NO";
+		var val = (enabled || enabled !== "NO") ? "YES" : "NO";
 		var command = 'sudo ' + '/usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED ' + val + '" ' + settingsPlist;
 		
 		shell.exec(command, {
