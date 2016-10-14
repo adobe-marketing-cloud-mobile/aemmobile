@@ -79,7 +79,7 @@ function disableCodeSigning() {
 }
 
 module.exports.isCodeSigningDisabled = isCodeSigningDisabled;
-function isCodeSigningDisabled(settingsPlist = null) {
+function isCodeSigningDisabled(settingsPlist) {
 	return Q().then( () => {
 		return settingsPlist ? Q(settingsPlist) : getSDKSettingsPlist();
 	})

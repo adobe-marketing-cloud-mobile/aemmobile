@@ -28,6 +28,8 @@ var cordova_lib = require('cordova-lib'),
     CordovaError  = cordova_lib.CordovaError,
     logger = require('cordova-common').CordovaLogger.get();
 
+var cmdLineToolInfo = require('../package.json');
+
 /*
  * init
  *
@@ -133,9 +135,7 @@ function cli(inputArgs)
     // Check for version
     if (args.version)
     {
-        var aemmVersion = require('../package.json').version;
-
-        logger.results(aemmVersion);
+        logger.results(cmdLineToolInfo.version);
         return Q();
     }
     
@@ -170,7 +170,6 @@ function cli(inputArgs)
     // Make sure we have a command with the right name
     if (!commands.hasOwnProperty(commandName))
     {
-        var cmdLineToolInfo = require('../package.json');
         throw new CordovaError(`${cmdLineToolInfo.name} does not know '${commandName}'; try '${cmdLineToolInfo.name} help' for a list of all the available commands.`);
     }
      
@@ -205,7 +204,6 @@ function cli(inputArgs)
         // Look for an appropriate sub command
         if (!cmd.hasOwnProperty(subcommandName))
         {
-            var cmdLineToolInfo = require('../package.json');
             throw new CordovaError(`${cmdLineToolInfo.name} ${commandName} does not have a subcommand of '${subcommandName}'; try '${cmdLineToolInfo.name} help ${commandName}' for a list of all the available sub commands within ${commandName}.`);
         }
         var subcommand = cmd[subcommandName];

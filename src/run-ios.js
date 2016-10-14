@@ -36,6 +36,7 @@ function run(opts)
 	var projectRootPath = null;
 	var target = opts.target;
 	var deviceName = opts.device ? "device" : "emulator";
+	var filteredList;
 	if (opts.list)
 	{
 		return listSimulators();
@@ -62,7 +63,7 @@ Install simulator devices from Xcode.`);
 		
 		if (target)
 		{
-			var filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith(target) );
+			filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith(target) );
 			if (filteredList.length === 0)
 			{
 				throw Error(`Target device specified(${target}) could not be found in the list of available devices.  Run 'aemm run ios --list' for device list.`);
@@ -72,7 +73,7 @@ Install simulator devices from Xcode.`);
 		} else
 		{
 			// Look first for an iPhone-6s.  No reason other than it is most popular phone
-			var filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith("iPhone-6s") );
+			filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith("iPhone-6s") );
 			target = filteredList.length > 0 ? filteredList[0] : allValidTargets[0];
 			events.emit("info", `No target specified for emulator. Deploying to ${target} simulator`);
 		}
