@@ -90,7 +90,7 @@ function add(options, target)
                 platform = null;
                 return Q(target);
             } else {
-                let target_repo = platforms[platform].repo_url;
+                var target_repo = platforms[platform].repo_url;
                 return getReleaseVersions(platform)
                 .then( (versions) => {
                     if (_.contains(versions, spec)) {

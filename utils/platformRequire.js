@@ -19,7 +19,7 @@ function platformRequire(packageName, platform)
 {
 	if (!platform)
 	{
-		let cmdLineToolName = require('../package.json').name;
+		var cmdLineToolName = require('../package.json').name;
 		throw Error(`You must specify a platform.  See '${cmdLineToolName} help ${packageName}' for more info.`);
 	}
 	try {

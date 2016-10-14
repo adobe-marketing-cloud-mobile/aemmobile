@@ -33,7 +33,7 @@ function getInstalledAppBinaryPath(deviceType)
 {
 	return app.getParentPathForAppBinary("ios", deviceType)
 	.then( (parentPath) => {
-		let viewerPath = path.join(parentPath, aemmAppName);
+		var viewerPath = path.join(parentPath, aemmAppName);
 		if (path.extname(viewerPath) === ".app")
 		{				
 			try {
@@ -67,16 +67,16 @@ function getAppVersion(deviceType)
 module.exports.installFromFilePath = installFromFilePath;
 function installFromFilePath(version, filepath, deviceType)
 {
-	let binaryParentPath = null;
+	var binaryParentPath = null;
 	return app.getParentPathForAppBinary("ios", deviceType)
 	.then(function (appBinaryParentPath) {
 		binaryParentPath = appBinaryParentPath;
-		let unzipPath = path.join(os.tmpdir(), "AEMMDownload");
+		var unzipPath = path.join(os.tmpdir(), "AEMMDownload");
 		return FS.removeTree(unzipPath)
 		.catch(() => {}) // Don't care if it is not there and errors
 		.then( () => unzip(filepath, unzipPath) ); 
 	}).then(function(unzipPath) {
-		let targetPath = path.join(binaryParentPath, aemmAppName);
+		var targetPath = path.join(binaryParentPath, aemmAppName);
 		const payloadPath = path.join(unzipPath, "Payload");							
 		return FS.makeTree(binaryParentPath)
 		.then( () => {
@@ -86,9 +86,9 @@ function installFromFilePath(version, filepath, deviceType)
 		.then( () => FS.list(payloadPath) )
 		.then( (fileList) => {
 			// Get .app directory in payload
-			let ipaAppDir = null;
+			var ipaAppDir = null;
 			fileList.forEach( (file) => {
-				let viewerPath = path.join( payloadPath, file);
+				var viewerPath = path.join( payloadPath, file);
 				if (path.extname(viewerPath) === ".app")
 				{
 					ipaAppDir = viewerPath;

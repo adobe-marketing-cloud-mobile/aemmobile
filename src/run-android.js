@@ -158,7 +158,7 @@ function checkApk() {
         } else {
             app.getParentPathForAppBinary("android", "emulator")
                 .then((parentPath) => {
-                    let prebuiltAppPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
+                    var prebuiltAppPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
                     if (!fs.existsSync(prebuiltAppPath)) {
                         deferred.reject(new Error(`No apk found, please run 'aemm app install android'.`));
                     } else {
@@ -246,7 +246,7 @@ var getArgs = function(ipAddress, port)
             // fileArray.reduce( function (item) {
             // 	return null;
             // });
-            let articles = fileArray2.join(" ");
+            var articles = fileArray2.join(" ");
             args = ["-phonegapServer", ipAddress + ":" + port, "-serveArticles", articles];
             return Q(args);
         });

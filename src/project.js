@@ -54,12 +54,12 @@ function create(options, projectPath)
 module.exports.projectRootPath = projectRootPath;
 function projectRootPath()
 {
-	let projectRoot = cordova.findProjectRoot(process.cwd());
+	var projectRoot = cordova.findProjectRoot(process.cwd());
 	return isAEMMProject(projectRoot)
 	.then( (isAEMM) => {
 		if (!projectRoot || !isAEMM)
 		{
-			let cmdLineToolInfo = require('../package.json');
+			var cmdLineToolInfo = require('../package.json');
 			throw Error("Current working directory is not an `aemm` based project. If you believe you are in the appropriate project directory, you may need to re-create the project using `aemm project create`.");
 		}
 		return Q(projectRoot);
@@ -78,17 +78,17 @@ function articleList()
 	})
 	.then( function (fileArray) 
 	{
-		let sortedFileArray = fileArray.sort((a,b) => a.localeCompare(b));
-		let articleNameList = sortedFileArray.filter( (fileName) => !fileName.startsWith(".") && fs.lstatSync(path.join(wwwFolder, fileName)).isDirectory());		
+		var sortedFileArray = fileArray.sort((a,b) => a.localeCompare(b));
+		var articleNameList = sortedFileArray.filter( (fileName) => !fileName.startsWith(".") && fs.lstatSync(path.join(wwwFolder, fileName)).isDirectory());		
 		// Get metadata from article if it has any
-		let articleInfoPromiseList = articleNameList.map( (articleName) => metadataForArticle(path.join(wwwFolder, articleName)));
+		var articleInfoPromiseList = articleNameList.map( (articleName) => metadataForArticle(path.join(wwwFolder, articleName)));
 		return Q.all(articleInfoPromiseList);
 	});
 }
 
 function metadataForArticle(articlePath)
 {
-	let metadataPath = path.join(articlePath, "metadata.json");
+	var metadataPath = path.join(articlePath, "metadata.json");
 	return FS.exists(metadataPath)
 	.then( (exists)=> {
 		if (!exists)
@@ -98,7 +98,7 @@ function metadataForArticle(articlePath)
 			
 		return FS.read(metadataPath)
 		.then( (fileContents) => {
-			let json = JSON.parse(fileContents);
+			var json = JSON.parse(fileContents);
 			return updateMetadata(json, articlePath);
 		})
 		.catch( (err) => {
@@ -110,7 +110,7 @@ function metadataForArticle(articlePath)
 
 function updateMetadata(json, articlePath)
 {
-	let articleName = path.basename(articlePath);
+	var articleName = path.basename(articlePath);
 	json.id = `urn:xx-xx:article:${articleName}`;
 	json.type = "article";
 	json.metadata = json.metadata || {};
@@ -137,7 +137,7 @@ function removeUnwantedCordovaArtifacts(appPath)
 
 function createAEMMScaffolding(fullProjectPath)
 {
-	let currentDir = process.cwd();
+	var currentDir = process.cwd();
 	process.chdir(fullProjectPath);
 	return article.create({}, "SampleArticle")
 	.finally( () => {
@@ -146,7 +146,7 @@ function createAEMMScaffolding(fullProjectPath)
 }
 
 function populateProjectMetadata(fullProjectPath) {
-	let metadataJson = {};
+	var metadataJson = {};
 	metadataJson.createdByAemmVersion = require('../package.json').version;
 	return FS.write(path.join(fullProjectPath, '.aemm'), JSON.stringify(metadataJson, null , 2));
 }

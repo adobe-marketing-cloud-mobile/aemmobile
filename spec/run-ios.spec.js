@@ -80,7 +80,7 @@ describe('run ios:', function()
                 
     describe('valid sims:', function() 
     {
-        let fullDeviceList = [
+        var fullDeviceList = [
             "iPhone-6, 7.1",
             "iPhone-6, 8.1",
             "iPhone-6, 9.1",
@@ -95,7 +95,7 @@ describe('run ios:', function()
         {
             spyOn(iossim, "getdevicetypes").and.callFake(function(value) {return fullDeviceList;});  
             
-            let serveStub = {
+            var serveStub = {
                 on: function(event, callback) {
                     if (event === "complete")
                     {
@@ -113,10 +113,10 @@ describe('run ios:', function()
         {
             run({ 'platforms' : [ 'ios' ] })
             .then( () => {
-                let path = iossim.launch.calls.argsFor(0)[0];
-                let target = iossim.launch.calls.argsFor(0)[1];
-                let logPath = iossim.launch.calls.argsFor(0)[2];
-                let cmdLineArgs = iossim.launch.calls.argsFor(0)[4];
+                var path = iossim.launch.calls.argsFor(0)[0];
+                var target = iossim.launch.calls.argsFor(0)[1];
+                var logPath = iossim.launch.calls.argsFor(0)[2];
+                var cmdLineArgs = iossim.launch.calls.argsFor(0)[4];
                 
                 expect(path).toMatch(/AEMM.app/);
                 expect(fullDeviceList.indexOf(target)).toBe(1);
@@ -134,8 +134,8 @@ describe('run ios:', function()
         {
             run({ 'list': true, 'platforms' : [ 'ios' ] })
             .then( () => {
-                let count = events.emit.calls.count();
-                let calls = events.emit.calls;
+                var count = events.emit.calls.count();
+                var calls = events.emit.calls;
                 expect( calls.argsFor(count-5)[1].trim() ).toBe("Available ios virtual devices");
                 expect( calls.argsFor(count-4)[1].trim() ).toBe("iPhone-6, 8.1");
                 expect( calls.argsFor(count-3)[1].trim() ).toBe("iPhone-6, 9.2");
@@ -151,7 +151,7 @@ describe('run ios:', function()
         {
             run({ target: "iPhone-6, 9.2", 'platforms' : [ 'ios' ] })
             .then( () => {
-                let target = iossim.launch.calls.argsFor(0)[1];
+                var target = iossim.launch.calls.argsFor(0)[1];
                 
                 expect(fullDeviceList.indexOf(target)).toBe(3);
                 done();

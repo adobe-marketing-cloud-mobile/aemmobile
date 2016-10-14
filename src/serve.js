@@ -110,7 +110,7 @@ function getCordovaRoot()
 		});
 	})
 	.then( (appPath) => {
-		let cordovaRoot = path.join(appPath, "Frameworks", "CordovaPlugins.framework", "www");
+		var cordovaRoot = path.join(appPath, "Frameworks", "CordovaPlugins.framework", "www");
 		return cordovaRoot;
 	})
 	.catch( () => {

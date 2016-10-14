@@ -57,7 +57,7 @@ function getInstalledAppBinaryPath(deviceType)
 
 		return app.getParentPathForAppBinary("android", deviceType)
 			.then((parentPath) => {
-				let viewerPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
+				var viewerPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
 				if (!fs.existsSync(viewerPath)) {
 					throw new Error(`No application found at ${parentPath}`);
 				}
@@ -72,7 +72,7 @@ function getAppVersion(deviceType)
 {
 	return app.getParentPathForAppBinary("android", deviceType)
 		.then(function (appBinaryParentPath) {
-			let versionPath = path.join(appBinaryParentPath, constants.APP_VERSION_FILE);
+			var versionPath = path.join(appBinaryParentPath, constants.APP_VERSION_FILE);
 
 			if ( !fs.existsSync(versionPath) )
 			{
@@ -87,17 +87,17 @@ function getAppVersion(deviceType)
 module.exports.installFromFilePath = installFromFilePath;
 function installFromFilePath(version, filepath, deviceType)
 {
-	let apkAppPath = filepath;
-	let binaryParentPath = null;
+	var apkAppPath = filepath;
+	var binaryParentPath = null;
 	return app.getParentPathForAppBinary("android", deviceType)
 		.then(function (appBinaryParentPath) {
 			binaryParentPath = appBinaryParentPath;
 			return FS.makeTree(binaryParentPath)
 				.then(function() {
-					let targetPath = path.join(binaryParentPath, constants.APP_NAME_PREBUILT);
+					var targetPath = path.join(binaryParentPath, constants.APP_NAME_PREBUILT);
 					return FS.copy(apkAppPath, targetPath)
 						.then(function() {
-							let versionPath = path.join(binaryParentPath, constants.APP_VERSION_FILE);
+							var versionPath = path.join(binaryParentPath, constants.APP_VERSION_FILE);
 
 							var deferred = Q.defer();
 							fs.writeFile(versionPath, version, function(err) {

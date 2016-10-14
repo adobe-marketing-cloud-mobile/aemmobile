@@ -21,7 +21,7 @@ var os = require('os');
 var FS = require('q-io/fs');
 var fs = require('fs');
 var articleName = 'TestArticle';
-let tmpDir = path.join(os.tmpdir(), "AEMMTesting");
+var tmpDir = path.join(os.tmpdir(), "AEMMTesting");
 var projectPath = path.join(tmpDir, "TestArticleProject");
 
 
@@ -101,10 +101,10 @@ describe('article.create(options, articlename)', () =>
 	// article create articleThatExists articleThatDoesNotExist
 	it('should create articles it can and fail for articles it cannot create when trying to create multiple articles', (done) =>
 	{
-		let existingArticle1 = "existingArticle1";
-		let existingArticle2 = "existingArticle2";
-		let newArticle1 = "newArticle1";
-		let newArticle2 = "newArticle2";
+		var existingArticle1 = "existingArticle1";
+		var existingArticle2 = "existingArticle2";
+		var newArticle1 = "newArticle1";
+		var newArticle2 = "newArticle2";
         article.create({}, existingArticle1, existingArticle2)
 		.then( () => {
 			article.create({}, existingArticle1, existingArticle2, newArticle1, newArticle2)

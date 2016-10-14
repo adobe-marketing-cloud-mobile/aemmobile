@@ -33,7 +33,7 @@ module.exports = run;
 
 function run(opts) 
 {
-	let projectRootPath = null;
+	var projectRootPath = null;
 	var target = opts.target;
 	var deviceName = opts.device ? "device" : "emulator";
 	if (opts.list)
@@ -46,13 +46,13 @@ function run(opts)
 		// Make sure we are in a Cordova project folder
 		projectRootPath = projectPath;
 		
-		let allValidTargets = aemmSimulatorList();
+		var allValidTargets = aemmSimulatorList();
 		if (allValidTargets.length === 0)
 		{	
 			return exec('xcode-select -p')
 			.then( (response) => {
-				let xcode = response.stdout.trim();
-				let simsInstalled = iossim.getdevicetypes().join("\n");
+				var xcode = response.stdout.trim();
+				var simsInstalled = iossim.getdevicetypes().join("\n");
 				throw new Error(`No valid simulator devices installed in Xcode(${xcode}).
 The following devices are installed\n${simsInstalled}
 Valid devices must be iPhone or iPad and run iOS 8 or iOS 9.2 or greater.
@@ -62,7 +62,7 @@ Install simulator devices from Xcode.`);
 		
 		if (target)
 		{
-			let filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith(target) );
+			var filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith(target) );
 			if (filteredList.length === 0)
 			{
 				throw Error(`Target device specified(${target}) could not be found in the list of available devices.  Run 'aemm run ios --list' for device list.`);
@@ -72,7 +72,7 @@ Install simulator devices from Xcode.`);
 		} else
 		{
 			// Look first for an iPhone-6s.  No reason other than it is most popular phone
-			let filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith("iPhone-6s") );
+			var filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith("iPhone-6s") );
 			target = filteredList.length > 0 ? filteredList[0] : allValidTargets[0];
 			events.emit("info", `No target specified for emulator. Deploying to ${target} simulator`);
 		}
@@ -91,7 +91,7 @@ function listSimulators()
 {
 	return Q.fcall( () => 
 	{
-		let sims = aemmSimulatorList();
+		var sims = aemmSimulatorList();
 		events.emit("results", "Available ios virtual devices");
 		sims.forEach((target) => events.emit("results", target) );
 	});
@@ -99,11 +99,11 @@ function listSimulators()
 
 function aemmSimulatorList()
 {
-	let targetTypes = iossim.getdevicetypes();
-	let filteredList = targetTypes.filter( (item) => 
+	var targetTypes = iossim.getdevicetypes();
+	var filteredList = targetTypes.filter( (item) => 
 	{
-		let components = item.split(", ");
-		let versionNumber = Number(components[1]);
+		var components = item.split(", ");
+		var versionNumber = Number(components[1]);
 		if (versionNumber < 8.0 || (versionNumber >= 9.0 && versionNumber < 9.2))
 		{
 			return false;
@@ -126,7 +126,7 @@ var startSimulator = function(target, deviceName, ipAddress, port, projectRootPa
 		.then( function(jupiterPath) {
 			return app.getApplicationSupportPath()
 			.then( (applicationSupportPath) => {
-				let logPath = path.join(applicationSupportPath, `${path.basename(projectRootPath)}.sim.console.log`);
+				var logPath = path.join(applicationSupportPath, `${path.basename(projectRootPath)}.sim.console.log`);
 				// Start a new log whenever we launch sim
 				if (fs.existsSync())
 				{
@@ -142,9 +142,9 @@ var getArgs = function(ipAddress, port)
 {
 	return project.articleList( )
 	.then( (articleList) => {
-		let articleNames = articleList.map( (articleInfo) => articleInfo.metadata.entityName); 
-		let articles = articleNames.join(" ");
-		let args = ["-phonegapServer", ipAddress + ":" + port, "-serveArticles", articles];
+		var articleNames = articleList.map( (articleInfo) => articleInfo.metadata.entityName); 
+		var articles = articleNames.join(" ");
+		var args = ["-phonegapServer", ipAddress + ":" + port, "-serveArticles", articles];
 		return args;
 	});
 	

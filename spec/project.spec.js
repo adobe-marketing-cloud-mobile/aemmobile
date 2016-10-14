@@ -58,7 +58,7 @@ describe('project.create(options, projectPath)', function()
         project.create({}, projectName)
 		.then( () => {
 			var cordovaDirs = ['hooks', 'platforms', 'plugins'];
-			let projectDir = path.join(process.cwd(), projectName);
+			var projectDir = path.join(process.cwd(), projectName);
 			cordovaDirs.forEach(function(d) {
 				expect(fs.existsSync(path.join(projectDir, d))).toBe(false);
 			});
@@ -124,7 +124,7 @@ describe('project.create(options, projectPath)', function()
 
     it('should return Article List', function(done) 
 	{
-		let articleName = "TestArticle";
+		var articleName = "TestArticle";
         project.create({}, projectName)
 		.then( () => {
 			process.chdir(projectPath);	
@@ -164,7 +164,7 @@ describe('project.create(options, projectPath)', function()
 		.then( () => {
 			process.chdir(projectPath);	
 			
-			let metadata = { 
+			var metadata = { 
 				rootPath: "FakeRoot",
 				metadata: {
 					shortTitle: "My Short Title"
