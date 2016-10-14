@@ -1,17 +1,17 @@
 language: node_js
 sudo: false
 git:
-  depth: 10
+    depth: 10
 node_js:
-  - "0.10"
-  - "0.12"
-  - "4"
-  - "6"i
+    - "0.10"
+    - "0.12"
+    - "4"
+    - "6"
 install:
-  - npm install
-  - npm install -g codecov
+    - npm install
+    - npm install -g codecov
 script:
-  - npm test
-  - npm run cover
+    - npm test
+    - npm run cover
 after_script: codecov
  

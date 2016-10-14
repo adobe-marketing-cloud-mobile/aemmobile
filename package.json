@@ -5,7 +5,7 @@
   "scripts": {
     "test": "npm run jasmine && npm run jshint",
     "jshint": "node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint spec",
-    "jasmine": "node_modules/jasmine/bin/jasmine.js",
+    "jasmine": "node node_modules/jasmine/bin/jasmine.js",
     "cover": "node node_modules/istanbul/lib/cli.js cover --root src --print detail --include-all-sources true node_modules/jasmine/bin/jasmine.js"
   },
   "author": "Adobe",
