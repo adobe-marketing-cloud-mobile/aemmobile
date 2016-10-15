@@ -16,7 +16,7 @@
 
 var Q = require('q');
 var platform = require('./platform-ios');
-var cordova_lib = require('cordova-lib'),
+var cordova_lib = require('../lib/cordova').lib,
     cordova = cordova_lib.cordova;
 
 module.exports.build = build;

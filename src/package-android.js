@@ -18,12 +18,12 @@
  * Module dependencies.
  */
 var Q = require('q');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 module.exports.package = packageBinary;
 
-function packageBinary(opts) {
+function packageBinary(file, opts) {
     events.emit('info', 'The package command is not required for android. Did you mean `aemm build android`?');
     return Q();
 }

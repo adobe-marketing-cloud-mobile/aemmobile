@@ -18,7 +18,7 @@
  * Module dependencies.
  */
 var Q = require('q');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var cordova = cordova_lib.cordova;
 var project = require('./project');
 

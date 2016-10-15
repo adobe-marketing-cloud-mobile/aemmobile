@@ -22,9 +22,9 @@ var platformRequire = require('../utils/platformRequire');
 
 module.exports = packageBinary;
 
-function packageBinary(opts) {
+function packageBinary(platform, file, opts) {
     return Q().then(function () {
-        var platformPackageModule = platformRequire("package", opts.platforms[0]);
-        return platformPackageModule.package(opts);   
+        var platformPackageModule = platformRequire("package", platform);
+        return platformPackageModule.package(file, opts);
     });
 }

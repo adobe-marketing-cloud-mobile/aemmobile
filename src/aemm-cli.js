@@ -23,7 +23,7 @@ var path = require('path'),
     nopt,
     Q = require('q');
 
-var cordova_lib = require('cordova-lib'),
+var cordova_lib = require('../lib/cordova').lib,
     events = cordova_lib.events,
     CordovaError  = cordova_lib.CordovaError,
     logger = require('cordova-common').CordovaLogger.get();
@@ -193,6 +193,12 @@ function cli(inputArgs)
             subcommandName = undashed[1];
             var targets = undashed.slice(2);
             return cmd.call(null, subcommandName, targets);
+        } else if (cmd.name === 'packageBinary') { // cannot use 'package' as the command name due to reserved words in javascript
+            var platform = undashed[1];
+            var file = undashed[2];
+            opts.options = args;
+            opts.options.argv = unparsedArgs;
+            return cmd.call(null, platform, file, opts);
         } else {
             opts.platforms = undashed.slice(1);
             opts.options = args;

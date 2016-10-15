@@ -19,7 +19,7 @@
  */
 var Q = require('q');
 var exec = require('child-process-promise').exec;
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var cordova = cordova_lib.cordova;
 var events = cordova_lib.events;
 var path = require('path');

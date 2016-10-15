@@ -16,7 +16,7 @@
 
 var rewire = require('rewire');
 var Q = require('q');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 var logger = require('cordova-common').CordovaLogger.get();
 

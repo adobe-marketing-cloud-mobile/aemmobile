@@ -23,7 +23,7 @@ var path = require("path");
 var FS = require('q-io/fs');
 var fs = require("fs");
 var appBinary = require('./app');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 /**

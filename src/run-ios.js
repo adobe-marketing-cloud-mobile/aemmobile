@@ -26,7 +26,7 @@ var app = require('./app');
 var config = require('./config');
 var bplist = require('bplist');
 var exec = require('child-process-promise').exec;
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 module.exports = run;

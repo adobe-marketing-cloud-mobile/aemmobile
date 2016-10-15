@@ -20,7 +20,7 @@ var Q = require('q');
 var path = require("path");
 var project = require('./project');
 var pathToNewArticleTemplate = path.join(__dirname, '..', 'templates', 'new_article');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 module.exports.testing = {};

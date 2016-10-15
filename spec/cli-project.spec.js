@@ -17,7 +17,7 @@
 var cli = require("../src/aemm-cli");
 var Q = require('q');
 var project = require('../src/project');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 var logger = require('cordova-common').CordovaLogger.get();
 

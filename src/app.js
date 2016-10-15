@@ -26,7 +26,7 @@ var rp = require('request-promise');
 var os = require('os');
 var downloadFile = require('../utils/downloadFile');
 var url = require('url');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 module.exports.getApplicationSupportPath = getApplicationSupportPath;

@@ -32,7 +32,7 @@ describe('build', function () {
                 opts = opts || {};
                 opts.platforms = opts.platforms || [];
                 if (opts.platforms.length === 0) {
-                    throw new Error('No platforms added to this project. Please use `cordova platform add <platform>`.'); 
+                    throw new Error('This is the "no platforms" error'); 
                 }
                 return opts;
             });
@@ -57,8 +57,7 @@ describe('build', function () {
         });
 
         it('should error if there are no platforms', function(done) {
-            var errMsg = 'No platforms added to this project. Please use `aemm platform add <platform>`.';
-            this.wrapperError(build(), errMsg, done, function () {});
+            this.wrapperError(build(), 'This is the "no platforms" error', done, function () {});
         });
 
         it('should error if illegal platforms are passed in', function(done) {

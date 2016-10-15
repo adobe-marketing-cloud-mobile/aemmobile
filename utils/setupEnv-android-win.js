@@ -19,7 +19,7 @@ var path = require("path");
 var shell = require('shelljs');
 var spawn = require('cross-spawn-async');
 var getUserHome = require('../utils/getUserHome');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 module.exports = function() {

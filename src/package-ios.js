@@ -24,14 +24,14 @@ var project = require('./project');
 var FS = require('q-io/fs');
 var os = require('os');
 var shell = require('shelljs');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 var unzip = require('../utils/unzip');
 var project = require('./project');
 
 module.exports.package = packageBinary;
 
-function packageBinary(opts) {
+function packageBinary(file, opts) {
     var args = opts.options || {};
     // Ensure we are in an AEMM project.
     return project.projectRootPath()
@@ -44,7 +44,7 @@ function packageBinary(opts) {
         if (platform === 'device')
         {
             // Copy the device framework into the provided path.
-            var ipaPath = args.argv.undashed[2];
+            var ipaPath = file;
             if (!ipaPath) {
                 throw new Error("You must provide an AEM Mobile .ipa, see `aemm help package`");
             }

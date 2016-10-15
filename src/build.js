@@ -35,14 +35,6 @@ function build(opts)
             var platformBuildModule = platformRequire("build", platform);
             return platformBuildModule.build(_.clone(opts));
         });
-    })
-    .catch( (err) => {
-        if (err.message == "No platforms added to this project. Please use `cordova platform add <platform>`.") {
-            throw new Error("No platforms added to this project. Please use `aemm platform add <platform>`.");
-        }
-        else {
-            throw err;
-        }
     });
 }
 

@@ -18,7 +18,7 @@ var Q = require('q');
 var path = require('path');
 var jsonfile = require('jsonfile');
 var project = require('./project');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 var pathToProjectConfig = null;

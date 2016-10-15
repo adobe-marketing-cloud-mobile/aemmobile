@@ -27,7 +27,7 @@ describe('package', function() {
         it('should call package-ios', function(done) {
             spyOn(package_ios, 'package');
 
-            this.wrapper(packageBinary({ 'platforms' : [ 'ios' ]}), done, function () {
+            this.wrapper(packageBinary('ios', 'myFakeFile', {}), done, function () {
                 expect(package_ios.calls.argsFor(0)[1].platforms).toEqual(['ios']);
             });
         });

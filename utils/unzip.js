@@ -16,7 +16,7 @@
 
 var Q = require('q');
 var decompressZip = require('decompress-zip');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 module.exports = function(zipFile, outputPath)
