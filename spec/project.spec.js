@@ -14,16 +14,77 @@
 	limitations under the License.
  */
 
-var project = require('../src/project');
-var article = require('../src/article');
+var rewire = require('rewire');
+var Q = require('q');
 var path = require('path');
 var os = require('os');
 var FS = require('q-io/fs');
 var fs = require('fs');
+var project = rewire('../src/project');
+var article = require('../src/article');
 var projectName = 'TestProject';
 var tmpDir = path.join(os.tmpdir(), "AEMMTesting");
 var projectPath = path.join(tmpDir, projectName);
 
+describe('project', function() {
+	
+	var fileResets = [];
+
+	afterEach(function () {
+        fileResets.forEach(function(func) {
+            func();
+        });
+        fileResets = [];
+    });
+	
+	describe('preserveWwwDir method', function() {
+		var preserveWwwDir = project.__get__('preserveWwwDir');
+		
+		beforeEach(function() {
+			spyOn(FS, 'write').and.returnValue(Q());
+		});
+
+		it('should create a .placeholder file in the www directory', function(done) {
+			this.wrapper(preserveWwwDir('/preservedproject'), done, function() {
+				expect(FS.write.calls.argsFor(0)[0]).toEqual(path.join('/preservedproject', 'www', '.placeholder'));
+				expect(FS.write.calls.argsFor(0)[1]).toEqual('# This file guarantees that the www directory will remain.');
+			});
+		});
+	});
+
+	describe('create method', function() {
+		var create = project.__get__('create');
+
+		it('should behave correctly with --no-samples', function(done) {
+			var opts = {
+				'samples' : false
+			};
+
+			// Need these so unit tests will pass on windows
+			var resolvedPath = path.resolve('/fakepath');
+
+			var cordovaSpy = jasmine.createSpy('cordovaSpy').and.returnValue(Q());
+			var artifactsSpy = jasmine.createSpy('artifactsSpy').and.returnValue(Q());
+			var metadataSpy = jasmine.createSpy('metadataSpy').and.returnValue(Q());
+			var scaffoldingSpy = jasmine.createSpy('scaffoldingSpy').and.returnValue(Q());
+			var wwwSpy = jasmine.createSpy('wwwSpy').and.returnValue(Q());
+
+			fileResets.push(project.__set__('createCordovaApp', cordovaSpy));
+			fileResets.push(project.__set__('removeUnwantedCordovaArtifacts', artifactsSpy));
+			fileResets.push(project.__set__('populateProjectMetadata', metadataSpy));
+			fileResets.push(project.__set__('createAEMMScaffolding', scaffoldingSpy));
+			fileResets.push(project.__set__('preserveWwwDir', wwwSpy));
+
+			this.wrapper(create(opts, resolvedPath), done, function() {
+				expect(cordovaSpy.calls.mostRecent().args[0]).toEqual(resolvedPath);
+				expect(artifactsSpy.calls.mostRecent().args[0]).toEqual(resolvedPath);
+				expect(metadataSpy.calls.mostRecent().args[0]).toEqual(resolvedPath);
+				expect(wwwSpy.calls.mostRecent().args[0]).toEquals(resolvedPath);
+				expect(scaffoldingSpy).not.toHaveBeenCalled();
+			});
+		});
+	});
+});
 
 describe('project.create(options, projectPath)', function() 
 {

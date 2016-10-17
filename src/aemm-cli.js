@@ -21,7 +21,8 @@
 var path = require('path'),
     help = require('./help'),
     nopt,
-    Q = require('q');
+    Q = require('q'),
+    updateNotifier = require('update-notifier');
 
 var cordova_lib = require('../lib/cordova').lib,
     events = cordova_lib.events,
@@ -66,6 +67,8 @@ var commands = {
 module.exports = function (inputArgs, cb) {
     cb = cb || function(){};
     
+    versionCheck();
+
     init();
     
     inputArgs = inputArgs || process.argv;
@@ -218,4 +221,9 @@ function cli(inputArgs)
         var newArgs = [args].concat(remain);
         return subcommand.apply(this, newArgs);
     }
+}
+
+function versionCheck() {
+    var notifier = updateNotifier({'pkg' : cmdLineToolInfo});
+    notifier.notify();
 }
