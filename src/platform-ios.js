@@ -13,14 +13,13 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
  */
 var Q = require('q');
 var exec = require('child-process-promise').exec;
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var cordova = cordova_lib.cordova;
 var events = cordova_lib.events;
 var path = require('path');
@@ -60,16 +59,6 @@ function post_add()
 			];
         return cordova.raw.plugin("add", targets);
     })
-    .then( () => {
-		events.emit("info", "Ensuring core AEM Mobile plugins are installed.");
-        var targets = [
-			"aemm-plugin-navto",
-			"aemm-plugin-inappbrowser",
-			"aemm-plugin-fullscreen-video",
-			"aemm-plugin-html-contract"
-			];
-        return cordova.raw.plugin("add", targets);
-    })
 	.then( function () {
 		events.emit("results", "Finished adding ios platform.");	
 	});
@@ -90,12 +79,12 @@ function disableCodeSigning() {
 }
 
 module.exports.isCodeSigningDisabled = isCodeSigningDisabled;
-function isCodeSigningDisabled(settingsPlist = null) {
+function isCodeSigningDisabled(settingsPlist) {
 	return Q().then( () => {
 		return settingsPlist ? Q(settingsPlist) : getSDKSettingsPlist();
 	})
 	.then( (settingsPlist) => {
-		return exec('/usr/libexec/PlistBuddy -c "Print DefaultProperties:CODE_SIGNING_REQUIRED" ' + settingsPlist)
+		return exec('/usr/libexec/PlistBuddy -c "Print DefaultProperties:CODE_SIGNING_REQUIRED" ' + settingsPlist);
 	})
 	.then( (codeSigningRequired) => {
 		if (codeSigningRequired.stdout.trim() === "NO") {
@@ -106,20 +95,20 @@ function isCodeSigningDisabled(settingsPlist = null) {
 	});
 }
 
-function changeCodeSigningPolicy(settingsPlist, enabled = false) {
+function changeCodeSigningPolicy(settingsPlist, enabled) {
 	return Q().then( () => {
 		events.emit("info", "aemm requires Xcode to allow building unsigned frameworks.");
-		events.emit("info", "sudo may prompt you for your password to change Xcode's code signing policy.")
+		events.emit("info", "sudo may prompt you for your password to change Xcode's code signing policy.");
 	})
 	.then( () => {
 		var deferred = Q.defer();
-		var val = enabled ? "YES" : "NO";
+		var val = (enabled || enabled !== "NO") ? "YES" : "NO";
 		var command = 'sudo ' + '/usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED ' + val + '" ' + settingsPlist;
 		
 		shell.exec(command, {
 			silent: false
 		}, function (code, output) {
-			if (code == 0) {
+			if (code === 0) {
 				deferred.resolve();
 			} else {
 				deferred.reject(new Error("Changing code signing policy failed. Please see the message above."));

@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
 var project = require('./project');
@@ -34,8 +33,8 @@ var constants = require('../utils/constants');
 
 module.exports = run;
 
-function run(args) {
-    var deviceName = args.device ? "device" : "emulator";
+function run(opts) {
+    var deviceName = opts.device ? "device" : "emulator";
 
     if (deviceName == "device") {
         return runOnDevice();
@@ -69,7 +68,7 @@ function runOnDevice() {
             var launchActivity = "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity";
             if (apkInstalledType == constants.APK_TYPE_PREBUILT) {
                 // prebuilt apk has different package name from custom apk
-                launchActivity = "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"
+                launchActivity = "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity";
             }
             var serverIp = ip.address();
             var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -d shell am start -n ' +
@@ -77,7 +76,7 @@ function runOnDevice() {
             shell.exec(launchCmd, {
                 silent: false
             }, function (code, output) {
-                if (code == 0) {
+                if (code === 0) {
                     defer.resolve();
                 } else {
                     deferred.reject(new Error("Launching AEM Mobile app in emulator failed."));
@@ -121,14 +120,14 @@ function runOnEmulator() {
             var launchActivity = "com.adobe.dps.viewer/com.adobe.dps.viewer.collectionview.CollectionActivity";
             if (apkInstalledType == constants.APK_TYPE_PREBUILT) {
                 // prebuilt apk has different package name from custom apk
-                launchActivity = "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity"
+                launchActivity = "com.adobe.dps.preflight/com.adobe.dps.viewer.collectionview.CollectionActivity";
             }
             var launchCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + deviceSerialNum +
                 ' shell am start -n ' + launchActivity + ' -e phonegapServer 10.0.2.2:3000' + ' -e initialOrientation ' + orientation;
             shell.exec(launchCmd, {
                 silent: false
             }, function (code, output) {
-                if (code == 0) {
+                if (code === 0) {
                     defer.resolve();
                 } else {
                     deferred.reject(new Error("Launching AEM Mobile app in emulator failed."));
@@ -138,7 +137,7 @@ function runOnEmulator() {
             return defer.promise;
         });
     });
-};
+}
 
 function checkApk() {
     return project.projectRootPath()
@@ -159,7 +158,7 @@ function checkApk() {
         } else {
             app.getParentPathForAppBinary("android", "emulator")
                 .then((parentPath) => {
-                    let prebuiltAppPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
+                    var prebuiltAppPath = path.join(parentPath, constants.APP_NAME_PREBUILT);
                     if (!fs.existsSync(prebuiltAppPath)) {
                         deferred.reject(new Error(`No apk found, please run 'aemm app install android'.`));
                     } else {
@@ -188,7 +187,7 @@ function installApkOnDevice()
             shell.exec(checkCmd, {
                 silent: false
             }, function(code, output) {
-                if (code == 0) {
+                if (code === 0) {
                     defer.resolve(apkType);
                 } else {
                     deferred.reject(new Error("Installing AEM Mobile app apk failed: " + apkPath));
@@ -196,7 +195,7 @@ function installApkOnDevice()
             });
 
             return defer.promise;
-        })
+        });
 }
 
 function installApkOnEmulator(deviceSerialNum)
@@ -215,7 +214,7 @@ function installApkOnEmulator(deviceSerialNum)
             shell.exec(checkCmd, {
                 silent: false
             }, function(code, output) {
-                if (code == 0) {
+                if (code === 0) {
                     defer.resolve(apkType);
                 } else {
                     deferred.reject(new Error("Installing AEM Mobile app apk failed: " + apkPath));
@@ -223,7 +222,7 @@ function installApkOnEmulator(deviceSerialNum)
             });
 
             return defer.promise;
-        })
+        });
 }
 
 var getArgs = function(ipAddress, port)
@@ -247,9 +246,9 @@ var getArgs = function(ipAddress, port)
             // fileArray.reduce( function (item) {
             // 	return null;
             // });
-            let articles = fileArray2.join(" ");
+            var articles = fileArray2.join(" ");
             args = ["-phonegapServer", ipAddress + ":" + port, "-serveArticles", articles];
             return Q(args);
         });
     });
-}
+};

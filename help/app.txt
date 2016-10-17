@@ -14,9 +14,10 @@ Commands:
 
 Examples:
 
+  $ aemm app install --list         # Lists available app binaries for all platforms
   $ aemm app install android        # Installs the latest version of android app binary
   $ aemm app install ios --list     # Lists available app binaries for ios
-  $ aemm app install ios 2016.3.0   # Installs app binary with version 2016.3.0 on ios
+  $ aemm app install ios 2016.10    # Installs app binary with version 2016.10 on ios
   $ aemm app version                # Displays installed app binary versions for all platforms
   $ aemm app update                 # Checks for updates to all platforms and installs new app binaries for platforms that are out of date
 

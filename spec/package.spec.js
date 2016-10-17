@@ -14,18 +14,23 @@
     limitations under the License.
  */
 
-/**
- * Module dependencies.
- */
-var Q = require('q');
-var cordova_lib = require('../lib/cordova').lib;
-var cordova = cordova_lib.cordova;
-var project = require('./project');
+var rewire = require('rewire');
+var package = rewire('../src/package');
+var package_ios = require('../src/package-ios');
 
-module.exports = plugin;
-function plugin(subcommand, targets) {
-    return project.projectRootPath()
-    .then( () => {
-        return cordova.raw.plugin(subcommand, targets);
+describe('package', function() {
+
+    describe('packageBinary method', function() {
+
+        var packageBinary = package.__get__('packageBinary');
+
+        it('should call package-ios', function(done) {
+            spyOn(package_ios, 'package');
+
+            this.wrapper(packageBinary('ios', 'myFakeFile', {}), done, function () {
+                expect(package_ios.calls.argsFor(0)[1].platforms).toEqual(['ios']);
+            });
+        });
     });
-}
+
+});

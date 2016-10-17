@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -23,9 +22,9 @@ var platformRequire = require('../utils/platformRequire');
 
 module.exports = packageBinary;
 
-function packageBinary(args, platform) {
+function packageBinary(platform, file, opts) {
     return Q().then(function () {
         var platformPackageModule = platformRequire("package", platform);
-        return platformPackageModule.package(args);   
-    });;
+        return platformPackageModule.package(file, opts);
+    });
 }

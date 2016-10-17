@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
 var aemmConfig = require('../config');
 var exec = require('child-process-promise').exec;
@@ -24,7 +23,7 @@ var path = require("path");
 var FS = require('q-io/fs');
 var fs = require("fs");
 var appBinary = require('./app');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 /**
@@ -38,13 +37,14 @@ var ServeDefaults = {
 
 module.exports = serve;
 
-function serve(options) 
+function serve(opts) 
 {
+	var options = opts.options || {} ;
 	return project.projectRootPath()
 	.then( () => getCordovaRoot())
 	.then( (cordovaRootPath) => {
 		events.emit("log", 'starting app server...');
-		events.emit("log", "Use Ctrl-C to exit")
+		events.emit("log", "Use Ctrl-C to exit");
 		
 		if (!options) throw new Error('requires option parameter');
 
@@ -55,8 +55,7 @@ function serve(options)
 		options.cordovaRoot = cordovaRootPath;
 		options.customMiddleware = [articleMiddleware];
 
-
-		var deferred = Q.defer()
+		var deferred = Q.defer();
 
 		phoneGap.listen(options)
 		.on('log', function() {
@@ -107,11 +106,11 @@ function getCordovaRoot()
 	return Q().then( () => {
 		return appBinary.getInstalledAppBinaryPath("ios", "emulator")
 		.catch( () => {
-			return appBinary.getInstalledAppBinaryPath("ios", "device")
-		})		
+			return appBinary.getInstalledAppBinaryPath("ios", "device");
+		});
 	})
 	.then( (appPath) => {
-		let cordovaRoot = path.join(appPath, "Frameworks", "CordovaPlugins.framework", "www");
+		var cordovaRoot = path.join(appPath, "Frameworks", "CordovaPlugins.framework", "www");
 		return cordovaRoot;
 	})
 	.catch( () => {

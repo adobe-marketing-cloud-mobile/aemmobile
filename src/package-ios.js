@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -25,14 +24,15 @@ var project = require('./project');
 var FS = require('q-io/fs');
 var os = require('os');
 var shell = require('shelljs');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 var unzip = require('../utils/unzip');
 var project = require('./project');
 
 module.exports.package = packageBinary;
 
-function packageBinary(args, platform) {
+function packageBinary(file, opts) {
+    var args = opts.options || {};
     // Ensure we are in an AEMM project.
     return project.projectRootPath()
     .then(function () {
@@ -44,7 +44,7 @@ function packageBinary(args, platform) {
         if (platform === 'device')
         {
             // Copy the device framework into the provided path.
-            var ipaPath = args.argv.undashed[2];
+            var ipaPath = file;
             if (!ipaPath) {
                 throw new Error("You must provide an AEM Mobile .ipa, see `aemm help package`");
             }
@@ -72,7 +72,7 @@ function packageBinary(args, platform) {
                 var cmd = "zip -0 -y -r zipped.ipa Payload/";
                 events.emit('log', 'zipping Payload directory.');
                 shell.exec(cmd, {silent:true}, function(code, stdout, stderr) {
-                    if (code != 0) {
+                    if (code !== 0) {
                         deferred.reject(stderr);
                     } else {
                         events.emit('results', "zip complete.");
@@ -115,7 +115,7 @@ function replaceFramework(appPath, platform) {
             if (!sourceExists) {
                 throw new Error("No built framework. Please run `aemm build ios`, see `aemm help build` for details.");
             } else {
-                return FS.removeTree(destinationPluginsPath)
+                return FS.removeTree(destinationPluginsPath);
             }
         })
         .then( () => {

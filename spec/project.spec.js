@@ -13,14 +13,13 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict"
 
-var helpers = require('./helpers');
 var project = require('../src/project');
 var article = require('../src/article');
 var path = require('path');
 var os = require('os');
 var FS = require('q-io/fs');
+var fs = require('fs');
 var projectName = 'TestProject';
 var tmpDir = path.join(os.tmpdir(), "AEMMTesting");
 var projectPath = path.join(tmpDir, projectName);
@@ -59,16 +58,16 @@ describe('project.create(options, projectPath)', function()
         project.create({}, projectName)
 		.then( () => {
 			var cordovaDirs = ['hooks', 'platforms', 'plugins'];
-			let projectDir = path.join(process.cwd(), projectName);
+			var projectDir = path.join(process.cwd(), projectName);
 			cordovaDirs.forEach(function(d) {
-				expect(path.join(projectDir, d)).not.toExist();
+				expect(fs.existsSync(path.join(projectDir, d))).toBe(false);
 			});
 
 			// Expect config.xml
-			expect(path.join(projectDir, 'config.xml')).toExist();
+			expect(fs.existsSync(path.join(projectDir, 'config.xml'))).toBe(true);
 
 			// Check if Article file exists
-			expect(path.join(projectDir, 'www', "SampleArticle", 'index.html')).toExist();
+			expect(fs.existsSync(path.join(projectDir, 'www', "SampleArticle", 'index.html'))).toBe(true);
 
 		})
 		.catch( (err) => done.fail(err) )
@@ -84,7 +83,7 @@ describe('project.create(options, projectPath)', function()
 
         project.create({}, fullPathDir)
 		.then( () => {
-			expect(path.join(fullPathDir, 'config.xml')).toExist();
+			expect(fs.existsSync(path.join(fullPathDir, 'config.xml'))).toBe(true);
 		})
 		.catch( (err) => done.fail(err) )
 		.finally( () => {
@@ -119,13 +118,13 @@ describe('project.create(options, projectPath)', function()
 			.catch( (err) => expect(err.message).toMatch(/Path already exists and is not empty/) )
 			.finally( done );
 		})
-		.catch( (err) => done.fail(err) )
+		.catch( (err) => done.fail(err) );
 
     });
 
     it('should return Article List', function(done) 
 	{
-		let articleName = "TestArticle";
+		var articleName = "TestArticle";
         project.create({}, projectName)
 		.then( () => {
 			process.chdir(projectPath);	
@@ -148,7 +147,7 @@ describe('project.create(options, projectPath)', function()
 		.then( () => {
 			process.chdir(projectPath);
 			// create a file too
-			return FS.write(path.join(projectPath, "www", "Hello.txt"), "Hello, World!\n")	
+			return FS.write(path.join(projectPath, "www", "Hello.txt"), "Hello, World!\n");
 		})
 		.then( () => project.articleList() )
 		.then( (articleList) => {
@@ -165,7 +164,7 @@ describe('project.create(options, projectPath)', function()
 		.then( () => {
 			process.chdir(projectPath);	
 			
-			let metadata = { 
+			var metadata = { 
 				rootPath: "FakeRoot",
 				metadata: {
 					shortTitle: "My Short Title"

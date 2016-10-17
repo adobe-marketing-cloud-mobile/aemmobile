@@ -14,18 +14,19 @@
     limitations under the License.
  */
 
-/**
- * Module dependencies.
- */
-var Q = require('q');
-var cordova_lib = require('../lib/cordova').lib;
-var cordova = cordova_lib.cordova;
-var project = require('./project');
+beforeEach(function() {
+    this.wrapper = function (p, done, post) {
+        p.then(post, function(err) {
+            expect(err.stack).toBeUndefined();
+        }).fin(done);
+    };
 
-module.exports = plugin;
-function plugin(subcommand, targets) {
-    return project.projectRootPath()
-    .then( () => {
-        return cordova.raw.plugin(subcommand, targets);
-    });
-}
+    this.wrapperError = function (p, message, done, post) {
+        p.then(post, function(err) {
+            expect(err.stack).toBeDefined();
+            if (message) {
+                expect(err.message).toEqual(message);
+            }
+        }).fin(done);
+    };
+});

@@ -13,16 +13,15 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict"
 
-var helpers = require('./helpers');
 var article = require('../src/article');
 var project = require('../src/project');
 var path = require('path');
 var os = require('os');
 var FS = require('q-io/fs');
+var fs = require('fs');
 var articleName = 'TestArticle';
-let tmpDir = path.join(os.tmpdir(), "AEMMTesting");
+var tmpDir = path.join(os.tmpdir(), "AEMMTesting");
 var projectPath = path.join(tmpDir, "TestArticleProject");
 
 
@@ -31,7 +30,6 @@ describe('article.create(options, articlename)', () =>
 	
     beforeEach( (done) => 
 	{
-		let err = undefined;
 		FS.makeTree(tmpDir) 
 		.then( () => {
 			process.chdir(tmpDir);
@@ -39,7 +37,7 @@ describe('article.create(options, articlename)', () =>
 			return project.create({}, projectPath)
 			.then( ()=> process.chdir(projectPath) );
 		})
-		.catch((error) => done.fail(err) )
+		.catch((err) => done.fail(err) )
 		.finally( done );
     });
 	
@@ -64,7 +62,7 @@ describe('article.create(options, articlename)', () =>
         article.create({}, articleName)
 		.then( () => {
 			// Check if Article file exists
-			expect(path.join(projectPath, 'www', articleName, 'index.html')).toExist();
+			expect(fs.existsSync(path.join(projectPath, 'www', articleName, 'index.html'))).toBe(true);
 
 		})
 		.catch( (err) => done.fail(err) )
@@ -77,10 +75,9 @@ describe('article.create(options, articlename)', () =>
         article.create({}, articleName, `${articleName}2`, `${articleName}3`)
 		.then( () => {
 			// Check if Article file exists
-			expect(path.join(projectPath, 'www', articleName, 'index.html')).toExist();
-			expect(path.join(projectPath, 'www', `${articleName}2`, 'index.html')).toExist();
-			expect(path.join(projectPath, 'www', `${articleName}3`, 'index.html')).toExist();
-
+			expect(fs.existsSync(path.join(projectPath, 'www', articleName, 'index.html'))).toBe(true);
+			expect(fs.existsSync(path.join(projectPath, 'www', `${articleName}2`, 'index.html'))).toBe(true);
+			expect(fs.existsSync(path.join(projectPath, 'www', `${articleName}3`, 'index.html'))).toBe(true);
 		})
 		.catch( (err) => done.fail(err) )
 		.finally(done);
@@ -104,11 +101,10 @@ describe('article.create(options, articlename)', () =>
 	// article create articleThatExists articleThatDoesNotExist
 	it('should create articles it can and fail for articles it cannot create when trying to create multiple articles', (done) =>
 	{
-		let existingArticle1 = "existingArticle1";
-		let existingArticle2 = "existingArticle2";
-		let newArticle1 = "newArticle1";
-		let newArticle2 = "newArticle2";
-		let err = undefined;
+		var existingArticle1 = "existingArticle1";
+		var existingArticle2 = "existingArticle2";
+		var newArticle1 = "newArticle1";
+		var newArticle2 = "newArticle2";
         article.create({}, existingArticle1, existingArticle2)
 		.then( () => {
 			article.create({}, existingArticle1, existingArticle2, newArticle1, newArticle2)
@@ -119,11 +115,9 @@ describe('article.create(options, articlename)', () =>
 				expect(results[1].reason).toMatch(/Cannot create article/);
 				expect(results[2].state).toBe("fulfilled");
 				expect(results[3].state).toBe("fulfilled");
-				
-				var x = expect(path.join(projectPath, 'www', newArticle1, 'index.html'));
-				x.toExist();
-				expect(path.join(projectPath, 'www', newArticle2, 'index.html')).toExist();
-				
+
+				expect(fs.existsSync(path.join(projectPath, 'www', newArticle1, 'index.html'))).toBe(true);
+				expect(fs.existsSync(path.join(projectPath, 'www', newArticle2, 'index.html'))).toBe(true);
 			})
 			.catch( (err) => done.fail(err) )
 			.finally( done );

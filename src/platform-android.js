@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -31,7 +30,7 @@ var setupEnv_win = require('../utils/setupEnv-android-win');
 var setupEnv_mac = require('../utils/setupEnv-android-mac');
 var spawn = require('cross-spawn-async');
 var spinner = require('simple-spinner');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 var cordova = cordova_lib.cordova;
 const skinName = "Nexus-7";
@@ -52,7 +51,7 @@ function install() {
         })
         .then( () => {
             return installHAXM();
-        })
+        });
 }
 
 function installSdk() {
@@ -89,13 +88,13 @@ function installSdk() {
 
             FS.makeTree(sdkInstallPath)
             .then( () => {
-                return downloadFile(sdkDownloadUrl, tempSdkDownloadFilePath)
+                return downloadFile(sdkDownloadUrl, tempSdkDownloadFilePath);
             })
             .then( () => {
-                return unzip(tempSdkDownloadFilePath, tempSdkUnzipRoot)
+                return unzip(tempSdkDownloadFilePath, tempSdkUnzipRoot);
             })
             .then( () => {
-                return FS.copyTree(tempSdkUnzipPath, sdkInstallPath)
+                return FS.copyTree(tempSdkUnzipPath, sdkInstallPath);
             })
             .then ( () => {
                 return FS.removeTree(tempSdkUnzipRoot)
@@ -106,7 +105,7 @@ function installSdk() {
 
                 events.emit("log", "Android SDK is installed successfully.");
                 deferred.resolve();
-            })
+            });
         }
     });
 
@@ -180,7 +179,7 @@ function installHAXM() {
         silent: false
     }, function (code, output) {
         spinner.stop();
-        if (code == 0) {
+        if (code === 0) {
             deferred.resolve();
         } else {
             deferred.reject(new Error("Installing Intel HAXM failed."));
@@ -196,7 +195,7 @@ function createAvd() {
 
     return FS.makeTree(skinTo)
         .then( () => {
-            return FS.copyTree(skinFrom, skinTo)
+            return FS.copyTree(skinFrom, skinTo);
         })
         .then( () => {
             var deferred = Q.defer();
@@ -214,7 +213,7 @@ function createAvd() {
             shell.exec(command, {
                 silent: false
             }, function (code, output) {
-                if (code == 0) {
+                if (code === 0) {
                     events.emit("log", "AVD is created successfully.");
                     deferred.resolve();
                 } else {

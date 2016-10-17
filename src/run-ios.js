@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
 var project = require('./project');
@@ -27,17 +26,18 @@ var app = require('./app');
 var config = require('./config');
 var bplist = require('bplist');
 var exec = require('child-process-promise').exec;
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 module.exports = run;
 
-function run(args) 
+function run(opts) 
 {
-	let projectRootPath = null;
-	var target = args.target;
-	var deviceName = args.device ? "device" : "emulator";
-	if (args.list)
+	var projectRootPath = null;
+	var target = opts.target;
+	var deviceName = opts.device ? "device" : "emulator";
+	var filteredList;
+	if (opts.list)
 	{
 		return listSimulators();
 	}
@@ -47,13 +47,13 @@ function run(args)
 		// Make sure we are in a Cordova project folder
 		projectRootPath = projectPath;
 		
-		let allValidTargets = aemmSimulatorList();
+		var allValidTargets = aemmSimulatorList();
 		if (allValidTargets.length === 0)
 		{	
 			return exec('xcode-select -p')
 			.then( (response) => {
-				let xcode = response.stdout.trim();
-				let simsInstalled = iossim.getdevicetypes().join("\n");
+				var xcode = response.stdout.trim();
+				var simsInstalled = iossim.getdevicetypes().join("\n");
 				throw new Error(`No valid simulator devices installed in Xcode(${xcode}).
 The following devices are installed\n${simsInstalled}
 Valid devices must be iPhone or iPad and run iOS 8 or iOS 9.2 or greater.
@@ -63,8 +63,8 @@ Install simulator devices from Xcode.`);
 		
 		if (target)
 		{
-			let filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith(target) );
-			if (filteredList.length == 0)
+			filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith(target) );
+			if (filteredList.length === 0)
 			{
 				throw Error(`Target device specified(${target}) could not be found in the list of available devices.  Run 'aemm run ios --list' for device list.`);
 			}
@@ -73,7 +73,7 @@ Install simulator devices from Xcode.`);
 		} else
 		{
 			// Look first for an iPhone-6s.  No reason other than it is most popular phone
-			let filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith("iPhone-6s") );
+			filteredList = allValidTargets.filter( (targetItem) => targetItem.startsWith("iPhone-6s") );
 			target = filteredList.length > 0 ? filteredList[0] : allValidTargets[0];
 			events.emit("info", `No target specified for emulator. Deploying to ${target} simulator`);
 		}
@@ -81,18 +81,18 @@ Install simulator devices from Xcode.`);
 	})
 	.then( () => app.ensureInstalledBinary("ios", deviceName) )
 	.then( function() {
-		return serve({}, deviceName);
+		return serve({ options: {} }, deviceName);
 	})
 	.then( function(serveResponse) {
 		return startSimulator(target, deviceName, serveResponse.address, serveResponse.port, projectRootPath);	
 	});
-};
+}
 
-function listSimulators(args)
+function listSimulators()
 {
 	return Q.fcall( () => 
 	{
-		let sims = aemmSimulatorList();
+		var sims = aemmSimulatorList();
 		events.emit("results", "Available ios virtual devices");
 		sims.forEach((target) => events.emit("results", target) );
 	});
@@ -100,16 +100,16 @@ function listSimulators(args)
 
 function aemmSimulatorList()
 {
-	let targetTypes = iossim.getdevicetypes();
-	let filteredList = targetTypes.filter( (item) => 
+	var targetTypes = iossim.getdevicetypes();
+	var filteredList = targetTypes.filter( (item) => 
 	{
-		let components = item.split(", ");
-		let versionNumber = Number(components[1]);
+		var components = item.split(", ");
+		var versionNumber = Number(components[1]);
 		if (versionNumber < 8.0 || (versionNumber >= 9.0 && versionNumber < 9.2))
 		{
 			return false;
 		}
-		return item.startsWith("iPhone") || item.startsWith("iPad") 
+		return item.startsWith("iPhone") || item.startsWith("iPad");
 	});
 	
 	return filteredList;
@@ -127,32 +127,31 @@ var startSimulator = function(target, deviceName, ipAddress, port, projectRootPa
 		.then( function(jupiterPath) {
 			return app.getApplicationSupportPath()
 			.then( (applicationSupportPath) => {
-				let logPath = path.join(applicationSupportPath, `${path.basename(projectRootPath)}.sim.console.log`);
+				var logPath = path.join(applicationSupportPath, `${path.basename(projectRootPath)}.sim.console.log`);
 				// Start a new log whenever we launch sim
 				if (fs.existsSync())
 				{
 					fs.unlinkSync(logPath);
 				}
 				return iossim.launch(jupiterPath, target, logPath, false, args);						
-			})
+			});
 		});
 	});
-}
+};
 
 var getArgs = function(ipAddress, port) 
 {
 	return project.articleList( )
 	.then( (articleList) => {
-		let articleNames = articleList.map( (articleInfo) => articleInfo.metadata.entityName); 
-		let articles = articleNames.join(" ");
-		let args = ["-phonegapServer", ipAddress + ":" + port, "-serveArticles", articles];
+		var articleNames = articleList.map( (articleInfo) => articleInfo.metadata.entityName); 
+		var articles = articleNames.join(" ");
+		var args = ["-phonegapServer", ipAddress + ":" + port, "-serveArticles", articles];
 		return args;
 	});
 	
 // return ["-phonegapServer", ipAddress + ":" + port];
 
-}
-
+};
 
 function modifyBinaryPlist(appPath)
 {

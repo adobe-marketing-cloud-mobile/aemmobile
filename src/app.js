@@ -13,7 +13,6 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
  */
-"use strict";
 
 /**
  * Module dependencies.
@@ -27,7 +26,7 @@ var rp = require('request-promise');
 var os = require('os');
 var downloadFile = require('../utils/downloadFile');
 var url = require('url');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 
 module.exports.getApplicationSupportPath = getApplicationSupportPath;
@@ -41,7 +40,7 @@ function getApplicationSupportPath()
 	} else if (process.platform == 'darwin') {
 		return exec('osascript -e "posix path of (path to application support folder from user domain)"')
 			.then(function (processResponse) {
-				let appSupportPath = path.join(processResponse.stdout.trim(), "com.adobe.aemmobile");
+				var appSupportPath = path.join(processResponse.stdout.trim(), "com.adobe.aemmobile");
 				return appSupportPath;
 			});
 	}
@@ -58,7 +57,7 @@ function getInstalledAppBinaryPath(platform, deviceType)
 			throw new Error(`Invalid platform(${platform}) sent to getInstalledAppBinaryPath())`);
 		}
 		return platformAppBinary.getInstalledAppBinaryPath(deviceType);
-	})
+	});
 }
 
 module.exports.getParentPathForAppBinary = getParentPathForAppBinary;
@@ -66,9 +65,9 @@ function getParentPathForAppBinary(platform, deviceType)
 {
 	return getApplicationSupportPath()
 	.then( function(appSupportPath) {
-		let aemmPath = path.join( appSupportPath, platform, deviceType);
+		var aemmPath = path.join( appSupportPath, platform, deviceType);
 		try {
-			let binaryPath =  fs.realpathSync( aemmPath );
+			var binaryPath =  fs.realpathSync( aemmPath );
 			return binaryPath;
 		} catch (e) 
 		{
@@ -87,7 +86,7 @@ function ensureInstalledBinary(platform, deviceName)
 	})
 	.catch( (err) => {
 		throw Error("You must install downloaded app binary before using this command.  See 'aemm app install'.");
-	})
+	});
 }
 
 module.exports.version = displayAppVersion;
@@ -102,7 +101,7 @@ function displayAppVersion(options, platform)
 			return platformAppBinary.getAppVersion(deviceType)
 			.then( (appVersion) => {
 				events.emit('log', `${platform} version:\n${appVersion ? appVersion : "No app install for ios."}\n`);
-			})	
+			});
 		});
 		
 		return Q.all(promises)
@@ -120,7 +119,7 @@ function install(options, urlOrFilepathOrPlatform, appVersion)
 		}
 		const deviceType = "emulator";
 
-		let installPromise = null;
+		var installPromise = null;
 		if (urlOrFilepathOrPlatform === "ios" || urlOrFilepathOrPlatform === "android")
 		{
 			installPromise =  installFromServerInConfig(urlOrFilepathOrPlatform, deviceType, appVersion);
@@ -131,7 +130,7 @@ function install(options, urlOrFilepathOrPlatform, appVersion)
 		}
 		else
 		{
-			events.emit("warn", `You need to indicate a plaftorm for the app you would like to install.\n\tPlease see your options below:`)
+			events.emit("warn", `You need to indicate a plaftorm for the app you would like to install.\n\tPlease see your options below:`);
 			return listAppVersions();
 		}
 	
@@ -145,9 +144,9 @@ function installFromServerInConfig(platform, deviceType, specificVersion)
 	return Q.fcall( () => {
 		return rp( remoteBinaryVersionsUrl() )
 		.then( (response) => {
-			let versions = JSON.parse( response );
+			var versions = JSON.parse( response );
 			const versionDict = versions[platform];
-			const getVersion = specificVersion || versionDict["latest"];
+			const getVersion = specificVersion || versionDict.latest;
 			const appUrl = versionDict[getVersion];
 			
 			if (!appUrl)
@@ -169,8 +168,8 @@ function installFromFile(version, urlOrFilepath, deviceType)
 {
 	return Q.fcall( () => {
 		// determine platform from type of file
-		let ext = path.extname(urlOrFilepath).toLowerCase();
-		let platform = null;
+		var ext = path.extname(urlOrFilepath).toLowerCase();
+		var platform = null;
 		if (ext === ".ipa")
 		{
 			platform = "ios";
@@ -183,7 +182,7 @@ function installFromFile(version, urlOrFilepath, deviceType)
 				
 		if (platform)
 		{
-			let foundUrl = urlOrFilepath.match(/http[s]?:\/\//);
+			var foundUrl = urlOrFilepath.match(/http[s]?:\/\//);
 			if (foundUrl)
 			{
 				events.emit("log", `Downloading ${urlOrFilepath}`);
@@ -203,7 +202,7 @@ function installFromFile(version, urlOrFilepath, deviceType)
 module.exports.installFromUrl = installFromUrl;
 function installFromUrl(platform, version, appUrl, deviceType)
 {
-	let tmpIpaFile = path.join(os.tmpdir(), "appBinary");
+	var tmpIpaFile = path.join(os.tmpdir(), "appBinary");
     const resolvedUrl = url.resolve(remoteBinaryVersionsUrl(), appUrl);
 	return downloadFile(resolvedUrl, tmpIpaFile)
 	.then( () => {
@@ -218,7 +217,7 @@ function listAppVersions(platform)
 	return Q.fcall( () => {
 		return rp( remoteBinaryVersionsUrl() )
 		.then( (response) => {
-			let versions = JSON.parse( response );
+			var versions = JSON.parse( response );
 			if (platform && versions[platform])
 			{
 				logVersions(platform, versions[platform]);
@@ -256,11 +255,11 @@ function update(options, optionalPlatform)
 
 	return rp( remoteBinaryVersionsUrl() ) 
 	.then( (response) => {
-		let versionInfo = JSON.parse( response );
+		var versionInfo = JSON.parse( response );
 		
 		const platformList = optionalPlatform ? [optionalPlatform] : ["ios", "android"];
 		
-		let promise = Q();
+		var promise = Q();
 		platformList.forEach( (platform) => {
 			promise = promise.then( () => {
 				const platformAppBinary = platformRequire("app", platform);
@@ -276,16 +275,16 @@ function update(options, optionalPlatform)
 						return false;
 					}
 					const platformVersions = versionInfo[platform];
-					if (appVersion !== platformVersions["latest"])
+					if (appVersion !== platformVersions.latest)
 					{
-						let latest = platformVersions[platformVersions["latest"]];
+						var latest = platformVersions[platformVersions.latest];
 						if (!latest)
 						{
 							throw new Error("Could not determine latest update.  Please install specific version.  See 'aemm help app' for more info");
 						}
-						return installFromFile(platformVersions["latest"], latest, deviceType);
+						return installFromFile(platformVersions.latest, latest, deviceType);
 					} else {
-						events.emit("log", `${platform} app binary is up to date.`)
+						events.emit("log", `${platform} app binary is up to date.`);
 					}
 					return false;
 				});

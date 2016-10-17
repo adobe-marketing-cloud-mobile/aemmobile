@@ -13,12 +13,11 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict"
 
 var cli = require("../src/aemm-cli");
 var Q = require('q');
 var project = require('../src/project');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 var logger = require('cordova-common').CordovaLogger.get();
 
@@ -35,7 +34,7 @@ describe("aemm cli project", function () {
             return new FakeEvents();
         };
 
-        spyOn(events, "on").andReturn(new FakeEvents());
+        spyOn(events, "on").and.returnValue(new FakeEvents());
        
         // Spy and mute output
         spyOn(logger, 'results');
@@ -51,7 +50,7 @@ describe("aemm cli project", function () {
         });
 
         it("will call project create", function (done) {
-            let projectName = "TestProject";
+            var projectName = "TestProject";
             cli(["node", "aemm", "project", "create", projectName], () => {
                 expect(project.create).toHaveBeenCalledWith({ argv : { remain : [ 'TestProject' ], cooked : [ 'project', 'create', 'TestProject' ], original : [ 'project', 'create', 'TestProject' ], undashed : [ 'project', 'create', 'TestProject' ] } }, 'TestProject');
                 done();

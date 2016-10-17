@@ -13,12 +13,11 @@
     See the License for the specific language governing permissions and
     limitations under the License.
  */
-"use strict"
 
 var cli = require("../src/aemm-cli");
 var Q = require('q');
 var article = require('../src/article');
-var cordova_lib = require('cordova-lib');
+var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 var logger = require('cordova-common').CordovaLogger.get();
 
@@ -35,7 +34,7 @@ describe("aemm cli article:", function () {
             return new FakeEvents();
         };
 
-        spyOn(events, "on").andReturn(new FakeEvents());
+        spyOn(events, "on").and.returnValue(new FakeEvents());
        
         // Spy and mute output
         spyOn(logger, 'results');
@@ -51,22 +50,12 @@ describe("aemm cli article:", function () {
         });
 
         it("will call article create", function (done) {
-            let articleName = "TestArticle";
+            var articleName = "TestArticle";
             cli(["node", "aemm", "article", "create", articleName], (err) => {
                 expect(err).not.toBeTruthy();
                 expect(article.create).toHaveBeenCalledWith({ argv : { remain : [ 'TestArticle' ], cooked : [ 'article', 'create', 'TestArticle' ], original : [ 'article', 'create', 'TestArticle' ], undashed : [ 'article', 'create', 'TestArticle' ] } }, 'TestArticle');
                 done();
             });
         });
-
     });
-/*
-        // Ignoring negative tests.
-        it("will fail if an invalid subcommand is called", function (done) {
-            cli(["node", "aemm", "article", "bogus"], (err) => {
-                expect(err.message).toBe("aemm article does not have a subcommand of 'bogus'; try 'aemm help article' for a list of all the available sub commands within article.");
-                done();
-            });
-        });
-*/
 });

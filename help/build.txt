@@ -1,8 +1,8 @@
-Usage: aemm build <platform>
+Usage: aemm build <platform> 
 
 Description:
 
-  Builds a binary for the indicated platform.
+  Builds a binary for the indicated platform(s).
 
 Options:
 
@@ -11,10 +11,12 @@ Options:
   --emulator           Builds for emulator architectures (some platforms require different architectures for an emulator build). 
                        May not be used with the --device option. This is the default option.
   --device             Builds for device architectures. May not be used with the emulator option.
+  --buildFlag          (iOS only) Allows you to pass flags or settings to xcodebuild
 
 Examples:
 
-  $ aemm build ios
-  $ aemm build android
-  $ aemm build ios --release --device
+  $ aemm build
+  $ aemm build ios android
+  $ aemm build android --release --device
+  $ aemm build ios --buildFlag=GCC_WARN_INHIBIT_ALL_WARNINGS=YES
   

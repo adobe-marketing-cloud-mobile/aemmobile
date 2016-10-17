@@ -13,33 +13,20 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
-var cordova_lib = require('cordova-lib'),
+var cordova_lib = require('../lib/cordova').lib,
     cordova = cordova_lib.cordova;
 
 module.exports.build = build;
 
-function build(args)
+function build(opts)
 {
     return Q.fcall( () => {
         var cmd = "build";
-        var opts = {
-            platforms: [ "android" ],
-            options: [],
-            verbose: false,
-            silent: false,
-            browserify: false,
-            fetch: false,
-            nohooks: [],
-            searchpath : ""
-        };
-
-        opts.options = args;
-        opts.options.argv = [];
+        opts.platforms = [ "android" ];
 
         return cordova.raw[cmd].call(null, opts);
     });
-};
+}
 

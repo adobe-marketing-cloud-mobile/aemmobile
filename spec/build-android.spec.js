@@ -15,21 +15,25 @@
  */
 
 var Q = require('q');
-var platformRequire = require('../utils/platformRequire');
-var project = require('./project');
+var rewire = require('rewire');
+var cordova = require('cordova-lib').cordova;
+var build_android = rewire('../src/build-android');
 
-module.exports = run;
 
-function run(opts) 
-{
-	return project.projectRootPath()
-	.then( () => {
-		var platformRun = platformRequire("run", opts.platforms[0]);
+describe('build-android', function() {
+    var build = build_android.__get__('build');
 
-		// We don't want to kill the process after run returns
-		opts.killProcessAfterCommand = false;
-		
-		return platformRun(opts);
-	});
-}
+    beforeEach(function () {
+        spyOn(cordova.raw, 'build');
+    });
 
+    describe('build method', function() {
+        it('should call cordova build', function(done) {
+            return build({})
+            .then( () =>{
+                expect(cordova.raw.build.calls.argsFor(0)[0].platforms).toEqual(['android']);
+                done();
+            });
+        });
+    });
+});

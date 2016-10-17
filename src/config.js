@@ -13,38 +13,41 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-"use strict";
 
 var Q = require('q');
 var path = require('path');
 var jsonfile = require('jsonfile');
 var project = require('./project');
+var cordova_lib = require('../lib/cordova').lib;
+var events = cordova_lib.events;
 
 var pathToProjectConfig = null;
-var file = null;
+var configFile = null;
 
 module.exports = config;
-function config(options, args)
+function config(opts)
 {
-    var getKey = options.get;
-    var setKey = options.set;
-    var unsetKey = options.unset;
+    opts = opts || {};
+    opts.options = opts.options || {};
+    var getKey = opts.options.get;
+    var setKey = opts.options.set;
+    var unsetKey = opts.options.unset;
 
     return getConfigFile()
-    .then( (file) => {
-        if (options.list)
+    .then( (configFile) => {
+        if (opts.options.list)
         {
-            if (!file)
+            if (!configFile)
             {
                 throw new Error("No valid config file found.");
             }
             else
             {
-                events.emit("log", file);
+                events.emit("log", configFile);
                 return Q();
             }
         }
-        if (options.get)
+        if (opts.options.get)
         {
             return getValueFromConfig(getKey)
             .then( (val) => {
@@ -52,17 +55,17 @@ function config(options, args)
                 return Q();
             });
         }
-        if (options.set)
+        if (opts.options.set)
         {
-            return setValueInConfig(setKey, args);
+            return setValueInConfig(setKey, opts.options.argv);
         }
-        if (options.unset)
+        if (opts.options.unset)
         {
             return removeKeyFromConfig(unsetKey);
         }
         else
         {
-            throw new Error("Unrecognized command. See `aemm help config` for correct usage.")
+            throw new Error("Unrecognized command. See `aemm help config` for correct usage.");
         }
     });
 }
@@ -71,21 +74,19 @@ module.exports.getValueFromConfig = getValueFromConfig;
 function getValueFromConfig(key)
 {
     return getConfigFile()
-    .then( (file) => {
-        return Q(file[`${key}`]);
+    .then( (configFile) => {
+        return Q(configFile[`${key}`]);
     });
 }
 
 function setValueInConfig(key, value)
 {
-    var projectConfig = null;
     return getPathToProjectConfig()
     .then( (pathToProjectConfig) => {
-        projectConfig = pathToProjectConfig;
         return getConfigFile()
-        .then( (file) => {
-            file[`${key}`] = value;
-            jsonfile.writeFileSync(pathToProjectConfig, file);
+        .then( (configFile) => {
+            configFile[`${key}`] = value;
+            jsonfile.writeFileSync(pathToProjectConfig, configFile);
             return Q();
         });
     });
@@ -93,14 +94,12 @@ function setValueInConfig(key, value)
 
 function removeKeyFromConfig(key)
 {
-    var projectConfig = null;
     return getPathToProjectConfig()
     .then( (pathToProjectConfig) => {
-        projectConfig = pathToProjectConfig;
         return getConfigFile()
-        .then( (file) => {
-            delete file[`${key}`];
-            jsonfile.writeFileSync(projectConfig, file);
+        .then( (configFile) => {
+            delete configFile[`${key}`];
+            jsonfile.writeFileSync(pathToProjectConfig, configFile);
             return Q();
         });
     });
@@ -108,23 +107,26 @@ function removeKeyFromConfig(key)
 
 function getPathToProjectConfig()
 {
-    return project.projectRootPath()
-    .then( (projectRootPath) => {
-        if (!pathToProjectConfig) {
-            pathToProjectConfig = path.join(projectRootPath, "config.json");
-        }
+    if (pathToProjectConfig) {
         return Q(pathToProjectConfig);
-    });
+    } else {
+        return project.projectRootPath()
+        .then( (projectRootPath) => {
+            pathToProjectConfig = path.join(projectRootPath, "config.json");
+            return Q(pathToProjectConfig);
+        });
+    }
 }
 
 function getConfigFile()
 {
-    return getPathToProjectConfig()
-    .then( (pathToProjectConfig) => {
-        if (!file)
-        {
+    if (configFile) {
+        return Q(configFile);
+    } else {
+        return getPathToProjectConfig()
+        .then( (pathToProjectConfig) => {
             try {
-                file = require(pathToProjectConfig);
+                configFile = require(pathToProjectConfig);
             } catch (err) {
                 // It's not a problem if the file is non-existent, just give them an empty object to get started.
                 if (err.code == 'MODULE_NOT_FOUND') {
@@ -132,7 +134,7 @@ function getConfigFile()
                 }
                 throw err;
             }
-        }
-        return Q(file);
-    });
+            return Q(configFile);
+        });
+    }
 }
