@@ -20,6 +20,23 @@
 -->
 # aemm Release Notes
 
+## 2.1.0 (Oct 17, 2016)
+
+### Features
+* [Issue 33](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/33) Platforms at arbitrary git locations or local directories can now be added.
+* [Issue 26](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/26) Grab the latest tagged release of platforms, allow user to declare a version.
+* Notify users if a newer version of AEMM is available.
+* Add --no-samples flag for creating projects without sample articles.
+* Add continuous integration and code coverage.
+
+### Bug Fixes
+* [Issue 48](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/48) Allow args after '--' to be passed through.
+* [Issue 45](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/45) Errors now instruct user to use `aemm help` instead of `cordova help`.
+* [Issue 30](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/30) Improve messaging regarding Xcode's signing policy.
+* [Issue 29](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/29) Errors now instruct user to use `aemm help` instead of `cordova help`.
+* [Issue 28](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/28) Install core iOS plugins when platform is added.
+* [Issue 21](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/21) Instruct user if they are using aemm commands on a non-aemm project.
+
 ## 2.0.1 (Jul 21, 2016)
 
 ### Bug Fixes
