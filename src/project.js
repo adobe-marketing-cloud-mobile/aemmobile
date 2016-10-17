@@ -41,14 +41,13 @@ function create(options, projectPath)
 		fullProjectPath = path.resolve(projectPath);
 		events.emit("log", `Creating project ${path.basename(fullProjectPath)}`);
 	})
-	.then( () => createCordovaApp(projectPath) )
+	.then( () => createCordovaApp(fullProjectPath) )
 	.then( () => removeUnwantedCordovaArtifacts(fullProjectPath) )
 	.then( () => populateProjectMetadata(fullProjectPath) )
 	.then( () => {
 		// Only skip the samples if we are explicitly asked to skip them. (null is assumed to mean true)
-		return (options.samples !== false) ? createAEMMScaffolding(fullProjectPath) : Q(); 
+		return (options.samples !== false) ? createAEMMScaffolding(fullProjectPath) : preserveWwwDir(fullProjectPath); 
 	});
-	
 }
 
 module.exports.projectRootPath = projectRootPath;
@@ -133,6 +132,12 @@ function removeUnwantedCordovaArtifacts(appPath)
 		FS.removeTree(path.join( appPath, "www", "img")),
 		FS.removeTree(path.join( appPath, "www", "js"))
 	]); 
+}
+
+function preserveWwwDir(fullProjectPath)
+{
+	var placeholderPath = path.join(fullProjectPath, 'www', '.placeholder');
+	return FS.write(placeholderPath, '# This file guarantees that the www directory will remain.');
 }
 
 function createAEMMScaffolding(fullProjectPath)
