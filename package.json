@@ -60,7 +60,9 @@
   "homepage": "https://github.com/adobe-marketing-cloud-mobile/aemmobile#readme",
   "main": "aemm",
   "contributors": [
-    "name": "Andrew Zellman",
-    "email": "andrew.zellman@gmail.com"
+    {
+      "name": "Andrew Zellman",
+      "email": "andrew.zellman@gmail.com"
+    }
   ]
 }
