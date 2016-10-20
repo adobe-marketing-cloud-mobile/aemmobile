@@ -1,6 +1,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/mc3stvfqt98mmlnk/branch/master?svg=true)](https://ci.appveyor.com/project/adzellman/aemmobile-ju6lf)
 [![Build Status](https://travis-ci.org/adobe-marketing-cloud-mobile/aemmobile.svg?branch=master)](https://travis-ci.org/adobe-marketing-cloud-mobile/aemmobile)
 [![codecov.io](https://codecov.io/github/adobe-marketing-cloud-mobile/aemmobile/coverage.svg?branch=master)](https://codecov.io/github/adobe-marketing-cloud-mobile/aemmobile?branch=master)
+[![bitHound Overall Score](https://www.bithound.io/github/adobe-marketing-cloud-mobile/aemmobile/badges/score.svg)](https://www.bithound.io/github/adobe-marketing-cloud-mobile/aemmobile)
 [![NPM](https://nodei.co/npm/aemm.png)](https://nodei.co/npm/aemm/)
 
 # AEM Mobile
