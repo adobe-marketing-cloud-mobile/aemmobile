@@ -39,7 +39,7 @@ You need npm installed to run the command line tool. On Windows, run commands in
 2.  Install aemm:
 	
 ~~~~
-	npm install -g aemm
+	sudo npm install -g aemm
 ~~~~
 	
 If that doesn't work, do the following...
@@ -51,8 +51,8 @@ If that doesn't work, do the following...
 ~~~~
 	git clone https://github.com/adobe-marketing-cloud-mobile/aemmobile.git
 	cd aemmobile
-	npm -g install
-	npm link
+	sudo npm -g install
+	sudo npm link
 ~~~~
 
 For Android, you may see a couple compilation errors related to node-gyp when running "npm install" on Mac OS X and Windows.
@@ -61,9 +61,9 @@ It's safe to ignore them. They don't affect the functionalities of this tool.
 If the installation fails due to errors with a specific module, troubleshoot by clearing your npm cache and reinstalling.  
 
 ~~~~
-	npm remove -g aemm
-	npm cache clean
-	npm install -g aemm
+	sudo npm remove -g aemm
+	sudo npm cache clean
+	sudo npm install -g aemm
 ~~~~
 
 This will resolve current issues with the npm async module.
@@ -79,10 +79,12 @@ Commands for both workflows:
 
 `aemm platform install <platform>`
 
-    aemm platform install android
+    sudo aemm platform install android
  
 Accept several Android SDK license agreements. This installs and updates various Android SDKs, build tools and setup system environment for developing Android application.
 You may need to open a new terminal to have the new system environment settings take effect.
+
+	sudo aemm platform install ios
 
 `aemm project create [PROJECT_NAME or PATH]`
 

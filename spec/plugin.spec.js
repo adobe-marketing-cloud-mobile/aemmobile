@@ -16,7 +16,7 @@
 
 var Q = require('q');
 var rewire = require('rewire');
-var cordova = require('cordova-lib').cordova;
+var cordova = require('../lib/cordova').lib.cordova;
 var plugin = rewire('../src/plugin');
 var project = require('../src/project');
 
@@ -44,9 +44,9 @@ describe('plugin', function() {
                 throw new Error("cordova plugin error");
             });
 
-            this.wrapperError(pluginFn(), "cordova plugin error", done, function() {});
+            this.wrapperError(pluginFn(), done, function(err) {
+                expect(err.message).toEqual("cordova plugin error");
+            });
         });
-
     });
-
 });

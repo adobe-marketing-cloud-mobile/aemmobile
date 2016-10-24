@@ -21,12 +21,13 @@ beforeEach(function() {
         }).fin(done);
     };
 
-    this.wrapperError = function (p, message, done, post) {
-        p.then(post, function(err) {
+    this.wrapperError = function (p, done, post) {
+        p.then(function() {
+            fail("Expected an error to be thrown, but there was none.");
+        }, function(err) {
+            expect(err).toBeDefined();
             expect(err.stack).toBeDefined();
-            if (message) {
-                expect(err.message).toEqual(message);
-            }
+            return post(err);
         }).fin(done);
     };
 });

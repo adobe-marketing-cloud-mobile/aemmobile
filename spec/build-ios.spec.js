@@ -16,7 +16,7 @@
 
 var Q = require('q');
 var rewire = require('rewire');
-var cordova = require('cordova-lib').cordova;
+var cordova = require('../lib/cordova').lib.cordova;
 var build_ios = rewire('../src/build-ios');
 
 describe('build-ios', function() {
@@ -54,7 +54,8 @@ describe('build-ios', function() {
             var platform = require('../src/platform-ios');
             spyOn(platform, 'isCodeSigningDisabled').and.returnValue(Q(false));
             var errorMessage = "CODE_SIGNING_REQUIRED must be set to NO in order to build for device.\nYou can resolve this by running `aemm platform install ios`.";
-            this.wrapperError(build({ 'options': { 'device' : true }}), errorMessage, done, function() { 
+            this.wrapperError(build({ 'options': { 'device' : true }}), done, function(err) { 
+                expect(err.message).toEqual(errorMessage);
                 expect(platform.isCodeSigningDisabled).toHaveBeenCalled();
                 expect(cordova.raw.build.calls.argsFor(0)[0].platforms).toEqual(['ios']);
                 expect(cordova.raw.build.calls.argsFor(0)[0].options.device).toEqual(true);

@@ -57,11 +57,15 @@ describe('build', function () {
         });
 
         it('should error if there are no platforms', function(done) {
-            this.wrapperError(build(), 'This is the "no platforms" error', done, function () {});
+            this.wrapperError(build(), done, function (err) {
+                expect(err.message).toEqual('This is the "no platforms" error');
+            });
         });
 
         it('should error if illegal platforms are passed in', function(done) {
-            this.wrapperError(build({ 'platforms' : [ 'notPlatform' ]}), 'Invalid platform - notPlatform', done, function () {});
+            this.wrapperError(build({ 'platforms' : [ 'notPlatform' ]}), done, function (err) {
+                expect(err.message).toEqual('Invalid platform - notPlatform');
+            });
         });
     });
 });

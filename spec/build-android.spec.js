@@ -16,7 +16,7 @@
 
 var Q = require('q');
 var rewire = require('rewire');
-var cordova = require('cordova-lib').cordova;
+var cordova = require('../lib/cordova').lib.cordova;
 var build_android = rewire('../src/build-android');
 
 
