@@ -18,7 +18,7 @@ var Q = require('q');
 var path = require('path');
 var rewire = require('rewire');
 var jsonfile = require('jsonfile');
-var events = require('cordova-lib').events;
+var events = require('../lib/cordova').lib.events;
 var config = rewire('../src/config');
 var project = require('../src/project');
 
@@ -78,7 +78,9 @@ describe('config', function() {
                     return Q(null);
                 }));
                 
-                this.wrapperError(configFn(opts), 'No valid config file found.', done, function() { });
+                this.wrapperError(configFn(opts), done, function(err) {
+                    expect(err.message).toEqual('No valid config file found.');
+                });
             });
         });
 
@@ -155,7 +157,9 @@ describe('config', function() {
         describe('with no flags', function() {
             it('should throw an error', function(done) {
                 var errMsg = 'Unrecognized command. See `aemm help config` for correct usage.';
-                this.wrapperError(configFn(), errMsg, done, function() {});
+                this.wrapperError(configFn(), done, function(err) {
+                    expect(err.message).toEqual(errMsg);
+                });
             });
         });
     });
@@ -269,7 +273,9 @@ describe('config', function() {
                 throw Error("Some other error");
             }));
 
-            this.wrapperError(getConfigFile(), "Some other error", done, function() {});
+            this.wrapperError(getConfigFile(), done, function(err) {
+                expect(err.message).toEqual("Some other error");
+            });
         });
     });
 });

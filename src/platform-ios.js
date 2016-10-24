@@ -18,12 +18,13 @@
  * Module dependencies.
  */
 var Q = require('q');
+var path = require('path');
 var exec = require('child-process-promise').exec;
 var cordova_lib = require('../lib/cordova').lib;
 var cordova = cordova_lib.cordova;
 var events = cordova_lib.events;
-var path = require('path');
-var shell = require('shelljs');
+
+var settingsPlist;
 
 module.exports.install = install;
 function install()
@@ -34,14 +35,14 @@ function install()
 			return Q();
 		})
 		.catch( (err) => {
-			events.emit("warn", "You must install Xcode to run in the simulator.  You can get it from the Mac App Store.");
+			throw new Error('You must install Xcode to run in the simulator.  You can get it from the Mac App Store.');
 		});
 	})
 	.then( () => {
 		return disableCodeSigning();
 	})
 	.then( () => {
-		events.emit("log", "The ios platform is ready to use.");
+		events.emit('log', 'The ios platform is ready to use.');
 		return Q();
 	});
 }
@@ -50,44 +51,47 @@ module.exports.post_add = post_add;
 function post_add()
 {
     return Q.fcall( () => {
-		events.emit("info", "Ensuring core AEM Mobile plugins are installed.");
+		events.emit('info', 'Ensuring core AEM Mobile plugins are installed.');
         var targets = [
-			"aemm-plugin-navto",
-			"aemm-plugin-inappbrowser",
-			"aemm-plugin-fullscreen-video",
-			"aemm-plugin-html-contract"
+			'aemm-plugin-navto',
+			'aemm-plugin-inappbrowser',
+			'aemm-plugin-fullscreen-video',
+			'aemm-plugin-html-contract'
 			];
-        return cordova.raw.plugin("add", targets);
+        return cordova.raw.plugin('add', targets);
     })
 	.then( function () {
-		events.emit("results", "Finished adding ios platform.");	
+		events.emit('results', 'Finished adding ios platform.');	
 	});
 }
 
 function disableCodeSigning() {
-	var settingsPlist = null;
-	return getSDKSettingsPlist()
-	.then( (sdkSettingsPlist) => {
-		settingsPlist = sdkSettingsPlist;
-		return isCodeSigningDisabled(settingsPlist);
-	})
+	return isCodeSigningDisabled()
 	.then( (codeSigningDisabled) => {
 		if (!codeSigningDisabled) {
-			return changeCodeSigningPolicy(settingsPlist);
+			return changeCodeSigningPolicy('NO')
+			.then( () => {
+				return isCodeSigningDisabled();
+			})
+			.catch( () => { 
+					// sudo script didn't work
+					events.emit('warn', 'aemm tried to fix your code signing properties in Xcode, but was unable to.');
+					events.emit('warn', 'Please run the following command:');
+					events.emit('warn', 'sudo /usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED NO" "$(xcode-select -p)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist"');
+					throw new Error('Changing code signing policy failed. Please see the message above.');
+			});
 		} 
 	});
 }
 
 module.exports.isCodeSigningDisabled = isCodeSigningDisabled;
-function isCodeSigningDisabled(settingsPlist) {
-	return Q().then( () => {
-		return settingsPlist ? Q(settingsPlist) : getSDKSettingsPlist();
-	})
-	.then( (settingsPlist) => {
+function isCodeSigningDisabled() {
+	return loadSdkSettingsPlist()
+	.then( () => {
 		return exec('/usr/libexec/PlistBuddy -c "Print DefaultProperties:CODE_SIGNING_REQUIRED" ' + settingsPlist);
 	})
 	.then( (codeSigningRequired) => {
-		if (codeSigningRequired.stdout.trim() === "NO") {
+		if (codeSigningRequired.stdout.trim() === 'NO') {
 			return Q(true);
 		} else {
 			return Q(false);
@@ -95,33 +99,39 @@ function isCodeSigningDisabled(settingsPlist) {
 	});
 }
 
-function changeCodeSigningPolicy(settingsPlist, enabled) {
-	return Q().then( () => {
-		events.emit("info", "aemm requires Xcode to allow building unsigned frameworks.");
-		events.emit("info", "sudo may prompt you for your password to change Xcode's code signing policy.");
-	})
-	.then( () => {
-		var deferred = Q.defer();
-		var val = (enabled || enabled !== "NO") ? "YES" : "NO";
-		var command = 'sudo ' + '/usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED ' + val + '" ' + settingsPlist;
+function changeCodeSigningPolicy(required) {
+	var codeSigningRequired = ((required === true) || (required !== 'NO')) ? 'YES' : 'NO';
+	return loadSdkSettingsPlist()
+	.then( () => isCodeSigningDisabled() )
+	.then( (codeSigningDisabled) => {
+		// We only need to change it if it's not already the value we want.
+		if (codeSigningDisabled === (codeSigningRequired === 'YES')) {
+			events.emit('info', 'aemm requires Xcode to allow building unsigned frameworks.');
+			events.emit('info', 'sudo may prompt you for your password to change the Xcode code signing policy.');
 		
-		shell.exec(command, {
-			silent: false
-		}, function (code, output) {
-			if (code === 0) {
-				deferred.resolve();
-			} else {
-				deferred.reject(new Error("Changing code signing policy failed. Please see the message above."));
-			}
-		});
+			var command = 'sudo ' + '/usr/libexec/PlistBuddy -c "Set DefaultProperties:CODE_SIGNING_REQUIRED ' + codeSigningRequired + '" ' + settingsPlist;
 
-		return deferred.promise;
+			return exec(command)
+			.then( () => isCodeSigningDisabled())
+			.then( (codeSigningDisabled) => {
+				if (codeSigningDisabled === (codeSigningRequired === 'YES')) {
+					throw new Error('aemm was unable to change the Xcode code signing policy.');
+				}
+			});
+		} else {
+			events.emit('verbose', 'CODE_SIGNING_REQUIRED was already set to the desired value.');
+		}
 	});
 }
 
-function getSDKSettingsPlist() {
-	return exec('xcode-select -p')
-	.then( (result) => {
-		return Q(path.resolve(result.stdout.trim(), 'Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist'));
-	});
+function loadSdkSettingsPlist() {
+	if (settingsPlist) {
+		return Q();
+	} else {
+		return exec('xcode-select -p')
+		.then( (result) => {
+			settingsPlist = path.join(result.stdout.trim(), 'Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist');
+			return Q();
+		});
+	}
 }
