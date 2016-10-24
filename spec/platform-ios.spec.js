@@ -255,7 +255,7 @@ describe('platform-ios', function() {
             fileResets.push(platform_ios.__set__('exec', execSpy));
 
             this.wrapper(loadSdkSettingsPlist(), done, function() {
-                var fullResultPath = path.join('/test', 'Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist');
+                var fullResultPath = path.resolve('/test/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist');
 
                 expect(execSpy.calls.argsFor(0)[0]).toEqual('xcode-select -p');
                 expect(platform_ios.__get__('settingsPlist')).toEqual(fullResultPath);
