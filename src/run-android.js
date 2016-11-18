@@ -34,7 +34,7 @@ var constants = require('../utils/constants');
 module.exports = run;
 
 function run(opts) {
-    var deviceName = opts.device ? "device" : "emulator";
+    var deviceName = opts.options.device ? "device" : "emulator";
 
     if (deviceName == "device") {
         return runOnDevice();
