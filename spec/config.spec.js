@@ -69,7 +69,7 @@ describe('config', function() {
             it('should log the contents of the config file', function(done) {
                 this.wrapper(configFn(opts), done, function() {
                     expect(events.emit.calls.argsFor(0)[0]).toEqual('log');
-                    expect(events.emit.calls.argsFor(0)[1]).toEqual({ 'fakeKey' : 'fakeValue' });
+                    expect(events.emit.calls.argsFor(0)[1]).toEqual('{"fakeKey":"fakeValue"}');
                 });
             });
 
@@ -105,10 +105,45 @@ describe('config', function() {
             });
         });
 
+        describe('get value missing', function() {
+            var opts = {
+                'options' : {
+                    'get' : 'foo'
+                }
+            };
+
+            beforeEach(function() {
+                fileResets.push(config.__set__('getValueFromConfig', function() {
+                    return Q(undefined);
+                }));
+            });
+
+            it('should warn the user', function(done) {
+                this.wrapper(configFn(opts), done, function() {
+                    expect(events.emit.calls.argsFor(0)[0]).toEqual('warn');
+                    expect(events.emit.calls.argsFor(0)[1]).toEqual('foo is not set.');
+                });
+            });
+        });
+
+        describe('empty string get key', function() {
+            var opts = {
+                'options' : {
+                    'get' : ''
+                }
+            };
+
+            it('should throw an error', function(done) {
+                this.wrapperError(configFn(opts), done, function() {
+                    expect(err.message).toEqual("`aemm config --get` must be passed a key. See `aemm help config` for more info.");
+                });
+            });
+        });
+
         describe('set', function() {
             var opts = {
                 'options' : {
-                    'argv' : ['the value to set'],
+                    'setValue' : 'the value to set',
                     'set' : 'the key to set'
                 }
             };
@@ -125,7 +160,35 @@ describe('config', function() {
             it('should set the value in the config', function(done) {
                 this.wrapper(configFn(opts), done, function() {
                     expect(setSpy.calls.mostRecent().args[0]).toEqual('the key to set');
-                    expect(setSpy.calls.mostRecent().args[1][0]).toEqual('the value to set');
+                    expect(setSpy.calls.mostRecent().args[1]).toEqual('the value to set');
+                });
+            });
+        });
+
+        describe('empty string set key', function() {
+            var opts = {
+                'options' : {
+                    'set' : ''
+                }
+            };
+
+            it('should throw an error', function(done) {
+                this.wrapperError(configFn(opts), done, function() {
+                    expect(err.message).toEqual("`aemm config --set` must be passed a key and a value. See `aemm help config` for more info.");
+                });
+            });
+        });
+
+        describe('missing set value', function() {
+            var opts = {
+                'options' : {
+                    'set' : 'foo'
+                }
+            };
+
+            it('should throw an error', function(done) {
+                this.wrapperError(configFn(opts), done, function() {
+                    expect(err.message).toEqual("`aemm config --set` must be passed a key and a value. See `aemm help config` for more info.");
                 });
             });
         });
@@ -150,6 +213,20 @@ describe('config', function() {
             it('should unset the value in the config', function(done) {
                 this.wrapper(configFn(opts), done, function() {
                     expect(removeSpy.calls.mostRecent().args[0]).toEqual('the key to unset');
+                });
+            });
+        });
+
+        describe('empty string unset key', function() {
+            var opts = {
+                'options' : {
+                    'unset' : ''
+                }
+            };
+
+            it('should throw an error', function(done) {
+                this.wrapperError(configFn(opts), done, function() {
+                    expect(err.message).toEqual("`aemm config --unset` must be passed a key. See `aemm help config` for more info.");
                 });
             });
         });

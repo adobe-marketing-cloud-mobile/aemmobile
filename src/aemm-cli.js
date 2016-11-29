@@ -202,6 +202,10 @@ function cli(inputArgs)
             opts.options = args;
             opts.options.argv = unparsedArgs;
             return cmd.call(null, platform, file, opts);
+        } else if (cmd.name === 'config') {
+            opts.options = args;
+            opts.options.setValue = undashed[1];
+            return cmd.call(null, opts);
         } else {
             opts.platforms = undashed.slice(1);
             opts.options = args;

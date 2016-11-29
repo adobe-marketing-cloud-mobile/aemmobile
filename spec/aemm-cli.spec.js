@@ -23,6 +23,7 @@ var logger = require('cordova-common').CordovaLogger.get();
 var cli = rewire("../src/aemm-cli");
 var build = require('../src/build');
 var plugin = require('../src/plugin');
+var config = require('../src/config');
 
 describe("aemm-cli", function () {
 
@@ -115,6 +116,14 @@ describe("aemm-cli", function () {
             spyOn(plugin, 'call');
             cliMethod(['node', 'aemm', 'plugin', 'add', 'plugin1', 'plugin2']);
             expect(plugin.call).toHaveBeenCalledWith(null, 'add', ['plugin1', 'plugin2']);
+            done();
+        });
+
+        it('should call the config command', function(done) {
+            spyOn(config, 'call');
+            cliMethod(['node', 'aemm', 'config', '--set', 'fakeSetKey', 'fakeSetValue']);
+            expect(config.call.calls.argsFor(0)[1].options.set).toEqual('fakeSetKey');
+            expect(config.call.calls.argsFor(0)[1].options.setValue).toEqual('fakeSetValue');
             done();
         });
 
