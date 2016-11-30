@@ -43,24 +43,38 @@ function config(opts)
             }
             else
             {
-                events.emit("log", configFile);
+                events.emit("log", JSON.stringify(configFile));
                 return Q();
             }
         }
-        if (opts.options.get)
+        if (opts.options.get || opts.options.get === "")
         {
+            if (opts.options.get === "")
+            {
+                throw new Error("`aemm config --get` must be passed a key. See `aemm help config` for more info.");
+            }
             return getValueFromConfig(getKey)
             .then( (val) => {
-                events.emit("log", val);
+                if (val === undefined) {
+                    events.emit("warn", getKey + " is not set.");
+                } else {
+                    events.emit("log", val);
+                }
                 return Q();
             });
         }
-        if (opts.options.set)
+        if (opts.options.set || opts.options.set === "")
         {
-            return setValueInConfig(setKey, opts.options.argv);
+            if (opts.options.setValue === undefined || opts.options.set === "") {
+                throw new Error("`aemm config --set` must be passed a key and a value. See `aemm help config` for more info.");
+            }
+            return setValueInConfig(setKey, opts.options.setValue);
         }
-        if (opts.options.unset)
+        if (opts.options.unset || opts.options.unset === "")
         {
+            if (opts.options.unset === "") {
+                throw new Error("`aemm config --unset` must be passed a key. See `aemm help config` for more info.");
+            }
             return removeKeyFromConfig(unsetKey);
         }
         else
@@ -130,7 +144,7 @@ function getConfigFile()
             } catch (err) {
                 // It's not a problem if the file is non-existent, just give them an empty object to get started.
                 if (err.code == 'MODULE_NOT_FOUND') {
-                    return {};
+                    return Q({});
                 }
                 throw err;
             }
