@@ -123,13 +123,11 @@ You must run the following commands inside the directory created with `aemm proj
 
 	aemm run android
 
-	aemm run android --device
-
 	aemm run ios --list
 	
 	aemm run ios --target "iPhone-6s, 9.2"
 	
-Note: The `run` command without the `--device` parameter will run the application in the emulator/simulator.
+Note: For this workflow, the `--device` parameter is currently only available on iOS. The `run` command without the `--device` parameter will run the application in the emulator/simulator.
 
 
 ###### 2. Developing custom application with custom plugins.
