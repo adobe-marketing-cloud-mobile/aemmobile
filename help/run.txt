@@ -6,7 +6,7 @@ Description:
 
 Options:
 
-  --list		       list available targets
+  --list               list available targets
   --target <name>      install to a specific target
 
 Examples:

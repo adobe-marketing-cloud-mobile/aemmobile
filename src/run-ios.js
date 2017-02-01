@@ -35,8 +35,12 @@ function run(opts)
 {
 	var projectRootPath = null;
 	var target = opts.target;
-	var deviceName = opts.device ? "device" : "emulator";
+	var deviceName = opts.options.device ? "device" : "emulator";
 	var filteredList;
+
+	if (deviceName === "device") {
+		return Q.reject(new Error("The run command is only supported for simulator. Please see 'aemm help run'."));
+	}
 	if (opts.list)
 	{
 		return listSimulators();
