@@ -20,6 +20,13 @@
 -->
 # aemm Release Notes
 
+## 2.1.1 (Jan 31, 2017)
+
+### Bug Fixes
+* [Issue 58](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/58) Fix running Android app on device.
+* [Issue 53](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/53) Better handling of an attempt to disable code signing.
+* [Issue 49](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/49) Fix up config command.
+
 ## 2.1.0 (Oct 17, 2016)
 
 ### Features
