@@ -20,6 +20,13 @@
 -->
 # aemm Release Notes
 
+## 2.1.2 (Feb 17, 2017)
+
+### Bug Fixes
+* [Issue 63](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/63) Fix `run ios --list`.
+* [Issue 62](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/62) Fix `run ios --target`.
+* [Issue 61](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/61) Fix `run ios --device`.
+
 ## 2.1.1 (Jan 31, 2017)
 
 ### Bug Fixes
