@@ -33,6 +33,8 @@ var spinner = require('simple-spinner');
 var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 var cordova = cordova_lib.cordova;
+
+const emulatorInstallScriptPath = "platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/silent_install";
 const skinName = "Nexus-7";
 
 module.exports.install = install;
@@ -129,8 +131,8 @@ function updateSdk() {
     }
 
     var proc = spawn(command, [script, '--silent', 'update', 'sdk', '--all',
-        '--no-ui', '--filter', 'build-tools-23.0.2,platform-tool,tool,android-23,sys-img-x86_64-android-23,' +
-        'extra-android-m2repository,extra-android-support,extra-google-m2repository,' +
+        '--no-ui', '--filter', 'build-tools-26.0.2,platform-tools,tools,android-26,sys-img-x86_64-google_apis-26,' +
+        'extra-android-m2repository,extra-google-m2repository,' +
         'extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
 
     proc.on("error", function (error) {
@@ -162,11 +164,13 @@ function setupEnv() {
 function installHAXM() {
     var deferred = Q.defer();
     var command = null;
+    var command0 = null;
 
     if (process.platform == 'win32') {
-        command = path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/silent_install.bat');
+        command = path.join(getUserHome(), emulatorInstallScriptPath + '.bat');
     } else if (process.platform == 'darwin') {
-        command = 'sudo ' + path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/silent_install.sh');
+        command0 = 'sudo chmod ugo+x ' + path.join(getUserHome(), emulatorInstallScriptPath + '.sh')
+        command = 'sudo ' + path.join(getUserHome(), emulatorInstallScriptPath + '.sh');
     } else {
         events.emit("log", "Unsupported OS: %s", process.platform);
         return;
@@ -175,6 +179,11 @@ function installHAXM() {
     spinner.start();
     var workingDir = path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager');
     shell.cd(workingDir);
+    if (command0) {
+        shell.exec(command0, { silent: false });
+        spinner.stop();
+        events.emit("log", "Completed: " + command0);
+    }
     shell.exec(command, {
         silent: false
     }, function (code, output) {
@@ -191,7 +200,7 @@ function installHAXM() {
 
 function createAvd() {
     var skinFrom = path.join(__dirname, '..', 'platforms/android/skins', skinName);
-    var skinTo = path.join(getUserHome(), 'platforms/android/sdk/platforms/android-23/skins', skinName);
+    var skinTo = path.join(getUserHome(), 'platforms/android/sdk/platforms/android-26/skins', skinName);
 
     return FS.makeTree(skinTo)
         .then( () => {
@@ -202,9 +211,9 @@ function createAvd() {
 
             var command =  null;
             if (process.platform == 'win32') {
-                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-23" --abi default/x86_64 --skin "Nexus-7" --sdcard 1024M';
+                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-26" --abi google_apis/x86_64 --skin "Nexus-7" --sdcard 1024M';
             } else if (process.platform == 'darwin') {
-                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-23" --abi default/x86_64 --skin "Nexus-7" --sdcard 1024M';
+                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-26" --abi google_apis/x86_64 --skin "Nexus-7" --sdcard 1024M';
             } else {
                 deferred.reject(new Error("Platform not supported: " + process.platform));
                 return;
