@@ -34,7 +34,7 @@ function setEnvVariables() {
 }
 
 function setAndroid_Home() {
-    var android_home = path.join(getUserHome(), 'platforms/android/sdk');
+    var android_home = path.join(getUserHome(), 'Library/Android/sdk');
 
     return isEnvVariableSet("ANDROID_HOME", android_home)
         .then( (code) => {
@@ -46,19 +46,21 @@ function setAndroid_Home() {
 }
 
 function setPaths() {
-    var tools_path = path.join(getUserHome(), 'platforms/android/sdk/tools');
+    var platform_tools = "/Library/Android/sdk/platform-tools";
+    var tools = "/platforms/android/sdk/tools";
+    var platform_tools_path = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:" + getUserHome() + platform_tools + ":" + getUserHome() + tools + ":" + getUserHome();
+    var tools_path = platform_tools_path + '/Library/Android/sdk/tools';
     return setPath(tools_path)
         .then ( () => {
-            var platformtools_path = path.join(getUserHome(), 'platforms/android/sdk/platform-tools');
+            var platformtools_path = platform_tools_path + platform_tools;
             return setPath(platformtools_path);
         });
 }
 
 function setPath(path) {
-    return isEnvVariableSet("Path", path)
+    return isEnvVariableSet("PATH", path)
         .then( (code) => {
-            var path_value = "${PATH}:" + path;
-            return setEnvVariable("Path", path_value);
+            return setEnvVariable("PATH", path);
         });
 }
 
@@ -78,7 +80,8 @@ function isEnvVariableSet(name, value) {
 function setEnvVariable(name, value) {
     var deferred = Q.defer();
 
-    var command = "echo " + '"export ' + name + '=' + value + '"' + " >> ~/.bash_profile";
+    var command = "echo " + '"export ' + name + '=' + value + '"' + " >> ~/.bash_profile" + " && " + "source" + " ~/.bash_profile";
+    console.log("Setup ANDROID_HOME and PATH" + command);
     shell.exec(command, {
         silent: false
     }, function (code, output) {
