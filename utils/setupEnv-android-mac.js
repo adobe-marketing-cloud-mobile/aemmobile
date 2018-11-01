@@ -81,7 +81,6 @@ function setEnvVariable(name, value) {
     var deferred = Q.defer();
 
     var command = "echo " + '"export ' + name + '=' + value + '"' + " >> ~/.bash_profile" + " && " + "source" + " ~/.bash_profile";
-    console.log("Setup ANDROID_HOME and PATH" + command);
     shell.exec(command, {
         silent: false
     }, function (code, output) {
@@ -92,6 +91,6 @@ function setEnvVariable(name, value) {
             deferred.resolve();
         }
     });
-    
+
     return deferred.promise;
 }
