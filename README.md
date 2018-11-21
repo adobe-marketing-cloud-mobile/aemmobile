@@ -75,6 +75,9 @@ There are 2 types of workflow this tool is designed for:
 * Developing custom HTML content.
 * Developing custom application with custom plugins.
 
+##### SUDO NOTE
+> Command samples below are not always proceeded with **sudo**.  Some commands on MAC will fail without it.  For instance, permissions may not be available to set temporary and necessary environment variables.  If you encounter errors, try using **sudo** before the command.
+
 Commands for both workflows:
 
 `aemm platform install <platform>`
