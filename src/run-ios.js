@@ -137,7 +137,7 @@ var startSimulator = function(target, deviceName, ipAddress, port, projectRootPa
 				{
 					fs.unlinkSync(logPath);
 				}
-				return iossim.launch(jupiterPath, target, logPath, false, args);						
+				return iossim.launch(jupiterPath, target, logPath, false, [], args);						
 			});
 		});
 	});
