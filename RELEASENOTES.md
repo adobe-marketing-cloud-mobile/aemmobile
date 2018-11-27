@@ -20,6 +20,11 @@
 -->
 # aemm Release Notes
 
+## 2.1.3 (Nov 27, 2018)
+
+### Bug Fixes
+* [Issue 71](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/71) Fix `IOS Sim Fails to load Sample Article `
+
 ## 2.1.2 (Feb 17, 2017)
 
 ### Bug Fixes
