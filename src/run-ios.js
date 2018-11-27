@@ -153,8 +153,6 @@ var getArgs = function(ipAddress, port)
 		return args;
 	});
 	
-// return ["-phonegapServer", ipAddress + ":" + port];
-
 };
 
 function modifyBinaryPlist(appPath)

@@ -224,31 +224,3 @@ function installApkOnEmulator(deviceSerialNum)
             return defer.promise;
         });
 }
-
-var getArgs = function(ipAddress, port)
-{
-    return project.projectRootPath()
-	.then( (projectRootPath) => {
-        var args;
-        // Get list of articles to serve
-        var wwwFolder = path.join(projectRootPath, "www");
-        return FS.list(wwwFolder)
-        .then( function (fileArray) {
-            var i = 0;
-            var fileArray2 = [];
-            for (i = 0; i < fileArray.length; i++)
-            {
-                if (!fileArray[i].startsWith("."))
-                {
-                    fileArray2.push(fileArray[i]);
-                }
-            }
-            // fileArray.reduce( function (item) {
-            // 	return null;
-            // });
-            var articles = fileArray2.join(" ");
-            args = ["-phonegapServer", ipAddress + ":" + port, "-serveArticles", articles];
-            return Q(args);
-        });
-    });
-};
