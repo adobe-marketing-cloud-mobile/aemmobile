@@ -81,7 +81,6 @@ function setEnvVariable(name, value) {
     var deferred = Q.defer();
 
     var command = "echo " + '"export ' + name + '=' + value + '"' + " >> ~/.bash_profile";
-    console.log("Testing >>" + command);
     shell.exec(command, {
         silent: false
     }, function (code, output) {
