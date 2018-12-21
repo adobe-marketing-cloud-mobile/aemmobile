@@ -202,7 +202,7 @@ function createAvd() {
 
             var command =  null;
             if (process.platform == 'win32') {
-                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-27" --abi google_apis/x86_64 --skin "Nexus-7" --sdcard 1024M';
+                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-27" --abi google_apis/x86 --skin "Nexus-7" --sdcard 1024M';
             } else if (process.platform == 'darwin') {
                 command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-27" --abi google_apis/x86 --skin "Nexus-7" --sdcard 1024M';
             } else {
