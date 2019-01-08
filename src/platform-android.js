@@ -1,5 +1,5 @@
 /**
-    Copyright (c) 2018 Adobe Systems Incorporated. All rights reserved.
+    Copyright (c) 2019 Adobe Systems Incorporated. All rights reserved.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -88,27 +88,7 @@ function downloadSdk() {
             // do download, just update
             deferred.resolve()
         } else {
-            spinner.start();
-            // download an older Android SDK with 'tools' - need the 'templates', 'ant' etc...
-            // FS.makeTree(sdkInstallPath)
-            // .then( () => {
-            //     return downloadFile(sdkDownloadUrl, tmpSdkZip);
-            // })
-            // .then( () => {
-            //     return unzip(tmpSdkZip, tmpSdkUnzipFolder);
-            // })
-            // .then( () => {
-                
-            //     return FS.copyTree(sdkContents, sdkInstallPath);
-            // })
-            // .then ( () => {
-            //     return FS.removeTree(tmpSdkUnzipFolder)
-            //         .catch( (err) => false );
-            // })
-            // // downloading the Tools for Android Studio to have support for avdmanager;
-            // will be created at /platforms/android/sdk/ 
-            //.then( () => {
-                //return  
+            spinner.start(); 
             FS.makeTree(androidToolsPath)
              //})
             .then( () => {
@@ -139,7 +119,6 @@ function downloadSdk() {
 function updateSdk() {
     var deferred = Q.defer();
     // ./android is deprecated after 25.2.3 and higher, so will use ./sdkmanager instead;
-    // TO_DO:
     // This replaces the gradle folder that was being added with older version, and since it
     // was used on 'platform install', we need to make it available from other source    
     if (process.platform == 'win32') {
