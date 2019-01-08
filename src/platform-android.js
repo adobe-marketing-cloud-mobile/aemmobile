@@ -1,5 +1,5 @@
 /**
-    Copyright (c) 2016 Adobe Systems Incorporated. All rights reserved.
+    Copyright (c) 2018 Adobe Systems Incorporated. All rights reserved.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  * Module dependencies.
  */
 var Q = require('q');
-var path = require("path");
-var fs = require("fs");
+var path = require('path');
+var fs = require('fs');
 var FS = require('q-io/fs');
 var shell = require('shelljs');
 var os = require('os');
@@ -33,13 +33,18 @@ var spinner = require('simple-spinner');
 var cordova_lib = require('../lib/cordova').lib;
 var events = cordova_lib.events;
 var cordova = cordova_lib.cordova;
-const skinName = "Nexus-7";
+
+const skinName = 'Nexus-7';
+
+var sdkInstallPath = path.join(getUserHome(), 'platforms','android','sdk');
+var androidToolsPath = path.join(sdkInstallPath, 'tools');
+var pathToBin = path.join(androidToolsPath,'bin');
 
 module.exports.install = install;
 module.exports.post_add = post_add;
 
 function install() {
-    return installSdk()
+    return downloadSdk()
         .then( () => {
             return updateSdk();
         })
@@ -54,97 +59,132 @@ function install() {
         });
 }
 
-function installSdk() {
+function downloadSdk() {
     var deferred = Q.defer();
     var sdkDownloadUrl = null;
-    var sdkInstallPath = path.join(getUserHome(), 'platforms/android/sdk');
-    var tempSdkDownloadFilePath = path.join(os.tmpdir(), 'android_sdk.zip');
-    var tempSdkUnzipRoot = path.join(os.tmpdir(), 'platform');
-    var tempSdkUnzipPath = null;
+    var toolsDownloadUrl = null;
+    var tmpSdkZip = path.join(os.tmpdir(), 'android_sdk.zip');
+    var tmpSdkUnzipFolder = path.join(os.tmpdir(), 'android_sdk');
+    var tmpToolsZip = path.join(os.tmpdir(), 'studio_tools.zip');
+    var tmpToolsUnzipFolder = path.join(os.tmpdir(), 'studio_tools');
+    //var sdkInstallPath = path.join(getUserHome(), 'platforms','android','sdk');
+    //var toolsInstallPath = path.join(getUserHome(), 'platforms/android/sdk/tools');
 
-    // It's ok to hard code specific SDK download link since we will attempt to update
-    // to the latest SDK each time user runs "aemm platform install android".
-    //
-    // We just need to install an initial version to begin with. Android community keeps
-    // download links for all prior version of SDKs since it's introduction at:
-    // http://developer.android.com/tools/sdk/tools-notes.html
     if (process.platform == 'win32') {
-        sdkDownloadUrl = 'http://dl.google.com/android/android-sdk_r24.4.1-windows.zip';
-        tempSdkUnzipPath = path.join(tempSdkUnzipRoot, 'android-sdk-windows');
+        //sdkDownloadUrl = 'http://dl.google.com/android/android-sdk_r24.4.1-windows.zip';
+        toolsDownloadUrl = 'http://dl.google.com/android/repository/sdk-tools-windows-4333796.zip';
+        var sdkContents = path.join(tmpSdkUnzipFolder, 'android-sdk-windows');
     } else if (process.platform == 'darwin') {
-        sdkDownloadUrl = 'http://dl.google.com/android/android-sdk_r24.4.1-macosx.zip';
-        tempSdkUnzipPath = path.join(tempSdkUnzipRoot, 'android-sdk-macosx');
+        //sdkDownloadUrl = 'http://dl.google.com/android/android-sdk_r24.4.1-macosx.zip';
+        toolsDownloadUrl = 'http://dl.google.com/android/repository/sdk-tools-darwin-4333796.zip';
+        var sdkContents = path.join(tmpSdkUnzipFolder, 'android-sdk-macosx');
     } else {
-        events.emit("log", "Unsupported OS: %s", process.platform);
+        events.emit('log', 'Unsupported OS: %s', process.platform);
         return;
     }
 
-    // Check whether SDK is installed already
-    fs.access(sdkInstallPath, fs.F_OK, function(err) {
+    fs.access(androidToolsPath, fs.F_OK, function(err) {
         if (!err) {
-            deferred.resolve();
+            // do download, just update
+            deferred.resolve()
         } else {
             spinner.start();
-
-            FS.makeTree(sdkInstallPath)
+            // download an older Android SDK with 'tools' - need the 'templates', 'ant' etc...
+            // FS.makeTree(sdkInstallPath)
+            // .then( () => {
+            //     return downloadFile(sdkDownloadUrl, tmpSdkZip);
+            // })
+            // .then( () => {
+            //     return unzip(tmpSdkZip, tmpSdkUnzipFolder);
+            // })
+            // .then( () => {
+                
+            //     return FS.copyTree(sdkContents, sdkInstallPath);
+            // })
+            // .then ( () => {
+            //     return FS.removeTree(tmpSdkUnzipFolder)
+            //         .catch( (err) => false );
+            // })
+            // // downloading the Tools for Android Studio to have support for avdmanager;
+            // will be created at /platforms/android/sdk/ 
+            //.then( () => {
+                //return  
+            FS.makeTree(androidToolsPath)
+             //})
             .then( () => {
-                return downloadFile(sdkDownloadUrl, tempSdkDownloadFilePath);
+                return downloadFile(toolsDownloadUrl, tmpToolsZip)
             })
             .then( () => {
-                return unzip(tempSdkDownloadFilePath, tempSdkUnzipRoot);
+                return unzip(tmpToolsZip, tmpToolsUnzipFolder);
             })
             .then( () => {
-                return FS.copyTree(tempSdkUnzipPath, sdkInstallPath);
+                // copy contents of the folder, not the folder itself
+                var tt = path.join(tmpToolsUnzipFolder, 'tools');
+                return FS.copyTree(tt, androidToolsPath);
             })
             .then ( () => {
-                return FS.removeTree(tempSdkUnzipRoot)
-                    .catch( (err) => false ); // We don't care if it does not exist when we try to delete it
+                return FS.removeTree(tmpToolsUnzipFolder)
+                .catch( (err) => false );
             })
             .then( () => {
                 spinner.stop();
-
-                events.emit("log", "Android SDK is installed successfully.");
+                events.emit('log', '******** Android Studio Tools added successfully ********\n');
                 deferred.resolve();
             });
         }
     });
-
     return deferred.promise;
 }
 
 function updateSdk() {
     var deferred = Q.defer();
-    var command = null;
-    var script = null;
-
+    // ./android is deprecated after 25.2.3 and higher, so will use ./sdkmanager instead;
+    // TO_DO:
+    // This replaces the gradle folder that was being added with older version, and since it
+    // was used on 'platform install', we need to make it available from other source    
     if (process.platform == 'win32') {
-        command = "powershell";
-        script = path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat');
+        var script= path.join(pathToBin, 'sdkmanager.bat');
+        var proc = spawn('powershell', [script, '--install', 
+                            'sources;android-27',
+                            'platform-tools',
+                            'patcher;v4',
+                            'build-tools;27.0.1',
+                            'emulator',
+                            'system-images;android-27;default;x86',
+                            'platforms;android-27',
+                            'extras;android;m2repository',
+                            'extras;google;m2repository',
+                            'extras;intel;Hardware_Accelerated_Execution_Manager',
+                            'extras;google;google_play_services'], { stdio: 'inherit' });
     } else if (process.platform == 'darwin') {
-        command = "sh";
-        script = path.join(getUserHome(), 'platforms/android/sdk/tools/android');
+        var script = path.join(pathToBin, 'sdkmanager');
+        var proc = spawn('sh', [script, '--install', 
+                            'sources;android-27',
+                            'platform-tools',
+                            'patcher;v4',
+                            'build-tools;27.0.1',
+                            'emulator',
+                            'system-images;android-27;default;x86',
+                            'platforms;android-27',
+                            'extras;android;m2repository',
+                            'extras;google;m2repository',
+                            'extras;intel;Hardware_Accelerated_Execution_Manager',
+                            'extras;google;google_play_services'], { stdio: 'inherit' });
     } else {
-        events.emit("log", "Platform not supported: " + process.platform);
+        events.emit('log', 'Platform not supported: ' + process.platform);
         return;
     }
-
-    var proc = spawn(command, [script, '--silent', 'update', 'sdk', '--all',
-        '--no-ui', '--filter', 'build-tools-27.0.1,platform-tools,tools,android-27,sys-img-x86-google_apis-27,' +
-        'extra-android-m2repository,extra-android-support,extra-google-m2repository,' +
-        'extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
-
-    proc.on("error", function (error) {
-        deferred.reject(new Error("Installing Android platform encountered error " + error.message));
+    proc.on('error', function (error) {
+        deferred.reject(new Error('Installing Android platform encountered error ' + error.message));
     });
-    proc.on("exit", function(code) {
+    proc.on('exit', function(code) {
         if (code !== 0) {
-            deferred.reject(new Error("Installing Android platform exited with code " + code));
+            deferred.reject(new Error('Installing Android platform exited with code ' + code));
         } else {
-            events.emit("log", "Android SDK is updated successfully.");
+            events.emit('log', '******** Android SDK added successfully. ********\n');
             deferred.resolve();
         }
     });
-
     return deferred.promise;
 }
 
@@ -154,7 +194,7 @@ function setupEnv() {
     } else if (process.platform == 'darwin') {
         return setupEnv_mac();
     } else {
-        events.emit("log", "Unsupported OS: %s", process.platform);
+        events.emit('log', 'Unsupported OS: %s', process.platform);
         return;
     }
 }
@@ -162,51 +202,58 @@ function setupEnv() {
 function installHAXM() {
     var deferred = Q.defer();
     var command = null;
+    var haxm_path = path.join(sdkInstallPath,'extras',
+        'intel','Hardware_Accelerated_Execution_Manager');
 
     if (process.platform == 'win32') {
-        command = path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/silent_install.bat');
+        command = path.join(haxm_path,'silent_install.bat');
     } else if (process.platform == 'darwin') {
-        command = 'sudo ' + path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager/silent_install.sh');
+        command = 'sudo ' + path.join(haxm_path, 'silent_install.sh');
+            
     } else {
-        events.emit("log", "Unsupported OS: %s", process.platform);
+        events.emit('log', 'Unsupported OS: %s', process.platform);
         return;
     }
-
     spinner.start();
-    var workingDir = path.join(getUserHome(), 'platforms/android/sdk/extras/intel/Hardware_Accelerated_Execution_Manager');
-    shell.cd(workingDir);
+    shell.cd(haxm_path);
     shell.exec(command, {
         silent: false
     }, function (code, output) {
         spinner.stop();
         if (code === 0) {
+            events.emit('log', '******** HAXM successfully. ********\n');
             deferred.resolve();
         } else {
-            deferred.reject(new Error("Installing Intel HAXM failed."));
+            deferred.reject(new Error('Installing Intel HAXM failed.'));
         }
     });
-
     return deferred.promise;
 }
 
 function createAvd() {
-    var skinFrom = path.join(__dirname, '..', 'platforms/android/skins', skinName);
-    var skinTo = path.join(getUserHome(), 'platforms/android/sdk/platforms/android-27/skins', skinName);
-
+    var skinFrom = path.join(__dirname, '..', 'platforms','android', 'skins', skinName);
+    var skinTo = path.join(sdkInstallPath, 'platforms', 'android-27','skins', skinName);
     return FS.makeTree(skinTo)
         .then( () => {
             return FS.copyTree(skinFrom, skinTo);
         })
         .then( () => {
             var deferred = Q.defer();
-
             var command =  null;
+            // ./android is deprecated, so will use ./avdmanager from Adnroid Studio Tools instead
             if (process.platform == 'win32') {
-                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android.bat') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-27" --abi google_apis/x86 --skin "Nexus-7" --sdcard 1024M';
+                command = path.join(androidToolsPath,'bin','avdmanager.bat') +
+                          ' -s create avd -f -n AEMM_Tablet -b default/x86 ' +
+                          '-k "system-images;android-27;default;x86" -c 1024M -d "Nexus 7"';
             } else if (process.platform == 'darwin') {
-                command = 'echo "no" | ' + path.join(getUserHome(), 'platforms/android/sdk/tools/android') + ' create avd --force -n AEMM_Tablet --device "Nexus 7" -t "android-27" --abi google_apis/x86 --skin "Nexus-7" --sdcard 1024M';
+                // seems that the exec files become TextEdit format after unzip
+                command = 'chmod -R 755 ' + androidToolsPath + ' && ' + 
+                          path.join(androidToolsPath,'bin','avdmanager') +
+                          ' -s create avd -f -n AEMM_Tablet -b default/x86 ' +
+                          '-k "system-images;android-27;default;x86" -c 1024M -d "Nexus 7"' + ' && ' +
+                          'chmod -R 755 ' + sdkInstallPath;
             } else {
-                deferred.reject(new Error("Platform not supported: " + process.platform));
+                deferred.reject(new Error('Platform not supported: ' + process.platform));
                 return;
             }
 
@@ -214,13 +261,12 @@ function createAvd() {
                 silent: false
             }, function (code, output) {
                 if (code === 0) {
-                    events.emit("log", "AVD is created successfully.");
+                    events.emit('log', '\n******** AVD is created successfully ********\n');
                     deferred.resolve();
                 } else {
-                    deferred.reject(new Error("Creating AVD failed"));
+                    deferred.reject(new Error('Creating AVD failed'));
                 }
             });
-
             return deferred.promise;
         });
 }
@@ -229,10 +275,10 @@ function post_add()
 {
     return Q.fcall( () => {
         // add aemm-plugin-navto by default to be consistent with our viewer app behavior.
-        var targets = ["aemm-plugin-navto"];
-        return cordova.raw.plugin("add", targets);
+        var targets = ['aemm-plugin-navto'];
+        return cordova.raw.plugin('add', targets);
     })
     .then(() => {
-        events.emit("results", "Finished adding Android platform.");
+        events.emit('results', 'Finished adding Android platform.');
     });
 }

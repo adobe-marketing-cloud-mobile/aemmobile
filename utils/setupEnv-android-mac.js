@@ -26,10 +26,14 @@ module.exports = function() {
 }
 
 function setEnvVariables() {
-    return setAndroid_Home()
-        .then( () => {
-            return setEnvVariable('PATH', entire_path)
-        });
+    if (process.env['ANDROID_HOME'] != android_home){
+        return setAndroid_Home()
+            .then( () => {
+                if (process.env['PATH'].includes('platform-tools') && process.env['PATH'].includes('tools')){
+                    return 
+                } else { return setEnvVariable('PATH', entire_path) }
+            });
+    } else {return}
 }
 
 function setAndroid_Home() {
