@@ -1,5 +1,5 @@
 /**
-    Copyright (c) 2016 Adobe Systems Incorporated. All rights reserved.
+    Copyright (c) 2018 Adobe Systems Incorporated. All rights reserved.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ module.exports = {
 
             // launch emulator in the orientation specified in the config
             var avdName = name + '.avd';
-            var avdConfigIni = path.join(userHome, ".android/avd/", avdName, 'config.ini');
+            var avdConfigIni = path.join(userHome, ".android", "avd", avdName, 'config.ini');
             var avdConfig = ini.parse(fs.readFileSync(avdConfigIni, 'utf-8'));
 
             avdConfig['hw.initialOrientation'] = orientation;
@@ -49,14 +49,13 @@ module.exports = {
                     spinner.stop();
                     return;
                 }
-
                 var checkCmd = null;
                 var serialNum = 'emulator-' + port;
                 if (process.platform == 'win32') {
-                    checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + serialNum + 
+                    checkCmd = path.join(userHome,'platforms', 'android', 'sdk', 'platform-tools', 'adb') + ' -s ' + serialNum + 
                         ' shell pm path android | findstr package:/system/framework/framework-res.apk';
                 } else if (process.platform == 'darwin') {
-                    checkCmd = path.join(userHome, 'platforms/android/sdk/platform-tools/adb') + ' -s ' + serialNum + 
+                    checkCmd = path.join(userHome, 'platforms', 'android', 'sdk', 'platform-tools', 'adb') + ' -s ' + serialNum + 
                         ' shell pm path android | grep package:/system/framework/framework-res.apk';
                 } else {
                     spinner.stop();
@@ -79,7 +78,7 @@ module.exports = {
                 });
             }
             
-            var cmd = userHome + '/platforms/android/sdk/tools/emulator -wipe-data -avd ' + name + ' -port ' + port + ' -gpu on';
+            var cmd = path.join(userHome,'platforms','android','sdk','emulator','emulator') + ' -wipe-data -avd ' + name + ' -port ' + port + ' -gpu host';
 
             shell.exec(cmd, {
                 async: true

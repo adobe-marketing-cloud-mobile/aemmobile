@@ -4,3 +4,4 @@ developmentConfig.json
 npm-debug.log
 .vscode
 .idea
+.DS_Store
