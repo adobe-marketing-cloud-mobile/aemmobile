@@ -20,6 +20,12 @@
 -->
 # aemm Release Notes
 
+## 2.1.6 (Sep 2, 2019)
+
+### Bug Fixes
+* [Issue 78](https://github.com/adobe-marketing-cloud-mobile/aemmobile/issues/78) Fix `aemm run iOS throwing error `
+
+
 ## 2.1.5 (Nov 27, 2018)
 
 ### Bug Fixes
