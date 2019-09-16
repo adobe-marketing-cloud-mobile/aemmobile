@@ -4,7 +4,7 @@
 		"android": {
 			"releases_url": "https://api.github.com/repos/adobe-marketing-cloud-mobile/aemm-android/releases",
 			"repo_url": "https://github.com/adobe-marketing-cloud-mobile/aemm-android.git",
-			"version": "^7.1.4-2"
+			"version": "^8.0.0"
 		},
 		"ios": {
 			"releases_url": "https://api.github.com/repos/adobe-marketing-cloud-mobile/aemm-ios/releases", 

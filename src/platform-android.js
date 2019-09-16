@@ -129,7 +129,7 @@ function updateSdk() {
     }
 
     var proc = spawn(command, [script, '--silent', 'update', 'sdk', '--all',
-        '--no-ui', '--filter', 'build-tools-27.0.1,platform-tools,tools,android-27,sys-img-x86-google_apis-27,' +
+        '--no-ui', '--filter', 'build-tools-28.0.3,platform-tools,tools,android-28,sys-img-x86-google_apis-28,' +
         'extra-android-m2repository,extra-android-support,extra-google-m2repository,' +
         'extra-intel-Hardware_Accelerated_Execution_Manager'], { stdio: 'inherit' });
 
@@ -191,7 +191,7 @@ function installHAXM() {
 
 function createAvd() {
     var skinFrom = path.join(__dirname, '..', 'platforms/android/skins', skinName);
-    var skinTo = path.join(getUserHome(), 'platforms/android/sdk/platforms/android-27/skins', skinName);
+    var skinTo = path.join(getUserHome(), 'platforms/android/sdk/platforms/android-28/skins', skinName);
 
     return FS.makeTree(skinTo)
         .then( () => {
