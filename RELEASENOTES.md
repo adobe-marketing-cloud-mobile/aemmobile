@@ -20,6 +20,13 @@
 -->
 # aemm Release Notes
 
+## 2.1.7 (Sep 16, 2019)
+
+### Bug Fixes
+* Updated aemm-android to 8.0.0
+* Updated android target API to 28.
+
+
 ## 2.1.6 (Sep 2, 2019)
 
 ### Bug Fixes
